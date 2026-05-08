@@ -1,0 +1,326 @@
+[
+    {
+        "id": "1",
+        "nome": "Vestido Longo Rosê",
+        "preco": "189.90",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/695820d79b581-Captura_de_tela_2025-12-29_101351_F382HwSga.webp",
+        "desconto": 10,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 10,
+            "sem-juros-ate": 3
+        }
+    },
+    {
+        "id": "2",
+        "nome": "Bolsa Satchel New Classic",
+        "preco": "89.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/6958226a7526e-Captura_de_tela_2025-12-29_102723_31VvGLhxd.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 5,
+            "sem-juros-ate": 2
+        }
+    },
+    {
+        "id": "3",
+        "nome": "Blusa Crepe Elegance",
+        "preco": "90.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/6958235477ece-Captura_de_tela_2025-12-29_103144_3FjrtP-Xf.webp",
+        "desconto": 10,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 3,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "4",
+        "nome": "Vestido Midi Tropical",
+        "preco": "120.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/695823d0e92ec-Captura_de_tela_2025-12-29_102959_I5cmn1z5l.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 5,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "5",
+        "nome": "Bolsa Baguete Textured",
+        "preco": "140.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/695826b5e9d70-Captura_de_tela_2025-12-29_102808_jkYBERoQx.webp",
+        "desconto": 2,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "6",
+        "nome": "Vestido Lady Like",
+        "preco": "120.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/6958277d659a3-Captura_de_tela_2025-12-29_102546_SflhH3IStA.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "7",
+        "nome": "Saia Jeans Midi",
+        "preco": "80.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/6958291fa536a-Captura_de_tela_2025-12-29_102604_Yl4iqam09.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "8",
+        "nome": "Cinto Fino Minimalista",
+        "preco": "55.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69582a8504de9-Captura_de_tela_2025-12-29_102641_uWBOBuH5c.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "9",
+        "nome": "Vestido Midi em Tricô",
+        "preco": "170.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69582b161a936-Captura_de_tela_2025-12-29_101127_ixcUD_keT.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "10",
+        "nome": "Macacão Jeans Pantalona Soft",
+        "preco": "230.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69582cbe43ea9-Captura_de_tela_2025-12-29_102055_HbisOdYUd.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "11",
+        "nome": "Calça Pantalona sarja",
+        "preco": "180.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69582d2b76538-Captura_de_tela_2025-12-29_101928_P7wANMPQ6.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "12",
+        "nome": "Saia Jeans Lápis com abotoamento",
+        "preco": "230.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69582dca7bc81-Captura_de_tela_2025-12-29_103220_iUGzJoYiF.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 5,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "13",
+        "nome": "Vestido Curto em Linho",
+        "preco": "240.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69582e654f063-Captura_de_tela_2025-12-29_103157_n4D7TusbHT.webp",
+        "desconto": 20,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "14",
+        "nome": "Saia Midi em Sarja Soft",
+        "preco": "250.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69582f0320c84-Captura_de_tela_2025-12-29_102208_v5pIXyWkM.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 5,
+            "sem-juros-ate": 2
+        }
+    },
+    {
+        "id": "15",
+        "nome": "Vestido Midi Floral em Linho",
+        "preco": "210.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/6958305685230-Captura_de_tela_2025-12-29_100707_zMsl4p15b.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "16",
+        "nome": "Bolsa Satchel Estruturada",
+        "preco": "190.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/6958323b07ebb-Captura_de_tela_2025-12-29_103056_kAUVnMZRkW.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "17",
+        "nome": "Vestido Girassol de Noite",
+        "preco": "180.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/695836d1b738c-Captura_de_tela_2025-12-29_102949_NPPue1SFX.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "18",
+        "nome": "Vestido Midi Linho Nature",
+        "preco": "260.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/695837b37541a-Captura_de_tela_2025-12-29_101820_zC7N3OrLY.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "19",
+        "nome": "Vestido Midi Turquesa Serene",
+        "preco": "340.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/695838d901936-Captura_de_tela_2025-12-29_100726_lsjS_DToy.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "20",
+        "nome": "Conjunto Midi Passion",
+        "preco": "150.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69583acfb73f3-Captura_de_tela_2025-12-29_101456_O84x6ITw-.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "21",
+        "nome": "Vestido Longo Royal Garden",
+        "preco": "190.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69583c1e31dfb-Captura_de_tela_2025-12-29_102914_5qnX0Gtnj.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "22",
+        "nome": "Vestido Longo Mint Garden",
+        "preco": "210.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69583cce780b6-Captura_de_tela_2025-12-29_101258_YSU1vXR9f.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "23",
+        "nome": "Vestido Midi Lady Like",
+        "preco": "270.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69583da96282d-Captura_de_tela_2025-12-29_101158_neV5o3erf.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 5,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "24",
+        "nome": "Vestido Longo Terra Doce",
+        "preco": "245.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69583e3f481ad-Captura_de_tela_2025-12-29_103037_REeALhEpg.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 6,
+            "sem-juros-ate": 2
+        }
+    },
+    {
+        "id": "25",
+        "nome": "Vestido Midi Canelado Soleil",
+        "preco": "290.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69583f1bac4b3-Captura_de_tela_2025-12-29_100807_DNhhicbC0l.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 7,
+            "sem-juros-ate": 4
+        }
+    },
+    {
+        "id": "26",
+        "nome": "Vestido Midi Rosa Romantique",
+        "preco": "320.00",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/69583fd0203a0-Captura_de_tela_2025-12-21_092352_AjwBg7MVZ.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 1,
+            "sem-juros-ate": 0
+        }
+    },
+    {
+        "id": "27",
+        "nome": "Vestido Midi Azul Royal",
+        "preco": "450.90",
+        "imagem": "https://ik.imagekit.io/8wd5xavoy/produtos/695f9921e2237-Captura_de_tela_2025-12-29_101236_nc-fbye1E.webp",
+        "desconto": null,
+        "disponibilidade": true,
+        "parcelamento": {
+            "parcelado-em-ate": 8,
+            "sem-juuros-ate": 0
+        }
+    }
+]

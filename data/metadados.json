@@ -1,0 +1,28 @@
+[
+    {
+        "arquivo": "logotipo-zoom",
+        "zoom": 1.5
+    },
+    {
+        "elemento": "typewriter-text-home",
+        "frases": [
+            "Ei, vem dar uma olhadinha... 👀",
+            "🫢 Esses looks estão um ARRASO, vem ver!",
+            "Temos o look perfeito para você! ✨"
+        ]
+    },
+    {
+        "elemento": "categorias",
+        "categorias": [
+            "BLAZER",
+            "BLUSA",
+            "BODY",
+            "BOLSA",
+            "CALÇADO",
+            "CINTO",
+            "SHORTS",
+            "SAIA",
+            "VESTIDO"
+        ]
+    }
+]

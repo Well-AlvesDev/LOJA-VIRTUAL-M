@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JUVELE - Moda Feminina</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
-    <link rel="stylesheet" href="./recursos/css/Barra-de-pesquisa.css">
-    <link rel="stylesheet" href="./recursos/css/estilos-para-card-de-produtos.css">
+    <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
+    <link rel="stylesheet" href="../recursos/css/estilos-para-card-de-produtos.css">
     <style>
         * {
             margin: 0;
@@ -282,122 +282,6 @@
         @media (min-width: 769px) and (max-width: 900px) {
             .nav-item-seguranca {
                 display: none;
-            }
-        }
-
-        /* Cursor piscante para animação typewriter */
-        .cursor-blink {
-            display: inline-block;
-            width: 2px;
-            height: 1em;
-            margin-left: 4px;
-            background-color: #f15797;
-            vertical-align: middle;
-            animation: blink-cursor 0.7s infinite;
-        }
-
-        @keyframes blink-cursor {
-
-            0%,
-            49% {
-                opacity: 1;
-
-
-            }
-
-            50%,
-            100% {
-                opacity: 0;
-
-            }
-        }
-
-        /* Animação de digitação suave */
-        #text-animator h2 {
-            letter-spacing: 0.05em;
-            min-height: 1.5em;
-        }
-
-        /* Hashtags rotativas 🔁 */
-        .hashtags-container {
-            display: inline-block;
-            position: relative;
-            width: 260px;
-            height: 24px;
-            /* ajuste conforme o tamanho da fonte */
-            overflow: hidden;
-        }
-
-        .hashtag {
-            position: absolute;
-            left: 0;
-            right: 0;
-            transform: translateY(100%);
-            opacity: 0;
-            transition: transform 0.6s cubic-bezier(.2, .8, .2, 1), opacity 0.9s ease;
-            font-size: 16px;
-            color: #468ae4;
-        }
-
-        .hashtag.active {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .hashtag.slide-up {
-            transform: translateY(-100%);
-            opacity: 0;
-        }
-
-        .hashtag.slide-in {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        /* Skeleton logo styles */
-        .logo-empresa-vue {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        .skeleton {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 50%, #eeeeee 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.2s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        .logo-empresa-vue img {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.2s ease;
-        }
-
-        @keyframes blink {
-
-            0%,
-            49% {
-                opacity: 1;
-            }
-
-            50%,
-            100% {
-                opacity: 0;
             }
         }
 
@@ -739,10 +623,10 @@
 </head>
 
 <body>
-    <!-- SIM, EU SEI... PARECE ESTRANHO COLOCAR O VJUES
+    <!--SIM, EU SEI... PARECE ESTRANHO COLOCAR O VJUES
     PARA CARREGAR AQUI. PORÉM ESSA FOI UMA BOA PRÁTICA
     PARA EVITAR ATRASOS NO CARREGAMENTO DO FRAMEWORK 
-    MAIS IMPORTANTE DO SITE. E EVITA QUE APAREÇA "{{TEXTO ANIMADO}}" -->
+    MAIS IMPORTANTE DO SITE. E EVITA QUE APAREÇA "{{TEXTO ANIMADO}} "-->
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <!-- Overlay -->
@@ -754,16 +638,16 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="./recursos/identidade/logotipo.png" alt="logotipo da empresa/loja" style="width: 100px;">
+                    <img src="../recursos/identidade/logotipo.png" alt="logotipo da empresa/loja" style="width: 100px;">
                 </a>
 
                 <!-- Menu Principal -->
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a href="#" class="nav-link">Início <i class="ri-home-smile-line"></i></a>
+                        <a href="../index.html" class="nav-link">Início <i class="ri-home-smile-line"></i></a>
                     </li>
 
-                    <!--Menu com Submenu-->
+                    <!-- Menu com Submenu -->
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             Produtos <i class="ri-arrow-down-s-line dropdown-icon"></i>
@@ -830,39 +714,13 @@
                 </ul>
             </div>
         </div>
-        <!-- LOGO EMPRESA (Vue + Skeleton) -->
-        <div id="logo-app"
-            style="display: flex; justify-content: center; width: 100px; height: 100px; margin: 20px auto; border-radius: 30px; overflow: hidden;">
-            <div class="logo-empresa-vue">
-                <div v-if="!loaded" class="skeleton" aria-hidden="true"></div>
-                <img id="logo-img" :src="src" alt="" @load="onLoad"
-                    :style="{ transform: 'scale(' + zoom + ')' , visibility: loaded ? 'visible' : 'hidden' }">
-            </div>
+        <div class="title">
+            <h1 id="stop-point" style="font-weight: 400; color: #4478da; text-align: center;">Página de pesquisa</h1>
         </div>
-        <!-- Dominio/Nome DA EMPRESA-->
-        <div class="nome-da-empresa">
-            <h1 style="text-align: center; font-size: 35px; color: #3f3f3f; font-weight: bold;">Juvele.com.br
-                <!-- Icone de verificação--> <img src="./recursos/icones/verified.svg" alt="icone-de-empresa-vefiricada"
-                    style="width: 23px; height: 23px; vertical-align: middle;">
-            </h1>
+        <div class="voltar-home" style="margin: 0 auto; text-align: center; margin-bottom: -15px; margin-top: 14px;">
+            <a href="../index.html" style="font-size: 13px;">Voltar para tela inicial</a>
         </div>
-        <!-- BIOGRAFIA DA EMPRESA -->
-        <div class="bio-da-empresa">
-            <p style=" text-align: center; font-size: 16px; color: #5a5a5a; margin: 10px auto; max-width: 400px;">
-                Seja MUITOO Bem vinda à nossa <strong><mark>Loja virtual</mark></strong>. Novidades toda semana! 🤍
-            </p>
-            <div class="hashtags-wrapper" style="margin: 10px auto; text-align: center;">
-                <div class="hashtags-container" aria-live="polite" aria-atomic="true">
-                    <span class="hashtag active"></span>
-                    <span class="hashtag"></span>
-                </div>
-            </div>
-        </div>
-        <!-- MÉTRICAS INSTAGRAM-->
-        <div class="metricas-instagram">
-
-        </div>
-        <div class="criptografia-desc" id="stop-point">
+        <div class="criptografia-desc">
             <p style="text-align: center; font-size: 12px; max-width: 300px; margin: 20px auto; color: #878787;">
                 <i class="ri-shield-check-line"
                     style="font-size: 16px; color: #228d14; margin-right: 2px; vertical-align: middle;"></i>
@@ -874,14 +732,11 @@
     <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
     <!-- SEÇÃO DE PRODUTOS -->
     <main>
-        <div id="text-animator"
-            style="text-align: center; min-height: 50px; display: flex; align-items: center; justify-content: center; padding: 0 20px;">
-            <h2
-                style="font-size: clamp(13px, 4vw, 14px); font-weight: 400; color: #3f3f3f; margin: 0; letter-spacing: 0.5px; max-width: 100%; word-wrap: break-word;">
-                {{ textoAnimado }}<span v-if="estaDigitando" class="cursor-blink"></span>
-            </h2>
+        <div class="exibindo-resultados-para">
+            <p style="text-align: center; font-size: 14px; color: #555;">
+                Exibindo resultados para "<strong id="termo-pesquisado"></strong>"
+            </p>
         </div>
-
         <section class="produtos-destaque">
             <div id="produtosContainer" class="produtos-container">
                 <!-- Cards serão gerados aqui pelo JavaScript -->
@@ -891,8 +746,6 @@
             </div>
         </section>
     </main>
-
-    <!-- Script -->
 
     <script>
         // ===== SISTEMA DE CACHE DE IMAGENS (10 DIAS) =====
@@ -1118,7 +971,7 @@
         function fetchMetadados() {
             if (metadadosCache) return Promise.resolve(metadadosCache);
             if (metadadosPromise) return metadadosPromise;
-            metadadosPromise = fetch('./data/metadados.json')
+            metadadosPromise = fetch('../data/metadados.json')
                 .then(response => {
                     if (!response.ok) throw new Error('Erro ao carregar metadados.json');
                     return response.json();
@@ -1132,32 +985,6 @@
                     throw err;
                 });
             return metadadosPromise;
-        }
-
-        // Função otimizada para carregar APENAS categorias (uma única vez)
-        let categoriasCache = null;
-        let categoriasPromise = null;
-        async function carregarCategorias() {
-            if (categoriasCache) return categoriasCache;
-            if (categoriasPromise) return categoriasPromise;
-
-            categoriasPromise = (async () => {
-                try {
-                    const metadados = await fetchMetadados();
-                    const categoriasObj = metadados.find(item => item.elemento === 'categorias');
-                    const categorias = (categoriasObj && categoriasObj.categorias) || [];
-                    categoriasCache = categorias;
-                    return categorias;
-                } catch (error) {
-                    console.error('Erro ao carregar categorias:', error);
-                    categoriasCache = [];
-                    return [];
-                } finally {
-                    categoriasPromise = null;
-                }
-            })();
-
-            return categoriasPromise;
         }
 
         createApp({
@@ -1174,7 +1001,6 @@
                 }
             },
             mounted() {
-                // Carregar configurações da logo do metadados.json
                 fetchMetadados()
                     .then(data => {
                         const logoConfig = data.find(item => item.arquivo === 'logotipo-zoom');
@@ -1182,53 +1008,78 @@
                             this.zoom = logoConfig.zoom;
                         }
                     })
-                    .catch(error => console.error('Erro ao carregar configuração da logo:', error));
+                    .catch(error => console.error('Erro ao carregar personalização:', error));
             }
         }).mount('#logo-app');
 
-        // ===== VUE APP PARA ANIMAÇÃO DE TEXTO COM TYPEWRITER =====
+        // Carregar quantidade de produtos do metadados.json
+        fetchMetadados()
+            .then(data => {
+                const produtosConfig = data.find(item => item.arquivo === 'produtos.json');
+                if (produtosConfig && produtosConfig['quantidade-produtos']) {
+                    document.getElementById('quantidade-produtos').textContent = produtosConfig['quantidade-produtos'];
+                }
+            })
+            .catch(error => console.error('Erro ao carregar quantidade de produtos:', error));
+
+        // ===== VUE APP PARA ANIMAÇÃO DE TEXTO COM TYPEWRITER ===== 
         const textAnimatorApp = Vue.createApp({
             data() {
                 return {
                     textoAnimado: '',
-                    frases: ['Bem vinda à Juvele!', 'Moda feminina de qualidade', 'Compra 100% segura'],
+                    frases: [],
                     indiceAtual: 0,
+                    digitando: true,
                     velocidadeDigitacao: 60,
-                    velocidadeApagamento: 30,
-                    pausaAposFrase: 4500,
-                    pausaAntesDeContinuar: 400,
-                    estaDigitando: true
+                    velocidadeApagacao: 30,
+                    pausaAntesdeApagar: 13000,
+                    pausaAntesDeTrocar: 500
                 };
             },
             methods: {
                 async animar() {
+                    // Aguardar até que as frases sejam carregadas
+                    while (this.frases.length === 0) {
+                        await this.delay(100);
+                    }
+
                     while (true) {
-                        const frase = this.frases[this.indiceAtual];
-                        this.estaDigitando = true;
+                        const fraseAtual = this.frases[this.indiceAtual];
 
-                        // Digitar com variação natural
-                        for (let i = 0; i <= frase.length; i++) {
-                            this.textoAnimado = frase.substring(0, i);
-                            // Variação aleatória de velocidade (humano)
-                            const variacaao = Math.random() * 40 - 20;
-                            await this.delay(this.velocidadeDigitacao + variacaao);
+                        // DIGITANDO
+                        this.digitando = true;
+                        for (let i = 0; i <= fraseAtual.length; i++) {
+                            this.textoAnimado = fraseAtual.substring(0, i);
+
+                            // Velocidade variável (mais rápido no início, mais lento no final)
+                            const progresso = i / fraseAtual.length;
+                            const velocidade = this.velocidadeDigitacao + (progresso * 20);
+
+                            await this.delay(velocidade);
                         }
 
-                        // Pausa com cursor piscando
-                        this.estaDigitando = false;
-                        await this.delay(this.pausaAposFrase);
+                        // PAUSA ANTES DE APAGAR
+                        await this.delay(this.pausaAntesdeApagar);
 
-                        // Apagar com velocidade diferente
-                        this.estaDigitando = true;
-                        for (let i = frase.length; i >= 0; i--) {
-                            this.textoAnimado = frase.substring(0, i);
-                            const variacaao = Math.random() * 20 - 10;
-                            await this.delay(this.velocidadeApagamento + variacaao);
+                        // APAGANDO
+                        this.digitando = false;
+                        for (let i = fraseAtual.length; i >= 0; i--) {
+                            this.textoAnimado = fraseAtual.substring(0, i);
+
+                            // Velocidade variável no apagamento (alternando - às vezes mais rápido, às vezes mais lento)
+                            const progresso = i / fraseAtual.length;
+                            const velocidadeBase = this.velocidadeApagacao;
+                            const variacao = Math.random() > 0.6 ? 15 : -10; // 60% chance de ser mais rápido
+                            const velocidade = Math.max(15, velocidadeBase + variacao);
+
+                            await this.delay(velocidade);
                         }
 
-                        // Próxima frase
+                        // PAUSA ANTES DE TROCAR DE FRASE
+                        await this.delay(this.pausaAntesDeTrocar);
+
+                        // PRÓXIMA FRASE
                         this.indiceAtual = (this.indiceAtual + 1) % this.frases.length;
-                        await this.delay(this.pausaAntesDeContinuar);
                     }
                 },
 
@@ -1241,14 +1092,20 @@
                 // Carregar frases do metadados.json
                 fetchMetadados()
                     .then(data => {
-                        const textConfig = data.find(item => item.elemento === 'typewriter-text-home');
-                        if (textConfig && textConfig.frases && Array.isArray(textConfig.frases)) {
-                            this.frases = textConfig.frases;
+                        const typewriterConfig = data.find(item => item.elemento === 'typewriter-text-home');
+                        if (typewriterConfig && typewriterConfig.frases) {
+                            // Adicionar aspas às frases
+                            this.frases = typewriterConfig.frases.map(frase => `"${frase}"`);
+                            // Iniciar a animação
+                            this.animar();
                         }
-                        this.animar();
                     })
                     .catch(error => {
-                        console.error('Erro ao carregar configuração de texto animado:', error);
+                        console.error('Erro ao carregar frases do metadados.json:', error);
+                        // Fallback para frases padrão
+                        this.frases = [
+
+                        ];
                         this.animar();
                     });
             }
@@ -1256,7 +1113,14 @@
 
         textAnimatorApp.mount('#text-animator');
 
-        // Selecionar elementos da busca
+        // Selecionar elementos
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        const overlay = document.querySelector('.overlay');
+        const navItems = document.querySelectorAll('.nav-item');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        /* ===== Autocomplete de sugestões (data/xrl.json) ===== */
         const buscaInput = document.getElementById('busca-input');
         const sugestoesList = document.getElementById('sugestoes-list');
         let sugestoesCache = null;
@@ -1283,9 +1147,14 @@
             buscaInput.addEventListener('input', updateBuscaClear);
             buscaInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    buscaInput.value = '';
-                    updateBuscaClear();
-                    fecharSugestoes();
+                    if (buscaInput.value) {
+                        buscaInput.value = '';
+                        updateBuscaClear();
+                        fecharSugestoes();
+                        buscaInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    } else {
+                        buscaInput.blur();
+                    }
                 }
             });
         }
@@ -1350,7 +1219,7 @@
                 return cached;
             }
             try {
-                const res = await fetch('./data/xrl.json', { cache: 'no-store' });
+                const res = await fetch('../data/xrl.json', { cache: 'no-store' });
                 const json = await res.json();
                 const lista = Array.isArray(json) && json[0] && Array.isArray(json[0].suggests) ? json[0].suggests : [];
                 sugestoesCache = lista;
@@ -1372,7 +1241,7 @@
                 return cached;
             }
             try {
-                const res = await fetch('./data/xrl.json', { cache: 'no-store' });
+                const res = await fetch('../data/xrl.json', { cache: 'no-store' });
                 const json = await res.json();
                 const lista = Array.isArray(json) && json[0] && Array.isArray(json[0].suggests) ? json[0].suggests : [];
                 sugestoesCache = lista;
@@ -1398,7 +1267,7 @@
 
             lastupKeyPromise = (async () => {
                 try {
-                    const res = await fetch('./data/LastupKey.json', { cache: 'no-store' });
+                    const res = await fetch('../data/LastupKey.json', { cache: 'no-store' });
                     const data = await res.json();
                     const key = Array.isArray(data) && data[0] && data[0].LastupKey ? data[0].LastupKey : null;
                     console.log('🔑 LastupKey obtida do servidor:', key);
@@ -1460,7 +1329,7 @@
                     }
 
                     // Fetch novo x89.json
-                    const res = await fetch('./data/x89.json', { cache: 'no-store' });
+                    const res = await fetch('../data/x89.json', { cache: 'no-store' });
                     const json = await res.json();
                     x89JsonCache = json;
                     JSONCacheManager.set(CACHE_KEY_X89_JSON, json, CACHE_TTL_3_DIAS_MS);
@@ -1476,13 +1345,6 @@
 
             return x89JsonPromise;
         }
-
-        // Selecionar elementos do menu
-        const hamburger = document.querySelector('.hamburger');
-        const navMenu = document.querySelector('.nav-menu');
-        const overlay = document.querySelector('.overlay');
-        const navItems = document.querySelectorAll('.nav-item');
-        const navLinks = document.querySelectorAll('.nav-link');
 
         function debounce(fn, wait = 150) {
             clearTimeout(debounceTimer);
@@ -2006,6 +1868,85 @@
         window.addEventListener('resize', hideOverlayIfDesktop);
         window.addEventListener('load', hideOverlayIfDesktop);
 
+        // Formata termo: primeira letra maiúscula e o restante minúscula
+        function formatarTermoCapitalizado(s) {
+            if (!s) return s;
+            const t = String(s).trim().toLowerCase();
+            return t.charAt(0).toLocaleUpperCase('pt-BR') + t.slice(1);
+        }
+
+        // Aplica termo pesquisado (se presente em query string) — mostra no elemento com id 'termo-pesquisado' e preenche input
+        function aplicarTermoDaQuery() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const q = params.get('q');
+
+                const termoEl = document.getElementById('termo-pesquisado');
+
+                // Se não houver parâmetro 'q', mostrar "todos os produtos"
+                if (!q) {
+                    if (termoEl) termoEl.textContent = 'todos os produtos';
+                    termoBuscaAtual = null;
+
+                    // mensagem acessível breve para leitores de tela
+                    (function () {
+                        let live = document.getElementById('busca-term-live');
+                        if (!live) {
+                            live = document.createElement('div');
+                            live.id = 'busca-term-live';
+                            live.setAttribute('aria-live', 'polite');
+                            live.style.position = 'absolute';
+                            live.style.width = '1px';
+                            live.style.height = '1px';
+                            live.style.margin = '-1px';
+                            live.style.border = '0';
+                            live.style.padding = '0';
+                            live.style.overflow = 'hidden';
+                            live.style.clip = 'rect(0 0 0 0)';
+                            document.body.appendChild(live);
+                        }
+                        live.textContent = 'Exibindo resultados para todos os produtos';
+                        setTimeout(() => { live.textContent = ''; }, 2000);
+                    })();
+
+                    return;
+                }
+
+                const termoRaw = decodeURIComponent(q).replace(/-/g, ' ').trim();
+                const termo = formatarTermoCapitalizado(termoRaw);
+                if (termoEl) termoEl.textContent = termo;
+                if (buscaInput) {
+                    buscaInput.value = termo;
+                    updateBuscaClear();
+                }
+                termoBuscaAtual = termo;
+
+                // mensagem acessível breve para leitores de tela
+                (function () {
+                    let live = document.getElementById('busca-term-live');
+                    if (!live) {
+                        live = document.createElement('div');
+                        live.id = 'busca-term-live';
+                        live.setAttribute('aria-live', 'polite');
+                        live.style.position = 'absolute';
+                        live.style.width = '1px';
+                        live.style.height = '1px';
+                        live.style.margin = '-1px';
+                        live.style.border = '0';
+                        live.style.padding = '0';
+                        live.style.overflow = 'hidden';
+                        live.style.clip = 'rect(0 0 0 0)';
+                        document.body.appendChild(live);
+                    }
+                    live.textContent = `Exibindo resultados para ${termo}`;
+                    setTimeout(() => { live.textContent = ''; }, 2000);
+                })();
+            } catch (err) {
+                console.warn('Erro ao aplicar termo da query:', err);
+            }
+        }
+        window.addEventListener('load', aplicarTermoDaQuery);
+
         // Fecha submenu 'Produtos' ao rolar a página em telas maiores
         let _scrollTimeout;
         window.addEventListener('scroll', () => {
@@ -2091,6 +2032,7 @@
 
         let produtosCarregados = [];
         let paginaAtual = 1;
+        let termoBuscaAtual = null;
         const PRODUTOS_POR_PAGINA = 24; //Deve ser sempre um multiplo de 2, 3 e 4 para melhor UX
 
         // Formata preço para Real brasileiro
@@ -2225,7 +2167,7 @@
             // Atualizar paginação
             atualizarPaginacao();
 
-            // Rolar para o ID do texto animado apenas se scrollToTop for true
+            // Rolar para o texto animado apenas se scrollToTop for true
             if (scrollToTop) {
                 const textAnimator = document.getElementById('stop-point');
                 if (textAnimator) {
@@ -2285,8 +2227,19 @@
                 return;
             }
 
-            // Carregar categorias (otimizado com cache)
-            const categorias = await carregarCategorias();
+            // Carregar categorias do metadados.json
+            let categorias = [];
+            try {
+                const metadados = await fetchMetadados();
+                const categoriasObj = metadados.find(item => item.elemento === 'categorias');
+                if (categoriasObj && categoriasObj.categorias) {
+                    categorias = categoriasObj.categorias;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar categorias do metadados.json:', error);
+                // Fallback para categorias padrão
+                categorias = ['BLAZER', 'BLUSA', 'BODY', 'BOLSA', 'CALÇADO', 'CINTO', 'SHORTS', 'SAIA', 'VESTIDO'];
+            }
 
             // Criar contêiner do dropdown
             const container = document.createElement('div');
@@ -2306,11 +2259,10 @@
             menu.className = 'categoria-dropdown-menu';
 
             // Adicionar "Todos os produtos" como primeira opção
-            let menuItems = '<a href="./produtos/" class="categoria-dropdown-item" data-categoria="todos">TODOS OS PRODUTOS</a>';
+            let menuItems = '<a href="./" class="categoria-dropdown-item" data-categoria="todos">TODOS OS PRODUTOS</a>';
             menuItems += categorias.map(categoria => {
-                const term = formatarTermoCapitalizado(categoria.toLowerCase());
-                const slug = encodeURIComponent(term.replace(/\s+/g, '-'));
-                return `<a href="./produtos/?q=${slug}" class="categoria-dropdown-item" data-categoria="${categoria.toLowerCase()}">${categoria}</a>`;
+                const slug = encodeURIComponent(categoria.toLowerCase());
+                return `<a href="./?q=${slug}" class="categoria-dropdown-item" data-categoria="${categoria.toLowerCase()}">${categoria}</a>`;
             }).join('');
 
             menu.innerHTML = menuItems;
@@ -2408,13 +2360,14 @@
 
                     e.preventDefault();
 
-                    // Redirecionar para searchpage com a categoria como parâmetro
+                    // Redirecionar para searchpage com a categoria como parâmetro (termo formatado)
                     if (categoria && categoria !== 'todos') {
-                        const encodedCategory = encodeURIComponent(categoria);
-                        window.location.href = `./produtos/?q=${encodedCategory}`;
+                        const term = formatarTermoCapitalizado(categoria.replace(/-/g, ' '));
+                        const encodedCategory = encodeURIComponent(term.replace(/\s+/g, '-'));
+                        window.location.href = `./?q=${encodedCategory}`;
                     } else {
                         // Se clicou em "TODOS OS PRODUTOS", redirecionar sem filtro
-                        window.location.href = `./produtos/`;
+                        window.location.href = `./`;
                     }
                 });
             });
@@ -2436,13 +2389,6 @@
             logManager.log('✓ Categorias em dropdown geradas dinamicamente');
         }
 
-        // Formata termo: primeira letra maiúscula e o restante minúscula
-        function formatarTermoCapitalizado(s) {
-            if (!s) return s;
-            const t = String(s).trim().toLowerCase();
-            return t.charAt(0).toLocaleUpperCase('pt-BR') + t.slice(1);
-        }
-
         // Realiza a busca e redireciona para a página de pesquisa
         async function realizarBusca(termo) {
             const searchInput = termo || buscaInput.value.trim();
@@ -2457,18 +2403,30 @@
             // Padronizar formatação do termo antes de redirecionar
             const formattedTerm = formatarTermoCapitalizado(searchInput);
             const encodedSearch = encodeURIComponent(formattedTerm.replace(/\s+/g, '-'));
-            window.location.href = `./produtos/?q=${encodedSearch}`;
+            window.location.href = `../produtos/?q=${encodedSearch}`;
+        }
+
+        // Limpar busca
+        function limparBusca() {
+            buscaInput.value = '';
+            termoBuscaAtual = null;
+            updateBuscaClear();
+            produtosExibidos = 0;
+            // Gerar novos produtos ao limpar a busca
+            carregarProdutos();
         }
 
         // Carregar Submenu de Produtos da Nav
         async function carregarSubmenuProdutos() {
             try {
-                const categorias = await carregarCategorias();
+                const metadados = await fetchMetadados();
+                const categoriasObj = metadados.find(item => item.elemento === 'categorias');
 
-                if (!categorias || categorias.length === 0) {
+                if (!categoriasObj || !categoriasObj.categorias) {
                     return;
                 }
 
+                const categorias = categoriasObj.categorias;
                 const submenu = document.querySelector('.submenu');
 
                 if (!submenu) return;
@@ -2574,9 +2532,8 @@
                 produtosCarregados = produtos;
                 logManager.log(`✓ ${produtosCarregados.length} produtos carregados do JSON`);
 
-                // Exibir primeira página
+                // Exibir primeira página com sistema de paginação
                 exibirPagina(1);
-                logManager.log(`🎨 Produtos renderizados com sistema de paginação`);
 
                 return true;
             } catch (erro) {
