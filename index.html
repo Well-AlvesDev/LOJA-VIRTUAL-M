@@ -745,6 +745,7 @@
     MAIS IMPORTANTE DO SITE. E EVITA QUE APAREÇA "{{TEXTO ANIMADO}}" -->
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Overlay -->
     <div class="overlay"></div>
 
@@ -1306,8 +1307,6 @@
             setTimeout(updateBuscaClear, 0);
             // pré-carregar e cachear xrl.json por 3 dias
             prefetchX89N2().catch(() => { });
-            // pré-carregar e cachear x89.json por 3 dias
-            carregarX89Json().catch(() => { });
         });
 
         // Cache simples em localStorage para JSON (TTL em ms)
@@ -1385,97 +1384,8 @@
             }
         }
 
-        // ===== CACHE PARA x89.json (Dados de Produtos Complementares) com validação por LastupKey =====
-        const CACHE_KEY_X89_JSON = 'x89_json_data';
-        const CACHE_KEY_X89_LASTUP = 'x89_json_lastup_key';
-        let x89JsonCache = null;
-        let x89JsonPromise = null;
-        let lastupKeyPromise = null;
-
-        // Carregar LastupKey do servidor
-        async function carregarLastupKey() {
-            if (lastupKeyPromise) return lastupKeyPromise;
-
-            lastupKeyPromise = (async () => {
-                try {
-                    const res = await fetch('./data/LastupKey.json', { cache: 'no-store' });
-                    const data = await res.json();
-                    const key = Array.isArray(data) && data[0] && data[0].LastupKey ? data[0].LastupKey : null;
-                    console.log('🔑 LastupKey obtida do servidor:', key);
-                    return key;
-                } catch (err) {
-                    console.warn('Não foi possível carregar LastupKey:', err);
-                    return null;
-                }
-            })();
-
-            return lastupKeyPromise;
-        }
-
-        // Validar cache comparando LastupKey
-        async function validarCacheX89Json() {
-            const cachedData = JSONCacheManager.get(CACHE_KEY_X89_JSON);
-            const cachedLastupKey = JSONCacheManager.get(CACHE_KEY_X89_LASTUP);
-            const currentLastupKey = await carregarLastupKey();
-
-            // Se não houver cache, não há o que validar
-            if (!cachedData || !cachedLastupKey) {
-                console.log('📝 Nenhum cache anterior encontrado');
-                return { isValid: false, currentKey: currentLastupKey };
-            }
-
-            // Comparar LastupKeys
-            if (cachedLastupKey !== currentLastupKey) {
-                console.log(`⚠️ Cache inválido! Versão antiga: ${cachedLastupKey} | Versão atual: ${currentLastupKey}`);
-                // Invalidar cache
-                JSONCacheManager.remove(CACHE_KEY_X89_JSON);
-                JSONCacheManager.remove(CACHE_KEY_X89_LASTUP);
-                return { isValid: false, currentKey: currentLastupKey };
-            }
-
-            console.log('✅ Cache válido! LastupKey coincide:', currentLastupKey);
-            return { isValid: true, currentKey: currentLastupKey };
-        }
-
-        async function carregarX89Json() {
-            // Se já está em memória, retornar
-            if (x89JsonCache) return x89JsonCache;
-            // Se já existe uma promise em andamento, reutilizar (evita múltiplos fetchs)
-            if (x89JsonPromise) return x89JsonPromise;
-
-            // Criar nova promise para fetch
-            x89JsonPromise = (async () => {
-                try {
-                    // Validar cache existente contra LastupKey atual
-                    const validation = await validarCacheX89Json();
-
-                    // Tentar recuperar do cache persistente se válido
-                    if (validation.isValid) {
-                        const cached = JSONCacheManager.get(CACHE_KEY_X89_JSON);
-                        if (cached) {
-                            x89JsonCache = cached;
-                            console.log('📦 x89.json carregado do cache local (validado)');
-                            return cached;
-                        }
-                    }
-
-                    // Fetch novo x89.json
-                    const res = await fetch('./data/x89.json', { cache: 'no-store' });
-                    const json = await res.json();
-                    x89JsonCache = json;
-                    JSONCacheManager.set(CACHE_KEY_X89_JSON, json, CACHE_TTL_3_DIAS_MS);
-                    JSONCacheManager.set(CACHE_KEY_X89_LASTUP, validation.currentKey, CACHE_TTL_3_DIAS_MS);
-                    console.log('📥 x89.json carregado e cacheado com sucesso (LastupKey: ' + validation.currentKey + ')');
-                    return json;
-                } catch (err) {
-                    console.warn('Não foi possível carregar x89.json:', err);
-                    x89JsonCache = null;
-                    return null;
-                }
-            })();
-
-            return x89JsonPromise;
-        }
+        // ===== FLUXO DE CARREGAMENTO: Supabase → Cache de Imagens (IndexedDB) =====
+        // Todos os produtos são carregados do Supabase, e apenas as imagens são cacheadas por 10 dias
 
         // Selecionar elementos do menu
         const hamburger = document.querySelector('.hamburger');
@@ -2091,7 +2001,7 @@
 
         let produtosCarregados = [];
         let paginaAtual = 1;
-        const PRODUTOS_POR_PAGINA = 24; //Deve ser sempre um multiplo de 2, 3 e 4 para melhor UX
+        const PRODUTOS_POR_PAGINA = 26; //Deve ser sempre um multiplo de 2, 3 e 4 para melhor UX
 
         // Formata preço para Real brasileiro
         function formatarPreco(preco) {
@@ -2554,6 +2464,13 @@
         }
 
 
+        // ===== INICIALIZAÇÃO DO SUPABASE =====
+        if (!window.supabaseClient) {
+            const SUPABASE_URL = 'https://hovfcntzthahwszjaxsw.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvdmZjbnR6dGhhaHdzempheHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDgxNDUsImV4cCI6MjA5Mzc4NDE0NX0.Pss5O_ykTybPUsuZCCln72Pq5dkTGMQ1G1kXR4HOVyw';
+            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
         // Embaralha um array (Fisher-Yates)
         function embaralharArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -2563,20 +2480,72 @@
             return array;
         }
 
-        // Carrega produtos do JSON
+        // Transforma dados do Supabase para formato esperado pela aplicação
+        function transformarDadosSuabase(dados) {
+            return dados
+                .filter(item => item.DISPONIBILIDADE === true || item.DISPONIBILIDADE === 'true')
+                .map(item => {
+                    // Parsear o campo PARCELAMENTO (formato: "quantidade_parcelas,parcelas_sem_juros")
+                    let parcelamento = {
+                        'parcelado-em-ate': 0,
+                        'sem-juros-ate': 0
+                    };
+
+                    if (item.PARCELAMENTO) {
+                        const parts = String(item.PARCELAMENTO).split(',').map(p => parseInt(p, 10));
+                        if (parts.length === 2) {
+                            parcelamento['parcelado-em-ate'] = parts[0];
+                            parcelamento['sem-juros-ate'] = parts[1];
+                        }
+                    }
+
+                    return {
+                        id: item.ID,
+                        nome: item.PRODUTO,
+                        preco: item.PREÇO,
+                        imagem: item['IMAGE-URL'],
+                        desconto: item.DESCONTO || 0,
+                        parcelamento: parcelamento,
+                        disponibilidade: item.DISPONIBILIDADE === true || item.DISPONIBILIDADE === 'true'
+                    };
+                });
+        }
+
+        // Carrega produtos do Supabase
         async function carregarProdutos() {
             try {
-                logManager.log('🔄 Iniciando carregamento de produtos...');
-                let produtos = await carregarX89Json();
-                if (!produtos) throw new Error('Erro ao carregar produtos');
+                logManager.log('🔄 Iniciando carregamento de produtos do Supabase...');
 
+                // Buscar dados da tabela j-box
+                const { data, error } = await window.supabaseClient
+                    .from('j-box')
+                    .select('*')
+                    .order('ID', { ascending: false });
+
+                if (error) {
+                    throw new Error(`Erro ao carregar produtos: ${error.message}`);
+                }
+
+                if (!data || data.length === 0) {
+                    throw new Error('Nenhum produto encontrado na tabela');
+                }
+
+                // Transformar dados para formato esperado
+                let produtos = transformarDadosSuabase(data);
+
+                // Embaralhar produtos para melhor UX
                 produtos = embaralharArray(produtos);
+
+                // Limitar a 26 produtos para a tela inicial (aleatórios)
+                produtos = produtos.slice(0, 26);
+
                 produtosCarregados = produtos;
-                logManager.log(`✓ ${produtosCarregados.length} produtos carregados do JSON`);
+
+                logManager.log(`✓ ${produtosCarregados.length} produtos aleatórios carregados do Supabase`);
 
                 // Exibir primeira página
                 exibirPagina(1);
-                logManager.log(`🎨 Produtos renderizados com sistema de paginação`);
+                logManager.log(`🎨 26 produtos renderizados na tela inicial`);
 
                 return true;
             } catch (erro) {

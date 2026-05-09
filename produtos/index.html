@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
     <link rel="stylesheet" href="../recursos/css/estilos-para-card-de-produtos.css">
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -333,29 +335,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 6px;
             margin: 40px auto;
             padding: 20px;
             flex-wrap: wrap;
         }
 
         .paginacao-btn {
-            padding: 12px 20px;
+            padding: 10px 12px;
             background-color: #f5f5f5;
             color: #3d77dc;
             border: 1px solid #ddd;
-            border-radius: 60px;
-            font-size: 14px;
+            border-radius: 30px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .paginacao-btn:hover:not(:disabled) {
             background-color: #3d77dc;
             color: white;
             border-color: #3d77dc;
-            transform: translateY(-2px);
         }
 
         .paginacao-btn:disabled {
@@ -366,10 +368,10 @@
         }
 
         .paginacao-info {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
             font-weight: 500;
-            min-width: 150px;
+            min-width: 60px;
             text-align: center;
         }
 
@@ -623,7 +625,7 @@
 </head>
 
 <body>
-    <!--SIM, EU SEI... PARECE ESTRANHO COLOCAR O VJUES
+    <!--SIM, EU SEI... PARECE ESTRANHO COLOCAR O VUEJS
     PARA CARREGAR AQUI. PORÉM ESSA FOI UMA BOA PRÁTICA
     PARA EVITAR ATRASOS NO CARREGAMENTO DO FRAMEWORK 
     MAIS IMPORTANTE DO SITE. E EVITA QUE APAREÇA "{{TEXTO ANIMADO}} "-->
@@ -748,6 +750,193 @@
     </main>
 
     <script>
+        // ===== SISTEMA DE LOGS PROVISÓRIO =====
+        // Será substituído pelo logManager completo mais abaixo
+        const logManager = (() => {
+            return {
+                log: (msg) => console.log(msg),
+                warn: (msg) => console.warn(msg),
+                error: (msg, err) => console.error(msg, err)
+            };
+        })();
+
+        // ===== CONFIGURAÇÃO DO SUPABASE =====
+        const SUPABASE_CONFIG = {
+            url: 'https://hovfcntzthahwszjaxsw.supabase.co',
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvdmZjbnR6dGhhaHdzempheHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDgxNDUsImV4cCI6MjA5Mzc4NDE0NX0.Pss5O_ykTybPUsuZCCln72Pq5dkTGMQ1G1kXR4HOVyw',
+            table: 'j-box'
+        };
+
+        // Inicializar cliente Supabase (verificar se já existe para evitar duplicação)
+        if (!window.supabaseClient) {
+            window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        }
+
+        // Função auxiliar para transformar dados do Supabase para formato esperado pelo app
+        function transformarDadosSupabase(dados) {
+            if (!Array.isArray(dados)) return [];
+            return dados.map((item, idx) => {
+                // Tentar múltiplas variações de nome de coluna para URL de imagem
+                let imagemUrl = item['IMAGEM-URL'] || item['Imagem-URL'] || item['IMAGEM_URL'] || item['imagem-url'] ||
+                    item['imagem'] || item['IMAGEM'] || item['url-imagem'] || item['URL_IMAGEM'] || '';
+
+                // Se ainda não encontrou, procurar em todas as chaves do item
+                if (!imagemUrl) {
+                    const allKeys = Object.keys(item);
+                    const imagemKey = allKeys.find(key =>
+                        key.toLowerCase().includes('imagem') ||
+                        key.toLowerCase().includes('image') ||
+                        key.toLowerCase().includes('url') ||
+                        key.toLowerCase().includes('foto')
+                    );
+                    if (imagemKey) {
+                        imagemUrl = item[imagemKey] || '';
+                    }
+                }
+
+                console.log(`Produto ${idx}:`, {
+                    id: item.id,
+                    nome: item.PRODUTO,
+                    imagemUrl: imagemUrl,
+                    todasAsColunas: Object.keys(item)
+                });
+
+                return {
+                    id: item.id,
+                    nome: item.PRODUTO || '',
+                    preco: item.PREÇO || '0.00',
+                    imagem: imagemUrl,
+                    desconto: item.DESCONTO || 0,
+                    parcelamento: parseParcelamento(item.PARCELAMENTO || ''),
+                    disponibilidade: item.DISPONIBILIDADE !== false
+                };
+            });
+        }
+
+        // Parse do campo parcelamento (ex: "12,3" -> {parcelado-em-ate: 12, sem-juros-ate: 3})
+        function parseParcelamento(str) {
+            if (!str || typeof str !== 'string') return { 'parcelado-em-ate': 0, 'sem-juros-ate': 0 };
+            const parts = str.split(',').map(p => parseInt(p.trim()) || 0);
+            return {
+                'parcelado-em-ate': parts[0] || 0,
+                'sem-juros-ate': parts[1] || 0
+            };
+        }
+
+        // Função para normalizar texto para comparação (remove acentos e converte para lowercase)
+        function normalizarTexto(texto) {
+            return String(texto || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                .toLowerCase()
+                .trim();
+        }
+
+        // Função para extrair palavras de um termo de pesquisa
+        function extrairPalavras(termo) {
+            return normalizarTexto(termo)
+                .split(/\s+/)
+                .filter(palavra => palavra.length > 0);
+        }
+
+        // Sistema de priorização inteligente de produtos
+        function priorizarProdutos(produtos, termo) {
+            if (!termo || !termo.trim() || produtos.length === 0) {
+                // Se não houver termo, retornar embaralhados
+                return embaralharArray([...produtos]);
+            }
+
+            const palavrasBusca = extrairPalavras(termo);
+            console.log(`🔍 Buscando por: "${termo}" | Palavras: [${palavrasBusca.join(', ')}]`);
+
+            const prioridade1 = []; // 100% match (todas as palavras)
+            const prioridade2 = []; // Match parcial (1+ palavras)
+            const prioridade3 = []; // Aleatório
+
+            const idsUsados = new Set();
+
+            // Classificar produtos
+            produtos.forEach(produto => {
+                const nomeProdutoNormalizado = normalizarTexto(produto.nome);
+                const palavrasProduto = nomeProdutoNormalizado.split(/\s+/).filter(p => p.length > 0);
+
+                // Contar quantas palavras da busca estão no produto
+                const palavrasEncontradas = palavrasBusca.filter(palavra =>
+                    nomeProdutoNormalizado.includes(palavra)
+                );
+
+                // Verificar se tem TODAS as palavras (100% match)
+                if (palavrasEncontradas.length === palavrasBusca.length) {
+                    prioridade1.push(produto);
+                    idsUsados.add(produto.id);
+                } else if (palavrasEncontradas.length > 0) {
+                    // Tem 1 ou mais palavras - adicionar com score de quantas palavras tem
+                    produto._matchScore = palavrasEncontradas.length;
+                    prioridade2.push(produto);
+                    idsUsados.add(produto.id);
+                } else {
+                    prioridade3.push(produto);
+                }
+            });
+
+            // Ordenar prioridade 2 por quantidade de palavras encontradas (decrescente)
+            prioridade2.sort((a, b) => b._matchScore - a._matchScore);
+
+            // Remover score do objeto
+            prioridade2.forEach(p => delete p._matchScore);
+
+            // Embaralhar prioridade 3 e selecionar quantidade necessária para chegar a 500
+            const produtosAleatorios = embaralharArray([...prioridade3]);
+            const quantidadeNecessaria = Math.max(0, 500 - (prioridade1.length + prioridade2.length));
+            const prioridade3Selecionados = produtosAleatorios.slice(0, quantidadeNecessaria);
+
+            const resultado = [...prioridade1, ...prioridade2, ...prioridade3Selecionados];
+
+            console.log(`📊 Resultados priorizados:`);
+            console.log(`   ✅ 100% match: ${prioridade1.length}`);
+            console.log(`   🔶 Parcial: ${prioridade2.length}`);
+            console.log(`   🎲 Aleatório: ${prioridade3Selecionados.length}`);
+            console.log(`   📦 Total: ${resultado.length}`);
+
+            return resultado.slice(0, 500); // Limitar a 500 resultados
+        }
+
+        // Buscar produtos do Supabase com sistema de priorização inteligente
+        async function buscarProdutosNoSupabase(termo = null) {
+            try {
+                logManager.log('🔄 Buscando produtos no Supabase...');
+
+                // Buscar TODOS os produtos (sem filtro)
+                const { data, error } = await window.supabaseClient.from(SUPABASE_CONFIG.table).select('*');
+
+                if (error) {
+                    console.error('❌ Erro ao buscar do Supabase:', error);
+                    logManager.error('Erro Supabase:', error.message);
+                    return [];
+                }
+
+                if (!data || data.length === 0) {
+                    logManager.log('⚠️ Nenhum produto encontrado no banco');
+                    return [];
+                }
+
+                console.log(`📦 Total de produtos no banco: ${data.length}`);
+
+                // Transformar dados
+                const produtosTransformados = transformarDadosSupabase(data);
+
+                // Aplicar priorização inteligente
+                const produtosPriorizados = priorizarProdutos(produtosTransformados, termo);
+
+                logManager.log(`✓ ${produtosPriorizados.length} produtos retornados (priorizados)`);
+                return produtosPriorizados;
+            } catch (erro) {
+                console.error('❌ Erro ao buscar produtos do Supabase:', erro);
+                logManager.error('Erro na busca:', erro.message);
+                return [];
+            }
+        }
+
         // ===== SISTEMA DE CACHE DE IMAGENS (10 DIAS) =====
         class ImagemCacheManager {
             constructor() {
@@ -1175,8 +1364,6 @@
             setTimeout(updateBuscaClear, 0);
             // pré-carregar e cachear xrl.json por 3 dias
             prefetchX89N2().catch(() => { });
-            // pré-carregar e cachear x89.json por 3 dias
-            carregarX89Json().catch(() => { });
         });
 
         // Cache simples em localStorage para JSON (TTL em ms)
@@ -1921,6 +2108,11 @@
                 }
                 termoBuscaAtual = termo;
 
+                // Recarregar produtos com o novo termo
+                carregarProdutos().catch(err => {
+                    console.error('Erro ao recarregar produtos com novo termo:', err);
+                });
+
                 // mensagem acessível breve para leitores de tela
                 (function () {
                     let live = document.getElementById('busca-term-live');
@@ -2091,11 +2283,13 @@
                 return `
                     <div class="produto-card" data-id="${produto.id}">
                         <div class="produto-imagem-wrapper">
-                            <img data-src="${produto.imagem}" alt="${produto.nome}" 
+                            <img 
+                                data-src="${produto.imagem}" 
+                                alt="${produto.nome}" 
                                 class="produto-imagem" 
                                 loading="lazy"
-                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23f0f0f0' width='300' height='400'/%3E%3C/svg%3E"
-                                onerror="this.src='https://via.placeholder.com/300x400?text=Produto'">
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23e0e0e0' width='300' height='400'/%3E%3Ctext x='50%' y='50%' font-size='14' fill='%23999' text-anchor='middle' dominant-baseline='middle'%3ECarregando...%3C/text%3E%3C/svg%3E"
+                                style="background-color: #f5f5f5;">
                         </div> 
                         <div class="produto-info">
                             <div>
@@ -2127,97 +2321,126 @@
             }
         }
 
-        // Helper: monta páginas respeitando a regra UX (merge se última página tiver < 10 itens)
-        function computePaginas() {
-            if (!produtosCarregados || produtosCarregados.length === 0) return [];
-            const pages = [];
-            for (let i = 0; i < produtosCarregados.length; i += PRODUTOS_POR_PAGINA) {
-                pages.push(produtosCarregados.slice(i, i + PRODUTOS_POR_PAGINA));
-            }
-            // Se a última página tiver menos de 10 itens, mesclar com a anterior para evitar página com poucos produtos
-            if (pages.length >= 2) {
-                const last = pages[pages.length - 1];
-                if (last.length > 0 && last.length < 10) {
-                    pages[pages.length - 2] = pages[pages.length - 2].concat(last);
-                    pages.pop();
-                }
-            }
-            return pages;
+        // Helper: calcula o total de páginas
+        function getTotalPaginas() {
+            if (!produtosCarregados || produtosCarregados.length === 0) return 1;
+            return Math.ceil(produtosCarregados.length / PRODUTOS_POR_PAGINA);
         }
 
-        // Função para exibir produtos da página atual (usa computePaginas)
+        // Helper: obtém produtos de uma página específica
+        function getProdutosDaPagina(numPagina) {
+            if (!produtosCarregados || produtosCarregados.length === 0) return [];
+            const inicio = (numPagina - 1) * PRODUTOS_POR_PAGINA;
+            const fim = inicio + PRODUTOS_POR_PAGINA;
+            return produtosCarregados.slice(inicio, fim);
+        }
+
+        // Função para exibir produtos da página atual
         function exibirPagina(numPagina, scrollToTop = false) {
+            const totalPaginas = getTotalPaginas();
+
+            // Validar número da página
             if (numPagina < 1) numPagina = 1;
-            const paginas = computePaginas();
-            const totalPaginas = paginas.length || 1;
             if (numPagina > totalPaginas) numPagina = totalPaginas;
 
             paginaAtual = numPagina;
-            const produtosDaPagina = paginas[numPagina - 1] || [];
 
-            // Renderizar produtos
+            // Obter produtos da página
+            const produtosDaPagina = getProdutosDaPagina(numPagina);
+            console.log(`🔵 Exibindo página ${numPagina} de ${totalPaginas} com ${produtosDaPagina.length} produtos`);
+
+            // Limpar container e renderizar produtos
+            const container = document.getElementById('produtosContainer');
+            if (container) {
+                container.innerHTML = '';
+            }
             renderizarProdutos(produtosDaPagina, false);
 
-            // Iniciar lazy loading
+            // Iniciar lazy loading de imagens
             setTimeout(() => {
                 iniciarLazyLoading();
-                logManager.log(`📄 Página ${numPagina} de ${totalPaginas} exibida`);
-            }, 0);
+            }, 100);
 
-            // Atualizar paginação
+            // Atualizar botões de paginação
             atualizarPaginacao();
 
-            // Rolar para o texto animado apenas se scrollToTop for true
+            // Rolar para o topo se solicitado
             if (scrollToTop) {
-                const textAnimator = document.getElementById('stop-point');
-                if (textAnimator) {
-                    textAnimator.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const stopPoint = document.getElementById('stop-point');
+                if (stopPoint) {
+                    stopPoint.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
         }
 
-        // Atualizar controles de paginação (respeita regra: não criar página com <10 itens)
+        // Atualizar controles de paginação
         function atualizarPaginacao() {
-            const paginas = computePaginas();
-            const totalPaginas = paginas.length;
-            let paginacaoContainer = document.getElementById('paginacaoContainer');
+            const totalPaginas = getTotalPaginas();
 
-            if (!produtosCarregados || produtosCarregados.length === 0 || totalPaginas <= 1) {
-                if (paginacaoContainer) paginacaoContainer.remove();
+            // Se houver apenas 1 página, não mostrar paginação
+            if (totalPaginas <= 1) {
+                const paginacaoContainer = document.getElementById('paginacaoContainer');
+                if (paginacaoContainer) {
+                    paginacaoContainer.remove();
+                }
                 return;
             }
 
+            let paginacaoContainer = document.getElementById('paginacaoContainer');
+
+            // Criar container se não existir
             if (!paginacaoContainer) {
                 const section = document.querySelector('.produtos-destaque');
                 paginacaoContainer = document.createElement('div');
                 paginacaoContainer.id = 'paginacaoContainer';
                 paginacaoContainer.className = 'paginacao-container';
                 section.appendChild(paginacaoContainer);
-            } else {
-                paginacaoContainer.innerHTML = '';
             }
 
-            // Botão Voltar
-            const btnVoltar = document.createElement('button');
-            btnVoltar.className = 'paginacao-btn';
-            btnVoltar.innerHTML = '<i class="ri-arrow-left-s-line"></i> Voltar';
-            btnVoltar.disabled = paginaAtual === 1;
-            btnVoltar.onclick = () => exibirPagina(paginaAtual - 1, true);
-            paginacaoContainer.appendChild(btnVoltar);
+            // Limpar conteúdo anterior
+            paginacaoContainer.innerHTML = '';
 
-            // Info de páginas
+            // BOTÃO ANTERIOR
+            const btnAnterior = document.createElement('button');
+            btnAnterior.type = 'button';
+            btnAnterior.className = 'paginacao-btn';
+            btnAnterior.innerHTML = '<i class="ri-arrow-left-s-line"></i> Anterior';
+            btnAnterior.disabled = paginaAtual === 1;
+
+            btnAnterior.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (paginaAtual > 1) {
+                    console.log(`⬅️ Voltando da página ${paginaAtual} para ${paginaAtual - 1}`);
+                    exibirPagina(paginaAtual - 1, true);
+                }
+            });
+
+            paginacaoContainer.appendChild(btnAnterior);
+
+            // INFO DE PÁGINAS
             const infoDiv = document.createElement('div');
             infoDiv.className = 'paginacao-info';
-            infoDiv.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+            infoDiv.textContent = `${paginaAtual} de ${totalPaginas}`;
             paginacaoContainer.appendChild(infoDiv);
 
-            // Botão Próximo
+            // BOTÃO PRÓXIMO
             const btnProximo = document.createElement('button');
+            btnProximo.type = 'button';
             btnProximo.className = 'paginacao-btn';
             btnProximo.innerHTML = 'Próximo <i class="ri-arrow-right-s-line"></i>';
             btnProximo.disabled = paginaAtual === totalPaginas;
-            btnProximo.onclick = () => exibirPagina(paginaAtual + 1, true);
+
+            btnProximo.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (paginaAtual < totalPaginas) {
+                    console.log(`➡️ Avançando da página ${paginaAtual} para ${paginaAtual + 1}`);
+                    exibirPagina(paginaAtual + 1, true);
+                }
+            });
+
             paginacaoContainer.appendChild(btnProximo);
+
+            console.log(`✅ Paginação atualizada: página ${paginaAtual}/${totalPaginas}`);
         }
 
         // Gerar Categorias Dinamicamente
@@ -2521,16 +2744,23 @@
             return array;
         }
 
-        // Carrega produtos do JSON
+        // Carrega produtos do Supabase com filtro opcional
         async function carregarProdutos() {
             try {
-                logManager.log('🔄 Iniciando carregamento de produtos...');
-                let produtos = await carregarX89Json();
-                if (!produtos) throw new Error('Erro ao carregar produtos');
+                logManager.log('🔄 Iniciando carregamento de produtos do Supabase...');
 
-                produtos = embaralharArray(produtos);
+                // Usar o termo de pesquisa já extraído da URL (termoBuscaAtual)
+                let produtos = await buscarProdutosNoSupabase(termoBuscaAtual);
+
+                if (!produtos || produtos.length === 0) {
+                    logManager.warn('⚠️ Nenhum produto encontrado para o termo pesquisado');
+                    document.getElementById('produtosErro').hidden = false;
+                    return false;
+                }
+
+                // NÃO embaralhar - produtos já estão priorizados inteligentemente
                 produtosCarregados = produtos;
-                logManager.log(`✓ ${produtosCarregados.length} produtos carregados do JSON`);
+                logManager.log(`✓ ${produtosCarregados.length} produtos carregados e priorizados do Supabase`);
 
                 // Exibir primeira página com sistema de paginação
                 exibirPagina(1);
@@ -2543,8 +2773,8 @@
             }
         }
 
-        // Sistema de controle de logs do console
-        const logManager = (() => {
+        // Sistema de controle de logs do console (versão completa)
+        Object.assign(logManager, (() => {
             let logCount = 0;
             const MAX_LOGS = 20;
 
@@ -2574,7 +2804,7 @@
                     }
                 }
             };
-        })();
+        })());
 
         // Adicionar ao carrinho
         function adicionarAoCarrinho(produtoId) {
@@ -2653,7 +2883,7 @@
             }, 500);
         }
 
-        // Lazy Loading de imagens com monitoramento e CACHE - Carrega apenas imagens visíveis
+        // Lazy Loading de imagens - Carrega apenas imagens visíveis (SEM cache para evitar falhas)
         function iniciarLazyLoading() {
             const container = document.getElementById('produtosContainer');
             if (!container) return;
@@ -2669,32 +2899,36 @@
                             if (img.dataset.processada) return;
                             img.dataset.processada = 'true';
 
-                            const urlOriginal = img.dataset.src || img.src;
+                            const urlOriginal = img.dataset.src;
 
-                            // ===== CARREGAR IMAGEM COM CACHE =====
-                            imagemCache.obterImagemComCache(urlOriginal).then(urlParaUsar => {
-                                if (!urlParaUsar) {
-                                    // Falha ao carregar, tentar retry
-                                    logManager.log(`⚠ Erro ao carregar imagem: ${urlOriginal}`);
-                                    img.style.opacity = '0.7';
-                                    imagemRetryMap.set(img, true);
-                                    tentarRecarregarImagem(img, 0);
-                                    return;
-                                }
-
-                                // Sucesso, aplicar a URL (pode ser do cache ou blob URL)
-                                img.src = urlParaUsar;
-                                img.removeAttribute('data-src');
+                            // Validar URL
+                            if (!urlOriginal || urlOriginal.trim() === '') {
+                                console.warn(`⚠️ URL vazia para imagem:`, img.alt);
+                                img.src = 'https://via.placeholder.com/300x400?text=Sem+Imagem';
                                 img.style.opacity = '1';
-                                imagemRetryMap.delete(img);
+                                totalImagensFalhadas++;
+                                return;
+                            }
+
+                            // ===== CARREGAR IMAGEM DIRETAMENTE =====
+                            console.log(`📥 Carregando imagem: ${urlOriginal}`);
+                            img.src = urlOriginal;
+                            img.style.opacity = '1';
+
+                            // Marcar sucesso quando carregar
+                            img.onload = function () {
                                 totalImagensCarregadas++;
-                                logManager.log(`✅ Imagem carregada: ${urlOriginal}`);
-                            }).catch(err => {
-                                console.error('Erro ao processar imagem com cache:', err);
-                                img.style.opacity = '0.7';
-                                imagemRetryMap.set(img, true);
-                                tentarRecarregarImagem(img, 0);
-                            });
+                                console.log(`✅ Imagem carregada com sucesso: ${urlOriginal}`);
+                                this.style.opacity = '1';
+                            };
+
+                            // Tratamento de erro: tentar placeholder
+                            img.onerror = function () {
+                                totalImagensFalhadas++;
+                                console.error(`❌ Erro ao carregar imagem: ${urlOriginal}`);
+                                this.src = 'https://via.placeholder.com/300x400?text=Imagem+Indisponivel';
+                                this.style.opacity = '1';
+                            };
                         }
                     });
                 }, {
@@ -2703,6 +2937,7 @@
 
                 // Observar todas as imagens atuais
                 const imagens = container.querySelectorAll('.produto-imagem');
+                console.log(`🔍 Iniciando lazy loading para ${imagens.length} imagens`);
                 imagens.forEach(img => {
                     if (!img.dataset.processada) {
                         imageObserver.observe(img);
@@ -2719,6 +2954,7 @@
                                     if (node.classList && node.classList.contains('produto-imagem')) {
                                         if (!node.dataset.processada) {
                                             imageObserver.observe(node);
+                                            console.log(`➕ Nova imagem adicionada ao observer`);
                                         }
                                     }
                                     // Procurar imagens dentro do nó adicionado
@@ -2727,7 +2963,7 @@
                                         novasImagens.forEach(img => {
                                             if (!img.dataset.processada) {
                                                 imageObserver.observe(img);
-                                                logManager.log(`🔍 Nova imagem adicionada ao observer`);
+                                                console.log(`➕ Nova imagem encontrada dentro de nó adicionado`);
                                             }
                                         });
                                     }
@@ -2744,79 +2980,26 @@
             }
         }
 
-        // Monitor contínuo de cards com imagens falhadas
+        // Monitor contínuo de cards com imagens falhadas (SIMPLIFICADO)
         function monitorarCardsComFalha() {
-            const container = document.getElementById('produtosContainer');
-            if (!container) return;
-
-            // Monitorar quando novos produtos são adicionados
-            const mutationObserverProdutos = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'childList') {
-                        mutation.addedNodes.forEach(node => {
-                            if (node.nodeType === 1 && node.classList?.contains('produto-card')) {
-                                const imagens = node.querySelectorAll('.produto-imagem');
-                                logManager.log(`🆕 ${imagens.length} novas imagens detectadas`);
-                            }
-                        });
-                    }
-                });
-            });
-
-            mutationObserverProdutos.observe(container, {
-                childList: true,
-                subtree: true
-            });
-
-            // Monitor de atributos de imagens
-            const mutationObserverAtributos = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'attributes' && mutation.target.classList?.contains('produto-imagem')) {
-                        const img = mutation.target;
-
-                        // Se a imagem está invisível ou com opacidade baixa, tentar recarregar
-                        if (img.style.opacity && parseFloat(img.style.opacity) < 1) {
-                            if (!imagemRetryMap.has(img)) {
-                                tentarRecarregarImagem(img, 0);
-                            }
-                        }
-                    }
-                });
-            });
-
-            mutationObserverAtributos.observe(container, {
-                attributes: true,
-                attributeFilter: ['src', 'style'],
-                subtree: true
-            });
-
-            // Verificação periódica de imagens quebradas
+            // Apenas log de status, sem tentar usar cache
             setInterval(() => {
                 const imagens = document.querySelectorAll('.produto-imagem');
-                let imagensQuebradas = 0;
+                let imagensBoas = 0;
+                let imagensFalhadas = 0;
 
                 imagens.forEach(img => {
-                    // Verificar se a imagem está quebrada
-                    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-                        imagensQuebradas++;
-                        if (!imagemRetryMap.has(img) && img.src && !img.src.includes('data:image')) {
-                            logManager.log(`🔄 Detectada imagem quebrada: ${img.src}`);
-                            imagemRetryMap.set(img, true);
-                            tentarRecarregarImagem(img, 0);
-                        }
+                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                        imagensBoas++;
+                    } else if (img.src && img.src !== '') {
+                        imagensFalhadas++;
                     }
                 });
 
-                // Log detalhado a cada 5 segundos
                 if (imagens.length > 0) {
-                    logManager.log(`📊 Status: ${totalImagensCarregadas} ✓ | ${totalImagensFalhadas} ✗ | ${imagensQuebradas} 🔄 de ${imagens.length} total`);
+                    logManager.log(`📊 Imagens: ${imagensBoas} ✓ | ${imagensFalhadas} ✗ de ${imagens.length} total`);
                 }
-
-                // Verificação final após 15 segundos
-                if (document.readyState === 'complete') {
-                    verificarSePaginaNecessitaReload();
-                }
-            }, 5000); // Verificar a cada 5 segundos
+            }, 10000); // Log a cada 10 segundos
         }
 
         // Controlar visibilidade do botão WhatsApp baseado no footer
@@ -2964,6 +3147,54 @@
                     console.error('❌ Erro ao obter informações do cache:', err);
                     return null;
                 }
+            },
+
+            // DEBUG: Verificar URLs das imagens
+            debug() {
+                console.log('%c=== DEBUG DE IMAGENS ===', 'color: #ff6b00; font-size: 14px; font-weight: bold;');
+
+                console.log(`\n📦 Produtos carregados: ${produtosCarregados.length}`);
+
+                if (produtosCarregados.length === 0) {
+                    console.warn('⚠️ Nenhum produto carregado ainda. Aguarde o carregamento.');
+                    return;
+                }
+
+                // Mostrar primeiros 5 produtos e suas URLs
+                console.log('\n📸 Primeiras 5 URLs de imagem:');
+                produtosCarregados.slice(0, 5).forEach((p, idx) => {
+                    const status = p.imagem && p.imagem.trim() ? '✅' : '❌';
+                    const urlPreview = p.imagem ? p.imagem.substring(0, 70) + (p.imagem.length > 70 ? '...' : '') : '[vazia]';
+                    console.log(`${status} [${idx}] ${p.nome.substring(0, 30)}: "${urlPreview}"`);
+                });
+
+                // Mostrar status das imagens renderizadas no DOM
+                const imagens = document.querySelectorAll('.produto-imagem');
+                console.log(`\n🖼️ Imagens renderizadas no DOM: ${imagens.length}`);
+
+                let imagensValidas = 0;
+                let imagensFalhadas = 0;
+                imagens.forEach((img, idx) => {
+                    const dataSrc = img.dataset.src;
+                    const currentSrc = img.src;
+                    if (dataSrc && dataSrc.trim()) {
+                        imagensValidas++;
+                        if (idx < 3) {
+                            console.log(`  ✅ [${idx}] data-src="${dataSrc.substring(0, 70)}..."`);
+                        }
+                    } else {
+                        imagensFalhadas++;
+                        if (imagensFalhadas <= 3) {
+                            console.log(`  ❌ [${idx}] data-src vazio - alt="${img.alt}"`);
+                        }
+                    }
+                });
+
+                console.log(`\n📊 Resumo: ${imagensValidas} válidas, ${imagensFalhadas} sem URL`);
+                console.log(`\n📊 Imagens carregadas com sucesso: ${totalImagensCarregadas}`);
+                console.log(`📊 Imagens que falharam: ${totalImagensFalhadas}`);
+                console.log(`\n💡 Dica: Se nenhuma URL for exibida, verifique o Supabase para certificar que a coluna de imagem tem um dos seguintes nomes:`);
+                console.log(`   - IMAGEM-URL, Imagem-URL, IMAGEM_URL, imagem-url, imagem, IMAGEM, url-imagem, URL_IMAGEM, foto`);
             }
         };
 
