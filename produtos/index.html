@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JUVELE - Moda Feminina</title>
+    <title>Dona Flor - Moda Feminina</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
     <link rel="stylesheet" href="../recursos/css/estilos-para-card-de-produtos.css">
+    <link rel="icon" type="image/png" href="../recursos/identidade/logo.jpg">
     <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -58,7 +59,7 @@
 
         /* Navbar */
         nav {
-            background-color: #e22a8c;
+            background-color: #ffd0e9;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
@@ -100,7 +101,7 @@
         }
 
         .nav-link {
-            color: #ffffff;
+            color: #730a52;
             text-decoration: none;
             font-weight: 500;
             padding: 10px 5px;
@@ -187,7 +188,7 @@
         .hamburger span {
             width: 23px;
             height: 2.3px;
-            background-color: #ffffff;
+            background-color:  #670e49;
             border-radius: 2px;
             transition: all 0.1s ease;
         }
@@ -621,6 +622,48 @@
                 font-size: 16px;
             }
         }
+
+        /* ===== LIQUID GLASS GRADIENT PARA BOTÃO VOLTAR ===== */
+        .voltar-home {
+            margin: 0 auto;
+            text-align: center;
+            margin-bottom: -15px;
+            margin-top: 14px;
+        }
+
+        .voltar-home a {
+            display: inline-block;
+            padding: 12px 28px;
+            font-size: 13px;
+            text-decoration: none;
+            color: #383838;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+
+            /* Liquid Glass Effect */
+            background: linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.4) 0%,
+                    rgba(220, 124, 208, 0.15) 100%);
+            border: 1.5px solid rgba(255, 143, 233, 0.31);
+            box-shadow:
+                0 8px 32px rgba(42, 113, 226, 0.073),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+
+        .voltar-home a:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .voltar-home a {
+                padding: 10px 24px;
+                font-size: 12px;
+                border-radius: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -640,7 +683,7 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/logotipo.png" alt="logotipo da empresa/loja" style="width: 100px;">
+                      <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png" alt="logotipo da empresa/loja" style="width: 180px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -719,8 +762,8 @@
         <div class="title">
             <h1 id="stop-point" style="font-weight: 400; color: #4478da; text-align: center;">Página de pesquisa</h1>
         </div>
-        <div class="voltar-home" style="margin: 0 auto; text-align: center; margin-bottom: -15px; margin-top: 14px;">
-            <a href="../index.html" style="font-size: 13px;">Voltar para tela inicial</a>
+        <div class="voltar-home">
+            <a href="../index.html"><i class="ri-arrow-left-long-fill"></i> Voltar para tela inicial</a>
         </div>
         <div class="criptografia-desc">
             <p style="text-align: center; font-size: 12px; max-width: 300px; margin: 20px auto; color: #878787;">
@@ -758,6 +801,36 @@
                 warn: (msg) => console.warn(msg),
                 error: (msg, err) => console.error(msg, err)
             };
+        })();
+
+        // ===== VARIÁVEIS GLOBAIS PRINCIPAIS =====
+        let termoBuscaAtual = null; // ✅ Declarar ANTES de qualquer IIFE que a use
+        let produtosCarregados = [];
+        let paginaAtual = 1;
+        const PRODUTOS_POR_PAGINA = 24;
+
+        // ===== INICIALIZAR TERMO DE BUSCA IMEDIATAMENTE (SÍNCRONO, antes de qualquer evento) =====
+        // Isso resolve a race condition entre DOMContentLoaded e load
+        (function inicializarTermoDeBuscaImediatamente() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const q = params.get('q');
+
+                if (!q) {
+                    termoBuscaAtual = null;
+                    console.log('🔍 Modo: Todos os produtos');
+                    return;
+                }
+
+                const termoRaw = decodeURIComponent(q).replace(/-/g, ' ').trim();
+                const termo = formatarTermoCapitalizado(termoRaw);
+                termoBuscaAtual = termo;
+
+                console.log(`🔍 Termo de busca inicializado ANTES de carregar produtos: "${termoBuscaAtual}"`);
+            } catch (err) {
+                console.warn('⚠️ Erro ao inicializar termo de busca:', err);
+                termoBuscaAtual = null;
+            }
         })();
 
         // ===== CONFIGURAÇÃO DO SUPABASE =====
@@ -843,11 +916,12 @@
         function priorizarProdutos(produtos, termo) {
             if (!termo || !termo.trim() || produtos.length === 0) {
                 // Se não houver termo, retornar embaralhados
-                return embaralharArray([...produtos]);
+                console.log('ℹ️ Sem termo de busca - retornando 500 produtos aleatórios');
+                return embaralharArray([...produtos]).slice(0, 500);
             }
 
             const palavrasBusca = extrairPalavras(termo);
-            console.log(`🔍 Buscando por: "${termo}" | Palavras: [${palavrasBusca.join(', ')}]`);
+            console.log(`🔍 PRIORIZANDO: Buscando por "${termo}" | Palavras-chave: [${palavrasBusca.join(', ')}]`);
 
             const prioridade1 = []; // 100% match (todas as palavras)
             const prioridade2 = []; // Match parcial (1+ palavras)
@@ -892,11 +966,11 @@
 
             const resultado = [...prioridade1, ...prioridade2, ...prioridade3Selecionados];
 
-            console.log(`📊 Resultados priorizados:`);
-            console.log(`   ✅ 100% match: ${prioridade1.length}`);
-            console.log(`   🔶 Parcial: ${prioridade2.length}`);
-            console.log(`   🎲 Aleatório: ${prioridade3Selecionados.length}`);
-            console.log(`   📦 Total: ${resultado.length}`);
+            console.log(`📊 RESULTADOS PRIORIZADOS:`);
+            console.log(`   ✅ 100% match: ${prioridade1.length} produto(s) - ${prioridade1.map(p => p.nome).slice(0, 3).join(', ')}${prioridade1.length > 3 ? '...' : ''}`);
+            console.log(`   🔶 Match parcial: ${prioridade2.length} produto(s)`);
+            console.log(`   🎲 Aleatório: ${prioridade3Selecionados.length} produto(s)`);
+            console.log(`   📦 TOTAL RETORNADO: ${resultado.length}`);
 
             return resultado.slice(0, 500); // Limitar a 500 resultados
         }
@@ -2062,82 +2136,52 @@
             return t.charAt(0).toLocaleUpperCase('pt-BR') + t.slice(1);
         }
 
-        // Aplica termo pesquisado (se presente em query string) — mostra no elemento com id 'termo-pesquisado' e preenche input
-        function aplicarTermoDaQuery() {
+        // Atualizar UI com o termo (mas SEM recarregar produtos - já serão carregados com o termo correto)
+        function atualizarUITermoDaQuery() {
             try {
                 const params = new URLSearchParams(window.location.search);
                 const q = params.get('q');
-
                 const termoEl = document.getElementById('termo-pesquisado');
 
-                // Se não houver parâmetro 'q', mostrar "todos os produtos"
                 if (!q) {
                     if (termoEl) termoEl.textContent = 'todos os produtos';
-                    termoBuscaAtual = null;
-
-                    // mensagem acessível breve para leitores de tela
-                    (function () {
-                        let live = document.getElementById('busca-term-live');
-                        if (!live) {
-                            live = document.createElement('div');
-                            live.id = 'busca-term-live';
-                            live.setAttribute('aria-live', 'polite');
-                            live.style.position = 'absolute';
-                            live.style.width = '1px';
-                            live.style.height = '1px';
-                            live.style.margin = '-1px';
-                            live.style.border = '0';
-                            live.style.padding = '0';
-                            live.style.overflow = 'hidden';
-                            live.style.clip = 'rect(0 0 0 0)';
-                            document.body.appendChild(live);
-                        }
-                        live.textContent = 'Exibindo resultados para todos os produtos';
-                        setTimeout(() => { live.textContent = ''; }, 2000);
-                    })();
-
                     return;
                 }
 
                 const termoRaw = decodeURIComponent(q).replace(/-/g, ' ').trim();
                 const termo = formatarTermoCapitalizado(termoRaw);
+
                 if (termoEl) termoEl.textContent = termo;
                 if (buscaInput) {
                     buscaInput.value = termo;
                     updateBuscaClear();
                 }
-                termoBuscaAtual = termo;
 
-                // Recarregar produtos com o novo termo
-                carregarProdutos().catch(err => {
-                    console.error('Erro ao recarregar produtos com novo termo:', err);
-                });
-
-                // mensagem acessível breve para leitores de tela
-                (function () {
-                    let live = document.getElementById('busca-term-live');
-                    if (!live) {
-                        live = document.createElement('div');
-                        live.id = 'busca-term-live';
-                        live.setAttribute('aria-live', 'polite');
-                        live.style.position = 'absolute';
-                        live.style.width = '1px';
-                        live.style.height = '1px';
-                        live.style.margin = '-1px';
-                        live.style.border = '0';
-                        live.style.padding = '0';
-                        live.style.overflow = 'hidden';
-                        live.style.clip = 'rect(0 0 0 0)';
-                        document.body.appendChild(live);
-                    }
-                    live.textContent = `Exibindo resultados para ${termo}`;
-                    setTimeout(() => { live.textContent = ''; }, 2000);
-                })();
+                // Mensagem acessível
+                let live = document.getElementById('busca-term-live');
+                if (!live) {
+                    live = document.createElement('div');
+                    live.id = 'busca-term-live';
+                    live.setAttribute('aria-live', 'polite');
+                    live.style.position = 'absolute';
+                    live.style.width = '1px';
+                    live.style.height = '1px';
+                    live.style.margin = '-1px';
+                    live.style.border = '0';
+                    live.style.padding = '0';
+                    live.style.overflow = 'hidden';
+                    live.style.clip = 'rect(0 0 0 0)';
+                    document.body.appendChild(live);
+                }
+                live.textContent = `Exibindo resultados para ${termo}`;
+                setTimeout(() => { live.textContent = ''; }, 2000);
             } catch (err) {
-                console.warn('Erro ao aplicar termo da query:', err);
+                console.warn('⚠️ Erro ao atualizar UI do termo:', err);
             }
         }
-        window.addEventListener('load', aplicarTermoDaQuery);
+
+        // Chamar apenas para atualizar UI após DOM estar pronto
+        window.addEventListener('load', atualizarUITermoDaQuery);
 
         // Fecha submenu 'Produtos' ao rolar a página em telas maiores
         let _scrollTimeout;
@@ -2221,11 +2265,6 @@
         })();
 
         // ===== GERADOR DE PRODUTOS (Simplificado e Otimizado) =====
-
-        let produtosCarregados = [];
-        let paginaAtual = 1;
-        let termoBuscaAtual = null;
-        const PRODUTOS_POR_PAGINA = 24; //Deve ser sempre um multiplo de 2, 3 e 4 para melhor UX
 
         // Formata preço para Real brasileiro
         function formatarPreco(preco) {
@@ -3039,8 +3078,9 @@
             // Carregar submenu de produtos primeiro
             carregarSubmenuProdutos();
 
+            // ✅ Produtos serão carregados com termoBuscaAtual CORRETO (inicializado sincronamente acima)
             carregarProdutos().then(() => {
-                logManager.log('📦 Produtos carregados, iniciando lazy loading...');
+                logManager.log('📦 Produtos carregados com termo correto, iniciando lazy loading...');
                 setTimeout(() => {
                     iniciarLazyLoading();
                     gerarCategorias(); // Gerar categorias após carregar produtos
