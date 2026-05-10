@@ -188,7 +188,7 @@
         .hamburger span {
             width: 23px;
             height: 2.3px;
-            background-color:  #670e49;
+            background-color: #670e49;
             border-radius: 2px;
             transition: all 0.1s ease;
         }
@@ -664,6 +664,203 @@
                 border-radius: 10px;
             }
         }
+
+        /* ===== MODAL DE DETALHES DO PRODUTO ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.481);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff36;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 23px;
+            color: #e7e7e7;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 34px;
+            color: #f6f6f6;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+
+        .modal-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .modal-product-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            background-color: #f5f5f517;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .modal-product-name {
+            font-size: 18px;
+            font-weight: 400;
+            color: #ffffff;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .modal-product-price {
+            font-size: 28px;
+            font-weight: 400;
+            color: #6af258;
+            margin-bottom: 5px;
+        }
+
+        .modal-product-original-price {
+            font-size: 18px;
+            color: #ff5555;
+            text-decoration: line-through;
+            margin-bottom: 12px;
+        }
+
+        .modal-parcelamento {
+            background-color: #f9f9f956;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .modal-parcelamento-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #f9f9f9;
+        }
+
+        .modal-parcelamento-item strong {
+            color: #ffffff;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #f0f0f0;
+            background-color: #fafafa;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .modal-whatsapp-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .modal-whatsapp-btn:hover {
+            background-color: #20ba5f;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        .modal-whatsapp-btn i {
+            font-size: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .modal-content {
+                max-width: 100%;
+                width: 95%;
+                max-height: 95vh;
+                border-radius: 16px;
+            }
+
+            .modal-body {
+                padding: 15px;
+            }
+
+            .modal-footer {
+                padding: 15px;
+            }
+
+            .modal-product-image {
+                max-height: 300px;
+                margin-bottom: 15px;
+            }
+
+            .modal-product-name {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .modal-product-price {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 
@@ -683,7 +880,8 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                      <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png" alt="logotipo da empresa/loja" style="width: 180px;">
+                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
+                        alt="logotipo da empresa/loja" style="width: 180px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -867,15 +1065,18 @@
                     }
                 }
 
+                // Gerar ID único: usar ID do Supabase se existir, senão usar índice como fallback
+                const produtoId = item.id || `produto_${idx}`;
+
                 console.log(`Produto ${idx}:`, {
-                    id: item.id,
+                    id: produtoId,
                     nome: item.PRODUTO,
                     imagemUrl: imagemUrl,
                     todasAsColunas: Object.keys(item)
                 });
 
                 return {
-                    id: item.id,
+                    id: produtoId,
                     nome: item.PRODUTO || '',
                     preco: item.PREÇO || '0.00',
                     imagem: imagemUrl,
@@ -2344,7 +2545,7 @@
                                 ${statusHtml}
                             </div>
                             
-                            <button class="produto-botao" onclick="adicionarAoCarrinho(${produto.id})" 
+                            <button class="produto-botao" onclick="adicionarAoCarrinho('${produto.id}')" 
                                 ${!produto.disponibilidade ? 'disabled' : ''}>
                                 Ver detalhes
                             </button>
@@ -2845,13 +3046,145 @@
             };
         })());
 
-        // Adicionar ao carrinho
-        function adicionarAoCarrinho(produtoId) {
-            const produto = produtosCarregados.find(p => p.id === produtoId);
-            if (produto) {
-                alert(`✓ "${produto.nome}" foi adicionado ao carrinho!`);
+        // ===== FUNÇÕES PARA GERENCIAR MODAL DE DETALHES =====
+
+        // Função para abrir o modal e preencher com dados do produto
+        async function abrirModalProduto(produtoId) {
+            console.log(`🔍 Abrindo modal para produto ID: ${produtoId} (tipo: ${typeof produtoId})`);
+            console.log(`📦 Total de produtos carregados: ${produtosCarregados.length}`);
+            console.log(`📋 IDs disponíveis:`, produtosCarregados.map(p => p.id).slice(0, 10));
+
+            const modal = document.getElementById('produtoModal');
+
+            // Buscar produto - tentar como número e string
+            let produto = produtosCarregados.find(p => p.id === produtoId || String(p.id) === String(produtoId));
+
+            if (!produto || !modal) {
+                console.error(`❌ Produto não encontrado com ID: ${produtoId}`);
+                console.error(`Produtos disponíveis:`, produtosCarregados);
+                return;
+            }
+
+            console.log(`✅ Produto encontrado:`, produto);
+
+            try {
+                // Tentar obter imagem do cache, caso não esteja disponível, usar a URL original
+                let imagemUrl = produto.imagem;
+                try {
+                    const imagemCacheada = await imagemCache.obterImagemComCache(produto.imagem);
+                    if (imagemCacheada) {
+                        imagemUrl = imagemCacheada;
+                    }
+                } catch (err) {
+                    console.warn('Erro ao carregar imagem do cache, usando URL original:', err);
+                    imagemUrl = produto.imagem;
+                }
+
+                // Preencher dados do modal
+                document.getElementById('modalProductName').textContent = produto.nome;
+                document.getElementById('modalProductImage').src = imagemUrl;
+                document.getElementById('modalProductImage').alt = produto.nome;
+
+                // Preço
+                const precoFinal = calcularPrecoComDesconto(produto.preco, produto.desconto);
+                const precoFormatado = formatarPreco(precoFinal);
+                const precoOriginal = formatarPreco(produto.preco);
+
+                document.getElementById('modalProductPrice').textContent = `R$ ${precoFormatado}`;
+
+                // Mostrar preço original se houver desconto
+                const originalPriceDiv = document.getElementById('modalProductOriginalPrice');
+                if (produto.desconto) {
+                    originalPriceDiv.textContent = `R$ ${precoOriginal}`;
+                    originalPriceDiv.style.display = 'block';
+                } else {
+                    originalPriceDiv.style.display = 'none';
+                }
+
+                // Parcelamento
+                const parcelamentDiv = document.getElementById('modalParcelamento');
+                if (produto.parcelamento && (produto.parcelamento['sem-juros-ate'] > 0 || produto.parcelamento['parcelado-em-ate'] > 0)) {
+                    let html = '';
+                    if (produto.parcelamento['sem-juros-ate'] > 0) {
+                        const valorParcela = (parseFloat(precoFinal) / produto.parcelamento['sem-juros-ate']).toFixed(2);
+                        html += `<div class="modal-parcelamento-item">
+                            <span><strong>${produto.parcelamento['sem-juros-ate']} parcelas sem juros</strong></span>
+                            <span>R$ ${formatarPreco(valorParcela)}</span>
+                        </div>`;
+                    }
+                    if (produto.parcelamento['parcelado-em-ate'] > 0) {
+                        html += `<div class="modal-parcelamento-item">
+                            <span><strong>Até ${produto.parcelamento['parcelado-em-ate']} parcelas</strong></span>
+                            <span>Com juros</span>
+                        </div>`;
+                    }
+                    parcelamentDiv.innerHTML = html;
+                    parcelamentDiv.style.display = 'block';
+                } else {
+                    parcelamentDiv.style.display = 'none';
+                }
+
+                // URL do WhatsApp
+                const mensagem = encodeURIComponent(`Olá! Tenho interesse no produto: ${produto.nome} - R$ ${precoFormatado}`);
+                document.getElementById('modalWhatsappBtn').href = `https://wa.me/5585988881234?text=${mensagem}`;
+
+                // Mostrar modal
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                console.log(`✅ Modal aberto com sucesso para: ${produto.nome}`);
+            } catch (erro) {
+                console.error('Erro ao abrir modal do produto:', erro);
+                logManager.error('Erro ao abrir modal:', erro.message);
             }
         }
+
+        // Função para fechar o modal
+        function fecharModalProduto() {
+            const modal = document.getElementById('produtoModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Função para inicializar os event listeners do modal (chamada após DOM estar pronto)
+        function inicializarEventListenersModal() {
+            const modal = document.getElementById('produtoModal');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+            if (!modal || !modalCloseBtn) {
+                console.warn('⚠️ Elementos do modal não encontrados');
+                return;
+            }
+
+            // Botão de fechar
+            modalCloseBtn.addEventListener('click', fecharModalProduto);
+
+            // Fechar ao clicar no overlay
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    fecharModalProduto();
+                }
+            });
+
+            // Fechar ao pressionar ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    fecharModalProduto();
+                }
+            });
+
+            logManager.log('✓ Event listeners do modal inicializados');
+        }
+
+
+        // Adicionar ao carrinho
+        function adicionarAoCarrinho(produtoId) {
+            // Agora essa função abre o modal em vez de adicionar ao carrinho
+            abrirModalProduto(produtoId);
+        }
+
 
         // Rastrear tentativas de reload das imagens
         const imagemRetryMap = new Map();
@@ -3086,6 +3419,7 @@
                     gerarCategorias(); // Gerar categorias após carregar produtos
                     gerarFooter(); // Gerar footer após carregar produtos
                     controlarBotaoWhatsApp(); // Iniciar controle do botão WhatsApp
+                    inicializarEventListenersModal(); // Inicializar event listeners do modal
                 }, 50);
             });
 
@@ -3248,6 +3582,28 @@
             }, 500);
         });
     </script>
+
+    <!-- Modal de Detalhes do Produto -->
+    <div class="modal-overlay" id="produtoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Produto</h2>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="modalProductImage" class="modal-product-image" src="" alt="Produto">
+                <h3 class="modal-product-name" id="modalProductName"></h3>
+                <div id="modalProductOriginalPrice" class="modal-product-original-price"></div>
+                <div class="modal-product-price" id="modalProductPrice"></div>
+                <div class="modal-parcelamento" id="modalParcelamento"></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="modal-whatsapp-btn" id="modalWhatsappBtn" target="_blank">
+                    <i class="ri-whatsapp-line"></i> Fazer meu pedido no WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Botão WhatsApp Fixo -->
     <a href="https://wa.me/5585988881234" target="_blank" class="whatsapp-button" title="Fale conosco no WhatsApp">
