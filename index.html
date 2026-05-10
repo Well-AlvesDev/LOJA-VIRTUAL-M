@@ -1082,7 +1082,7 @@
         <div id="text-animator"
             style="text-align: center; min-height: 50px; display: flex; align-items: center; justify-content: center; padding: 0 20px;">
             <h2
-                style="font-size: clamp(13px, 4vw, 14px); font-weight: 400; color: #3f3f3f; margin: 0; letter-spacing: 0.5px; max-width: 100%; word-wrap: break-word;">
+                style="font-size: clamp(13px, 3vw, 22px); font-weight: 400; color: #3f3f3f; margin: 0; letter-spacing: 0.5px; max-width: 100%; word-wrap: break-word;">
                 {{ textoAnimado }}<span v-if="estaDigitando" class="cursor-blink"></span>
             </h2>
         </div>
@@ -1398,9 +1398,9 @@
                     textoAnimado: '',
                     frases: ['Bem vinda à Juvele!', 'Moda feminina de qualidade', 'Compra 100% segura'],
                     indiceAtual: 0,
-                    velocidadeDigitacao: 60,
-                    velocidadeApagamento: 30,
-                    pausaAposFrase: 4500,
+                    velocidadeDigitacao: 20,
+                    velocidadeApagamento: 19,
+                    pausaAposFrase: 3200,
                     pausaAntesDeContinuar: 400,
                     estaDigitando: true
                 };
