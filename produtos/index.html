@@ -875,7 +875,7 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
+                    <img src="../recursos/identidade/logofpo.webp"
                         alt="logotipo da empresa/loja" style="width: 180px;">
                 </a>
 
@@ -1060,8 +1060,8 @@
                     }
                 }
 
-                // Gerar ID único: usar ID do Supabase se existir, senão usar índice como fallback
-                const produtoId = item.id || `produto_${idx}`;
+                // Gerar ID único: usar ID do Supabase (testar maiúscula e minúscula)
+                const produtoId = item.ID || item.id || item.Id || idx;
 
                 console.log(`Produto ${idx}:`, {
                     id: produtoId,
@@ -3043,141 +3043,39 @@
 
         // ===== FUNÇÕES PARA GERENCIAR MODAL DE DETALHES =====
 
-        // Função para abrir o modal e preencher com dados do produto
+        // Função para abrir o modal e preencher com dados do produto (DESATIVADA - usando página de detalhes)
         async function abrirModalProduto(produtoId) {
-            console.log(`🔍 Abrindo modal para produto ID: ${produtoId} (tipo: ${typeof produtoId})`);
-            console.log(`📦 Total de produtos carregados: ${produtosCarregados.length}`);
-            console.log(`📋 IDs disponíveis:`, produtosCarregados.map(p => p.id).slice(0, 10));
+            // Esta função foi desativada em favor da página de detalhes
+            // Manter como stub para compatibilidade com código legado
+            console.warn('abrirModalProduto foi desativada. Use a página de detalhes em: ./detalhes/index.html');
+        }
 
-            const modal = document.getElementById('produtoModal');
+        // Função para fechar o modal (DESATIVADA - usando página de detalhes)
+        function fecharModalProduto() {
+            // Esta função foi desativada em favor da página de detalhes
+            console.warn('fecharModalProduto foi desativada. Use a página de detalhes em: ./detalhes/index.html');
+        }
 
-            // Buscar produto - tentar como número e string
+        // Função para inicializar os event listeners do modal (DESATIVADA - usando página de detalhes)
+        function inicializarEventListenersModal() {
+            // Modal foi removido em favor de página de detalhes
+            // Esta função é mantida para compatibilidade com código legado
+        }
+
+
+        // Redirecionar para página de detalhes
+        function adicionarAoCarrinho(produtoId) {
+            // Encontrar o produto
             let produto = produtosCarregados.find(p => p.id === produtoId || String(p.id) === String(produtoId));
 
-            if (!produto || !modal) {
-                console.error(`❌ Produto não encontrado com ID: ${produtoId}`);
-                console.error(`Produtos disponíveis:`, produtosCarregados);
+            if (!produto) {
+                console.error(`Produto não encontrado com ID: ${produtoId}`);
                 return;
             }
 
-            console.log(`✅ Produto encontrado:`, produto);
-
-            try {
-                // Tentar obter imagem do cache, caso não esteja disponível, usar a URL original
-                let imagemUrl = produto.imagem;
-                try {
-                    const imagemCacheada = await imagemCache.obterImagemComCache(produto.imagem);
-                    if (imagemCacheada) {
-                        imagemUrl = imagemCacheada;
-                    }
-                } catch (err) {
-                    console.warn('Erro ao carregar imagem do cache, usando URL original:', err);
-                    imagemUrl = produto.imagem;
-                }
-
-                // Preencher dados do modal
-                document.getElementById('modalProductName').textContent = produto.nome;
-                document.getElementById('modalProductImage').src = imagemUrl;
-                document.getElementById('modalProductImage').alt = produto.nome;
-
-                // Preço
-                const precoFinal = calcularPrecoComDesconto(produto.preco, produto.desconto);
-                const precoFormatado = formatarPreco(precoFinal);
-                const precoOriginal = formatarPreco(produto.preco);
-
-                document.getElementById('modalProductPrice').textContent = `R$ ${precoFormatado}`;
-
-                // Mostrar preço original se houver desconto
-                const originalPriceDiv = document.getElementById('modalProductOriginalPrice');
-                if (produto.desconto) {
-                    originalPriceDiv.textContent = `R$ ${precoOriginal}`;
-                    originalPriceDiv.style.display = 'block';
-                } else {
-                    originalPriceDiv.style.display = 'none';
-                }
-
-                // Parcelamento
-                const parcelamentDiv = document.getElementById('modalParcelamento');
-                if (produto.parcelamento && (produto.parcelamento['sem-juros-ate'] > 0 || produto.parcelamento['parcelado-em-ate'] > 0)) {
-                    let html = '';
-                    if (produto.parcelamento['sem-juros-ate'] > 0) {
-                        const valorParcela = (parseFloat(precoFinal) / produto.parcelamento['sem-juros-ate']).toFixed(2);
-                        html += `<div class="modal-parcelamento-item">
-                            <span><strong>${produto.parcelamento['sem-juros-ate']} parcelas sem juros</strong></span>
-                            <span>R$ ${formatarPreco(valorParcela)}</span>
-                        </div>`;
-                    }
-                    if (produto.parcelamento['parcelado-em-ate'] > 0) {
-                        html += `<div class="modal-parcelamento-item">
-                            <span><strong>Até ${produto.parcelamento['parcelado-em-ate']} parcelas</strong></span>
-                            <span>Com juros</span>
-                        </div>`;
-                    }
-                    parcelamentDiv.innerHTML = html;
-                    parcelamentDiv.style.display = 'block';
-                } else {
-                    parcelamentDiv.style.display = 'none';
-                }
-
-                // URL do WhatsApp
-                const mensagem = encodeURIComponent(`Olá! Tenho interesse no produto: ${produto.nome} - R$ ${precoFormatado}`);
-                document.getElementById('modalWhatsappBtn').href = `https://wa.me/5585988881234?text=${mensagem}`;
-
-                // Mostrar modal
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-
-                console.log(`✅ Modal aberto com sucesso para: ${produto.nome}`);
-            } catch (erro) {
-                console.error('Erro ao abrir modal do produto:', erro);
-                logManager.error('Erro ao abrir modal:', erro.message);
-            }
-        }
-
-        // Função para fechar o modal
-        function fecharModalProduto() {
-            const modal = document.getElementById('produtoModal');
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-        }
-
-        // Função para inicializar os event listeners do modal (chamada após DOM estar pronto)
-        function inicializarEventListenersModal() {
-            const modal = document.getElementById('produtoModal');
-            const modalCloseBtn = document.getElementById('modalCloseBtn');
-
-            if (!modal || !modalCloseBtn) {
-                console.warn('⚠️ Elementos do modal não encontrados');
-                return;
-            }
-
-            // Botão de fechar
-            modalCloseBtn.addEventListener('click', fecharModalProduto);
-
-            // Fechar ao clicar no overlay
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    fecharModalProduto();
-                }
-            });
-
-            // Fechar ao pressionar ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.classList.contains('active')) {
-                    fecharModalProduto();
-                }
-            });
-
-            logManager.log('✓ Event listeners do modal inicializados');
-        }
-
-
-        // Adicionar ao carrinho
-        function adicionarAoCarrinho(produtoId) {
-            // Agora essa função abre o modal em vez de adicionar ao carrinho
-            abrirModalProduto(produtoId);
+            // Redirecionar para página de detalhes com o nome do produto e ID em parâmetros separados
+            const nomeSlug = produto.nome.toLowerCase().replace(/\s+/g, '-');
+            window.location.href = `../detalhes/index.html?q=${nomeSlug}&id=${produto.id}`;
         }
 
 
@@ -3414,7 +3312,7 @@
                     gerarCategorias(); // Gerar categorias após carregar produtos
                     gerarFooter(); // Gerar footer após carregar produtos
                     controlarBotaoWhatsApp(); // Iniciar controle do botão WhatsApp
-                    inicializarEventListenersModal(); // Inicializar event listeners do modal
+                    // inicializarEventListenersModal() - DESATIVADA em favor de página de detalhes
                 }, 50);
             });
 

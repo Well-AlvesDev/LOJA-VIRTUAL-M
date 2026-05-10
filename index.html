@@ -936,6 +936,37 @@
                 font-size: 24px;
             }
         }
+
+        /* Banner Responsivo */
+        .banner {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .banner img {
+            width: 100%;
+            margin-top: -10px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .banner img {
+                width: 120%;
+                margin-top: 0px;
+                margin-left: -5%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .banner img {
+                width: 120%;
+                margin-top: -15px;
+                margin-left: -10%;
+            }
+        }
     </style>
 </head>
 
@@ -956,8 +987,7 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="./recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
-                        alt="logotipo da empresa/loja" style="width: 180px;">
+                    <img src="./recursos/identidade/logofpo.webp" alt="logotipo da empresa/loja" style="width: 180px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -1033,37 +1063,8 @@
                 </ul>
             </div>
         </div>
-        <!-- LOGO EMPRESA (Vue + Skeleton) -->
-        <div id="logo-app"
-            style="display: flex; justify-content: center; width: 100px; height: 100px; margin: 20px auto; border-radius: 30px; overflow: hidden;">
-            <div class="logo-empresa-vue">
-                <div v-if="!loaded" class="skeleton" aria-hidden="true"></div>
-                <img id="logo-img" :src="src" alt="" @load="onLoad"
-                    :style="{ transform: 'scale(' + zoom + ')' , visibility: loaded ? 'visible' : 'hidden' }">
-            </div>
-        </div>
-        <!-- Dominio/Nome DA EMPRESA-->
-        <div class="nome-da-empresa">
-            <h1 style="text-align: center; font-size: 35px; color: #3f3f3f; font-weight: bold;">Dona Flor
-                <!-- Icone de verificação--> <img src="./recursos/icones/verified.svg" alt="icone-de-empresa-vefiricada"
-                    style="width: 23px; height: 23px; vertical-align: middle;">
-            </h1>
-        </div>
-        <!-- BIOGRAFIA DA EMPRESA -->
-        <div class="bio-da-empresa">
-            <p style=" text-align: center; font-size: 16px; color: #5a5a5a; margin: 10px auto; max-width: 400px;">
-                Seja Bem vinda à nossa <strong><mark>Loja virtual</mark></strong>. <br>Roupas e acessórios 🌷
-            </p>
-            <div class="hashtags-wrapper" style="margin: 10px auto; text-align: center;">
-                <div class="hashtags-container" aria-live="polite" aria-atomic="true">
-                    <span class="hashtag active"></span>
-                    <span class="hashtag"></span>
-                </div>
-            </div>
-        </div>
-        <!-- MÉTRICAS INSTAGRAM-->
-        <div class="metricas-instagram">
-
+        <div class="banner">
+            <img src="./recursos/identidade/file_00000000c060720ea0bf008ff62f0972.png" alt="">
         </div>
         <div class="criptografia-desc" id="stop-point">
             <p style="text-align: center; font-size: 12px; max-width: 300px; margin: 20px auto; color: #878787;">
@@ -2792,140 +2793,38 @@
 
         // ===== FUNÇÕES PARA GERENCIAR MODAL DE DETALHES =====
 
-        // Função para abrir o modal e preencher com dados do produto
+        // Função para abrir o modal e preencher com dados do produto (DESATIVADA - usando página de detalhes)
         async function abrirModalProduto(produtoId) {
-            console.log(`🔍 Abrindo modal para produto ID: ${produtoId} (tipo: ${typeof produtoId})`);
-            console.log(`📦 Total de produtos carregados: ${produtosCarregados.length}`);
-            console.log(`📋 IDs disponíveis:`, produtosCarregados.map(p => p.id).slice(0, 10));
+            // Esta função foi desativada em favor da página de detalhes
+            // Manter como stub para compatibilidade com código legado
+            console.warn('abrirModalProduto foi desativada. Use a página de detalhes em: ./produtos/detalhes/index.html');
+        }
 
-            const modal = document.getElementById('produtoModal');
+        // Função para fechar o modal (DESATIVADA - usando página de detalhes)
+        function fecharModalProduto() {
+            // Esta função foi desativada em favor da página de detalhes
+            console.warn('fecharModalProduto foi desativada. Use a página de detalhes em: ./produtos/detalhes/index.html');
+        }
 
-            // Buscar produto - tentar como número e string
+        // Função para inicializar os event listeners do modal (DESATIVADA - usando página de detalhes)
+        function inicializarEventListenersModal() {
+            // Modal foi removido em favor de página de detalhes
+            // Esta função é mantida para compatibilidade com código legado
+        }
+
+        // Redirecionar para página de detalhes
+        function adicionarAoCarrinho(produtoId) {
+            // Encontrar o produto
             let produto = produtosCarregados.find(p => p.id === produtoId || String(p.id) === String(produtoId));
 
-            if (!produto || !modal) {
-                console.error(`❌ Produto não encontrado com ID: ${produtoId}`);
-                console.error(`Produtos disponíveis:`, produtosCarregados);
+            if (!produto) {
+                console.error(`Produto não encontrado com ID: ${produtoId}`);
                 return;
             }
 
-            console.log(`✅ Produto encontrado:`, produto);
-
-            try {
-                // Tentar obter imagem do cache, caso não esteja disponível, usar a URL original
-                let imagemUrl = produto.imagem;
-                try {
-                    const imagemCacheada = await imagemCache.obterImagemComCache(produto.imagem);
-                    if (imagemCacheada) {
-                        imagemUrl = imagemCacheada;
-                    }
-                } catch (err) {
-                    console.warn('Erro ao carregar imagem do cache, usando URL original:', err);
-                    imagemUrl = produto.imagem;
-                }
-
-                // Preencher dados do modal
-                document.getElementById('modalProductName').textContent = produto.nome;
-                document.getElementById('modalProductImage').src = imagemUrl;
-                document.getElementById('modalProductImage').alt = produto.nome;
-
-                // Preço
-                const precoFinal = calcularPrecoComDesconto(produto.preco, produto.desconto);
-                const precoFormatado = formatarPreco(precoFinal);
-                const precoOriginal = formatarPreco(produto.preco);
-
-                document.getElementById('modalProductPrice').textContent = `R$ ${precoFormatado}`;
-
-                // Mostrar preço original se houver desconto
-                const originalPriceDiv = document.getElementById('modalProductOriginalPrice');
-                if (produto.desconto) {
-                    originalPriceDiv.textContent = `R$ ${precoOriginal}`;
-                    originalPriceDiv.style.display = 'block';
-                } else {
-                    originalPriceDiv.style.display = 'none';
-                }
-
-                // Parcelamento
-                const parcelamentDiv = document.getElementById('modalParcelamento');
-                if (produto.parcelamento && (produto.parcelamento['sem-juros-ate'] > 0 || produto.parcelamento['parcelado-em-ate'] > 0)) {
-                    let html = '';
-                    if (produto.parcelamento['sem-juros-ate'] > 0) {
-                        const valorParcela = (parseFloat(precoFinal) / produto.parcelamento['sem-juros-ate']).toFixed(2);
-                        html += `<div class="modal-parcelamento-item">
-                            <span><strong>${produto.parcelamento['sem-juros-ate']} parcelas sem juros</strong></span>
-                            <span>R$ ${formatarPreco(valorParcela)}</span>
-                        </div>`;
-                    }
-                    if (produto.parcelamento['parcelado-em-ate'] > 0) {
-                        html += `<div class="modal-parcelamento-item">
-                            <span><strong>Até ${produto.parcelamento['parcelado-em-ate']} parcelas</strong></span>
-                            <span>Com juros</span>
-                        </div>`;
-                    }
-                    parcelamentDiv.innerHTML = html;
-                    parcelamentDiv.style.display = 'block';
-                } else {
-                    parcelamentDiv.style.display = 'none';
-                }
-
-                // URL do WhatsApp
-                const mensagem = encodeURIComponent(`Olá! Tenho interesse no produto: ${produto.nome} - R$ ${precoFormatado}`);
-                document.getElementById('modalWhatsappBtn').href = `https://wa.me/5585988881234?text=${mensagem}`;
-
-                // Mostrar modal
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-
-                console.log(`✅ Modal aberto com sucesso para: ${produto.nome}`);
-            } catch (erro) {
-                console.error('Erro ao abrir modal do produto:', erro);
-                logManager.error('Erro ao abrir modal:', erro.message);
-            }
-        }
-
-        // Função para fechar o modal
-        function fecharModalProduto() {
-            const modal = document.getElementById('produtoModal');
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-        }
-
-        // Função para inicializar os event listeners do modal (chamada após DOM estar pronto)
-        function inicializarEventListenersModal() {
-            const modal = document.getElementById('produtoModal');
-            const modalCloseBtn = document.getElementById('modalCloseBtn');
-
-            if (!modal || !modalCloseBtn) {
-                console.warn('⚠️ Elementos do modal não encontrados');
-                return;
-            }
-
-            // Botão de fechar
-            modalCloseBtn.addEventListener('click', fecharModalProduto);
-
-            // Fechar ao clicar no overlay
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    fecharModalProduto();
-                }
-            });
-
-            // Fechar ao pressionar ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.classList.contains('active')) {
-                    fecharModalProduto();
-                }
-            });
-
-            logManager.log('✓ Event listeners do modal inicializados');
-        }
-
-        // Adicionar ao carrinho
-        function adicionarAoCarrinho(produtoId) {
-            // Agora essa função abre o modal em vez de adicionar ao carrinho
-            abrirModalProduto(produtoId);
+            // Redirecionar para página de detalhes com o nome do produto e ID em parâmetros separados
+            const nomeSlug = produto.nome.toLowerCase().replace(/\s+/g, '-');
+            window.location.href = `./detalhes/index.html?q=${nomeSlug}&id=${produto.id}`;
         }
 
         // Rastrear tentativas de reload das imagens
@@ -3313,8 +3212,7 @@
 
         // Log inicial do cache
         document.addEventListener('DOMContentLoaded', () => {
-            // Inicializar event listeners do modal
-            inicializarEventListenersModal();
+            // inicializarEventListenersModal() - DESATIVADA em favor de página de detalhes
 
             setTimeout(async () => {
                 const tamanho = await imagemCache.obterTamanhoCacheEmMB();

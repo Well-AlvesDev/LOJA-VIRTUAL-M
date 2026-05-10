@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dona Flor - Moda Feminina</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
+    <link rel="icon" type="image/png" href="../recursos/identidade/logo.jpg">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f5f5f5;
+        transition: overflow 0.3s ease;
+        margin-top: 140px;
+        padding-top: 0;
+    }
+
+    body.menu-open {
+        overflow: hidden;
+    }
+
+    /* Overlay */
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .overlay.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Navbar */
+    nav {
+        background-color: #ffd0e9;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        height: 60px;
+    }
+
+    .logo {
+        font-size: 16px;
+        color: #eb3a75;
+        margin-left: 10px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Menu Principal */
+    .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+        align-items: center;
+    }
+
+    .nav-item {
+        position: relative;
+    }
+
+    .nav-link {
+        color: #730a52;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 10px 5px;
+        transition: color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+
+    /* Submenu de Produtos */
+    .submenu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #fff;
+        list-style: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 220px;
+        margin-top: 10px;
+        animation: slideDown 0.3s ease;
+        max-height: 284px;
+        overflow-y: auto;
+    }
+
+    .submenu.active {
+        display: block;
+    }
+
+    .submenu-item {
+        padding: 12px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    .submenu-item:last-child {
+        border-bottom: none;
+    }
+
+    .submenu-link {
+        color: #333;
+        text-decoration: none;
+        display: block;
+        font-size: 14px;
+    }
+
+    /* Ícone de submenu */
+    .dropdown-icon {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+        display: inline-block;
+        transform-origin: center;
+    }
+
+    .nav-item.active .dropdown-icon {
+        transform: rotate(180deg);
+    }
+
+    /* Ícones de carrinho e usuário */
+    .nav-icons {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .nav-icon {
+        color: #333;
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        position: relative;
+    }
+
+    /* Toggle Mobile */
+    .hamburger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        gap: 5px;
+    }
+
+    .hamburger span {
+        width: 23px;
+        height: 2.3px;
+        background-color: #670e49;
+        border-radius: 2px;
+        transition: all 0.1s ease;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .nav-container {
+            height: 50px;
+            padding: 0 15px;
+        }
+
+        .hamburger {
+            display: flex;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(2px, -2px);
+        }
+
+        .nav-menu {
+            position: fixed;
+            left: -100%;
+            top: 52px;
+            flex-direction: column;
+            background-color: #fff;
+            width: 100%;
+            text-align: center;
+            transition: 0.1s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            gap: 0;
+            padding: 2px 0;
+        }
+
+        .nav-menu.active {
+            left: 0;
+        }
+
+        .nav-item {
+            width: 100%;
+        }
+
+        .nav-link {
+            color: #373737;
+            display: block;
+            font-weight: 400;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* Submenu Mobile */
+        .submenu {
+            position: static;
+            display: none;
+            box-shadow: none;
+            background-color: #f9f9f9;
+            border-radius: 0;
+            min-width: unset;
+            margin-top: 0;
+            animation: none;
+            max-height: 277px;
+            overflow-y: auto;
+        }
+
+        .submenu-item {
+            padding: 10px 20px;
+            padding-left: 40px;
+        }
+
+        .submenu-link {
+            color: #606060;
+        }
+
+        .submenu.active {
+            display: block;
+        }
+    }
+
+    /* Ocultar Contato em telas médias (menu desktop apertado) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .nav-item-contato {
+            display: none;
+        }
+    }
+
+    /* Ocultar Segurança em telas pequenas (menu desktop mais apertado) */
+    @media (min-width: 769px) and (max-width: 900px) {
+        .nav-item-seguranca {
+            display: none;
+        }
+    }
+
+    /* Botão WhatsApp Fixo */
+    .whatsapp-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #25d366;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        z-index: 20;
+        text-decoration: none;
+        color: #fff;
+    }
+
+    .whatsapp-button:hover {
+        background-color: #20ba5f;
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .whatsapp-button i {
+        font-size: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .whatsapp-button {
+            bottom: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+        }
+
+        .whatsapp-button i {
+            font-size: 19px;
+        }
+    }
+
+    /* ===== ESTILOS DA PÁGINA DE DETALHES ===== */
+    .container-detalhes {
+        max-width: 1200px;
+        margin: -40px auto;
+        padding: 40px 20px;
+    }
+
+    .produto-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 40px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .produto-imagem {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        min-height: 400px;
+        overflow: hidden;
+    }
+
+    .produto-imagem img {
+        max-width: 80%;
+        max-height: 80%;
+        object-fit: contain;
+    }
+
+    .produto-imagem.carregando {
+        background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    .produto-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .produto-nome {
+        font-size: 28px;
+        font-weight: 400;
+        color: #333;
+        margin-bottom: 20px;
+        text-transform: capitalize;
+    }
+
+    .produto-preco {
+        font-size: 32px;
+        font-weight: 400;
+        color: #eb3a75;
+        margin-bottom: 10px;
+    }
+
+    .produto-preco-original {
+        font-size: 18px;
+        color: #999;
+        text-decoration: line-through;
+        margin-bottom: 20px;
+    }
+
+    .produto-parcelamento {
+        background-color: #f5f5f5;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border-left: 4px solid #eb3a75;
+    }
+
+    .parcelamento-item {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .parcelamento-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .parcelamento-item i {
+        color: #eb3a75;
+        font-size: 16px;
+    }
+
+    .btn-pedido {
+        background-color: #25d366;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        font-weight: 400;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-pedido i {
+        font-size: 20px;
+    }
+
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        gap: 20px;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f0f0f0;
+        border-top: 4px solid #eb3a75;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 20px;
+        border-radius: 6px;
+        border: 1px solid #f5c6cb;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb a {
+        color: #eb3a75;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .breadcrumb a:hover {
+        color: #c91e5a;
+        text-decoration: underline;
+    }
+
+    .breadcrumb span {
+        color: #999;
+    }
+
+    .breadcrumb .breadcrumb-separator {
+        color: #ccc;
+    }
+
+    .breadcrumb .breadcrumb-current {
+        color: #333;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .produto-container {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .container-detalhes {
+            padding: 20px 15px;
+        }
+
+        .produto-nome {
+            font-size: 20px;
+        }
+
+        .produto-preco {
+            font-size: 24px;
+        }
+
+        .produto-imagem {
+            min-height: 300px;
+            max-height: 400px;
+        }
+
+        .produto-imagem img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .btn-pedido {
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<body>
+    <header>
+        <!-- BARRA DE NAVEGAÇÃO -->
+        <nav>
+            <div class="nav-container">
+                <!-- Logo -->
+                <a href="#" class="logo">
+                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
+                        alt="logotipo da empresa/loja" style="width: 180px;">
+                </a>
+
+                <!-- Menu Principal -->
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link">Início <i class="ri-home-smile-line"></i></a>
+                    </li>
+
+                    <!-- Menu com Submenu -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            Produtos <i class="ri-arrow-down-s-line dropdown-icon"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="#" class="submenu-link">Vestidos</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="#" class="submenu-link"> Blusas</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="#" class="submenu-link"> Calças</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="#" class="submenu-link"> Sapatos</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="#" class="submenu-link"> Acessórios</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Promoções <i class="ri-fire-line"></i></a>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Meus pedidos <i class="ri-menu-search-line"></i></a>
+                    </li>
+
+                    <li class="nav-item nav-item-seguranca">
+
+                        <a href="#" class="nav-link">Segurança <i class="ri-shield-check-line"></i></a>
+                    </li>
+
+                    <li class="nav-item nav-item-contato">
+                        <a href="#" class="nav-link">Contato <i class="ri-phone-line"></i></a>
+                    </li>
+                </ul>
+
+                <!-- Hambúrguer Menu -->
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </div>
+
+            </div>
+        </nav>
+        <!-- BARRA DE PESQUISA -->
+        <div class="barra-de-pesquisa-totalidade">
+            <div class="caixa-de-pesquisa" role="search">
+                <span class="icon-pesquisa"><i class="ri-search-line"></i></span>
+                <input id="busca-input" type="search" placeholder="Estou buscando..." autocomplete="off"
+                    aria-autocomplete="list" aria-controls="sugestoes-list" aria-expanded="false" role="combobox">
+
+                <!-- Botão limpar (visível apenas quando há texto) -->
+                <button type="button" id="busca-clear" class="clear-btn" aria-label="Limpar pesquisa"
+                    title="Limpar pesquisa" hidden>
+                    <i class="ri-close-line" aria-hidden="true"></i>
+                </button>
+
+                <!-- Sugestões dinâmicas (preenchidas via JS a partir de data/xrl.json) -->
+                <ul id="sugestoes-list" class="sugestoes-list" role="listbox" aria-label="Sugestões de pesquisa" hidden>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="container-detalhes" id="main-content">
+        <div id="produto-loader" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Carregando produto...</p>
+        </div>
+    </main>
+
+    <!-- BOTÃO WHATSAPP -->
+    <a href="https://wa.me/5511999999999" class="whatsapp-button" target="_blank" rel="noopener noreferrer"
+        title="Fale conosco no WhatsApp">
+        <i class="ri-whatsapp-line"></i>
+    </a>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="../config.js"></script>
+    <script>
+        // ===== MENU E BARRA DE PESQUISA =====
+        function initializeMenuAndSearch() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            const overlay = document.querySelector('.overlay');
+            const navItems = document.querySelectorAll('.nav-item');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const buscaInput = document.getElementById('busca-input');
+            const buscaClear = document.getElementById('busca-clear');
+            const sugestoesList = document.getElementById('sugestoes-list');
+
+            if (!hamburger || !navMenu) return;
+
+            // Abrir/fechar menu
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+                overlay.classList.toggle('active');
+                document.body.classList.toggle('menu-open');
+
+                if (!navMenu.classList.contains('active')) {
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                        const submenu = item.querySelector('.submenu');
+                        if (submenu) submenu.classList.remove('active');
+                    });
+                }
+            });
+
+            // Abrir/fechar submenu
+            navItems.forEach(item => {
+                const link = item.querySelector('.nav-link');
+                const submenu = item.querySelector('.submenu');
+
+                if (submenu) {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+
+                        navItems.forEach(otherItem => {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('active');
+                                const otherSubmenu = otherItem.querySelector('.submenu');
+                                if (otherSubmenu) otherSubmenu.classList.remove('active');
+                            }
+                        });
+
+                        item.classList.toggle('active');
+                        submenu.classList.toggle('active');
+                    });
+                }
+            });
+
+            // Fechar menu ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('nav')) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }
+            });
+
+            // Fechar ao clicar no overlay
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                });
+            }
+
+            // Barra de pesquisa
+            if (buscaInput && buscaClear) {
+                buscaInput.addEventListener('input', (e) => {
+                    const valor = e.target.value.trim();
+                    buscaClear.hidden = !valor;
+                });
+
+                buscaClear.addEventListener('click', () => {
+                    buscaInput.value = '';
+                    buscaClear.hidden = true;
+                    buscaInput.focus();
+                });
+
+                buscaInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const termo = buscaInput.value.trim();
+                        if (termo) {
+                            const encoded = encodeURIComponent(termo.replace(/\s+/g, '-'));
+                            window.location.href = `../produtos/?q=${encoded}`;
+                        }
+                    }
+                });
+            }
+        }
+
+        // Inicializar quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeMenuAndSearch);
+        } else {
+            initializeMenuAndSearch();
+        }
+    </script>
+    <script>
+        // ===== SISTEMA DE CACHE PARA IMAGENS =====
+        const CacheManager = (() => {
+            const CACHE_VERSION = 1;
+            const CACHE_NAME = `produto-cache-v${CACHE_VERSION}`;
+            const DB_NAME = 'DonaFlorDB';
+            const DB_VERSION = 1;
+            const OBJECT_STORE = 'images';
+
+            // Inicializar IndexedDB
+            function initDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve(request.result);
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains(OBJECT_STORE)) {
+                            db.createObjectStore(OBJECT_STORE, { keyPath: 'id' });
+                        }
+                    };
+                });
+            }
+
+            // Salvar imagem no cache
+            async function saveImageToCache(productId, imageUrl, imageData) {
+                try {
+                    const db = await initDB();
+                    const transaction = db.transaction(OBJECT_STORE, 'readwrite');
+                    const store = transaction.objectStore(OBJECT_STORE);
+
+                    const cacheEntry = {
+                        id: productId,
+                        url: imageUrl,
+                        data: imageData,
+                        timestamp: Date.now()
+                    };
+
+                    store.put(cacheEntry);
+
+                    return new Promise((resolve, reject) => {
+                        transaction.oncomplete = () => resolve(true);
+                        transaction.onerror = () => reject(transaction.error);
+                    });
+                } catch (err) {
+                    console.warn('⚠️ Erro ao salvar imagem em cache:', err);
+                    return false;
+                }
+            }
+
+            // Buscar imagem do cache
+            async function getImageFromCache(productId) {
+                try {
+                    const db = await initDB();
+                    const transaction = db.transaction(OBJECT_STORE, 'readonly');
+                    const store = transaction.objectStore(OBJECT_STORE);
+                    const request = store.get(productId);
+
+                    return new Promise((resolve, reject) => {
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => reject(request.error);
+                    });
+                } catch (err) {
+                    console.warn('⚠️ Erro ao buscar imagem do cache:', err);
+                    return null;
+                }
+            }
+
+            return {
+                saveImageToCache,
+                getImageFromCache,
+                initDB
+            };
+        })();
+
+        // ===== CONFIGURAÇÃO DO SUPABASE =====
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_CONFIG.url,
+            SUPABASE_CONFIG.anonKey
+        );
+
+        // ===== FUNÇÕES AUXILIARES =====
+        function extrairIdDaUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function formatarPreco(preco) {
+            const valor = parseFloat(preco);
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        function parseParcelamento(str) {
+            if (!str || typeof str !== 'string') {
+                return { 'parcelado-em-ate': 0, 'sem-juros-ate': 0 };
+            }
+            const parts = str.split(',').map(p => parseInt(p.trim()) || 0);
+            return {
+                'parcelado-em-ate': parts[0] || 0,
+                'sem-juros-ate': parts[1] || 0
+            };
+        }
+
+        function extrairUrlImagem(item) {
+            // Tentar múltiplas variações de nome de coluna para URL de imagem
+            let imagemUrl = item['IMAGEM-URL'] || item['Imagem-URL'] || item['IMAGEM_URL'] ||
+                item['imagem-url'] || item['imagem'] || item['IMAGEM'] || item['url-imagem'] ||
+                item['URL_IMAGEM'] || '';
+
+            // Se ainda não encontrou, procurar em todas as chaves do item
+            if (!imagemUrl) {
+                const allKeys = Object.keys(item);
+                const imagemKey = allKeys.find(key =>
+                    key.toLowerCase().includes('imagem') ||
+                    key.toLowerCase().includes('image') ||
+                    key.toLowerCase().includes('url') ||
+                    key.toLowerCase().includes('foto')
+                );
+                if (imagemKey) {
+                    imagemUrl = item[imagemKey] || '';
+                }
+            }
+
+            return imagemUrl;
+        }
+
+        function gerarLinkWhatsApp(nomeProduto, preco) {
+            const telefone = '5511999999999'; // ⚠️ SUBSTITUIR PELO NÚMERO REAL
+            const mensagem = `Olá! Gostaria de fazer um pedido do produto: *${nomeProduto}* - R$ ${preco}`;
+            const urlEncodedMsg = encodeURIComponent(mensagem);
+            return `https://wa.me/${telefone}?text=${urlEncodedMsg}`;
+        }
+
+        // ===== CARREGAR IMAGEM COM CACHE =====
+        async function carregarImagem(productId, imageUrl) {
+            const imgElement = document.querySelector('.produto-imagem img');
+
+            if (!imgElement) {
+                console.warn('⚠️ Elemento de imagem não encontrado');
+                return;
+            }
+
+            try {
+                // 1. Tentar buscar do cache
+                const cachedImage = await CacheManager.getImageFromCache(productId);
+
+                if (cachedImage && cachedImage.data) {
+                    console.log(`✅ Imagem carregada do cache para produto ${productId}`);
+                    imgElement.src = cachedImage.data;
+                    document.querySelector('.produto-imagem').classList.remove('carregando');
+                    return;
+                }
+
+                // 2. Se não estiver em cache, buscar da URL
+                if (!imageUrl) {
+                    console.warn('⚠️ Nenhuma URL de imagem fornecida');
+                    imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="Arial"%3EImagem não disponível%3C/text%3E%3C/svg%3E';
+                    document.querySelector('.produto-imagem').classList.remove('carregando');
+                    return;
+                }
+
+                console.log(`🔄 Buscando imagem da URL: ${imageUrl}`);
+
+                const response = await fetch(imageUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Erro ao buscar imagem: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const reader = new FileReader();
+
+                reader.onload = async (event) => {
+                    const base64Data = event.target.result;
+
+                    // Salvar em cache
+                    await CacheManager.saveImageToCache(productId, imageUrl, base64Data);
+
+                    imgElement.src = base64Data;
+                    document.querySelector('.produto-imagem').classList.remove('carregando');
+                    console.log(`✅ Imagem carregada e salva em cache para produto ${productId}`);
+                };
+
+                reader.onerror = () => {
+                    console.error('❌ Erro ao ler arquivo de imagem');
+                    document.querySelector('.produto-imagem').classList.remove('carregando');
+                };
+
+                reader.readAsDataURL(blob);
+            } catch (err) {
+                console.error('❌ Erro ao carregar imagem:', err);
+                document.querySelector('.produto-imagem').classList.remove('carregando');
+                imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="Arial"%3EErro ao carregar%3C/text%3E%3C/svg%3E';
+            }
+        }
+
+        // ===== BUSCAR PRODUTO DO SUPABASE =====
+        async function buscarProdutoPorId(productId) {
+            try {
+                console.log(`🔍 Buscando produto com ID: ${productId}`);
+
+                const { data, error } = await supabaseClient
+                    .from(SUPABASE_CONFIG.table)
+                    .select('*')
+                    .eq('ID', productId)
+                    .single();
+
+                if (error) {
+                    console.error('❌ Erro ao buscar produto:', error);
+                    throw new Error(`Produto não encontrado: ${error.message}`);
+                }
+
+                if (!data) {
+                    throw new Error('Produto não encontrado');
+                }
+
+                console.log('✅ Produto encontrado:', data);
+                return data;
+            } catch (err) {
+                console.error('❌ Erro ao buscar produto:', err);
+                throw err;
+            }
+        }
+
+        // ===== RENDERIZAR DETALHES DO PRODUTO =====
+        function renderizarProduto(produto, productId) {
+            const mainContent = document.getElementById('main-content');
+
+            const imagemUrl = extrairUrlImagem(produto);
+            const preco = formatarPreco(produto.PREÇO || 0);
+            const parcelamento = parseParcelamento(produto.PARCELAMENTO || '');
+            const nomeProduto = produto.PRODUTO || 'Produto sem nome';
+
+            const linkWhatsApp = gerarLinkWhatsApp(nomeProduto, preco);
+
+            let parcelamentoHtml = '';
+
+            if (parcelamento['parcelado-em-ate'] > 0) {
+                parcelamentoHtml += `
+                    <div class="parcelamento-item">
+                        <i class="ri-bank-card-line"></i>
+                        <span>Parcelado em até <strong>${parcelamento['parcelado-em-ate']}x</strong></span>
+                    </div>
+                `;
+            }
+
+            if (parcelamento['sem-juros-ate'] > 0) {
+                parcelamentoHtml += `
+                    <div class="parcelamento-item">
+                        <i class="ri-check-line"></i>
+                        <span><strong>${parcelamento['sem-juros-ate']}x sem juros</strong></span>
+                    </div>
+                `;
+            }
+
+            mainContent.innerHTML = `
+                <div class="breadcrumb" id="breadcrumb-container">
+                    <a href="../index.html">Início</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="../produtos/">Produtos</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">${nomeProduto}</span>
+                </div>
+                <div class="produto-container">
+                    <div class="produto-imagem carregando">
+                        <img src="" alt="${nomeProduto}" />
+                    </div>
+                    <div class="produto-info">
+                        <div>
+                            <h1 class="produto-nome">${nomeProduto}</h1>
+                            <div class="produto-preco">${preco}</div>
+                            ${parcelamentoHtml ? `
+                                <div class="produto-parcelamento">
+                                    ${parcelamentoHtml}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <a href="${linkWhatsApp}" target="_blank" rel="noopener noreferrer" class="btn-pedido">
+                            <i class="ri-whatsapp-line"></i>
+                            Fazer Pedido
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            // Carregar imagem com cache
+            carregarImagem(productId, imagemUrl);
+        }
+
+        function exibirErro(mensagem) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="error-message">
+                    <i class="ri-error-warning-line" style="font-size: 24px; margin-right: 10px;"></i>
+                    <div>${mensagem}</div>
+                    <p style="margin-top: 10px; font-size: 14px;">
+                        <a href="../index.html" style="color: #721c24; text-decoration: underline;">Voltar para a página inicial</a>
+                    </p>
+                </div>
+            `;
+        }
+
+        // ===== INICIALIZAR PÁGINA =====
+        async function inicializarPagina() {
+            try {
+                const productId = extrairIdDaUrl();
+
+                if (!productId) {
+                    exibirErro('❌ Nenhum produto selecionado. Por favor, escolha um produto na listagem.');
+                    return;
+                }
+
+                const produto = await buscarProdutoPorId(productId);
+                renderizarProduto(produto, productId);
+            } catch (err) {
+                console.error('❌ Erro ao inicializar página:', err);
+                exibirErro(`❌ Erro ao carregar o produto: ${err.message}`);
+            }
+        }
+
+        // Carregar quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarPagina);
+        } else {
+            inicializarPagina();
+        }
+    </script>
+</body>
+
+</html>
