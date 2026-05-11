@@ -640,23 +640,7 @@
                         <a href="#" class="nav-link">
                             Produtos <i class="ri-arrow-down-s-line dropdown-icon"></i>
                         </a>
-                        <ul class="submenu">
-                            <li class="submenu-item">
-                                <a href="#" class="submenu-link">Vestidos</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="#" class="submenu-link"> Blusas</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="#" class="submenu-link"> Calças</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="#" class="submenu-link"> Sapatos</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="#" class="submenu-link"> Acessórios</a>
-                            </li>
-                        </ul>
+                        <ul class="submenu"></ul>
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link">Promoções <i class="ri-fire-line"></i></a>
@@ -1170,7 +1154,7 @@
             if (desconto > 0) {
                 descontoHtml = `<div style="color: #eb3a75; font-size: 18px; font-weight: 400; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
                     <span style="color: #666;">Desconto:</span>
-                    <span style="color: #eb3a75; font-weight: bold;">-${desconto}%</span>
+                    <span style="color: #eb3a75; font-weight: 400;">-${desconto}%</span>
                 </div>`;
             }
 
@@ -1233,6 +1217,71 @@
             `;
         }
 
+        // ===== BUSCAR METADADOS =====
+        let metadadosCache = null;
+        let metadadosPromise = null;
+        function fetchMetadados() {
+            if (metadadosPromise) return metadadosPromise;
+
+            metadadosPromise = fetch('../data/metadados.json')
+                .then(response => response.json())
+                .then(data => {
+                    metadadosCache = data;
+                    return data;
+                })
+                .catch(err => {
+                    console.error('❌ Erro ao carregar metadados:', err);
+                    return null;
+                });
+
+            return metadadosPromise;
+        }
+
+        // ===== CARREGAR SUBMENU DE PRODUTOS =====
+        async function carregarSubmenuProdutos() {
+            try {
+                const metadados = await fetchMetadados();
+                const categoriasObj = metadados?.find(item => item.elemento === 'categorias');
+
+                if (!categoriasObj || !categoriasObj.categorias) {
+                    console.warn('⚠️ Categorias não encontradas nos metadados');
+                    return;
+                }
+
+                const categorias = categoriasObj.categorias;
+                const submenu = document.querySelector('.submenu');
+
+                if (!submenu) return;
+
+                // Limpar submenu existente
+                submenu.innerHTML = '';
+
+                // Adicionar categorias ao submenu
+                categorias.forEach(categoria => {
+                    const li = document.createElement('li');
+                    li.className = 'submenu-item';
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'submenu-link';
+                    a.textContent = categoria;
+
+                    // Adicionar evento para redirecionar quando clicado
+                    a.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const encoded = encodeURIComponent(categoria);
+                        window.location.href = `../produtos/?q=${encoded}`;
+                    });
+
+                    li.appendChild(a);
+                    submenu.appendChild(li);
+                });
+
+                console.log('✅ Submenu de produtos carregado dinamicamente');
+            } catch (error) {
+                console.error('❌ Erro ao carregar submenu de produtos:', error);
+            }
+        }
+
         // ===== INICIALIZAR PÁGINA =====
         async function inicializarPagina() {
             try {
@@ -1253,8 +1302,12 @@
 
         // Carregar quando o DOM estiver pronto
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', inicializarPagina);
+            document.addEventListener('DOMContentLoaded', () => {
+                carregarSubmenuProdutos();
+                inicializarPagina();
+            });
         } else {
+            carregarSubmenuProdutos();
             inicializarPagina();
         }
     </script>
