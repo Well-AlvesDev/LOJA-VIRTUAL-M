@@ -382,7 +382,8 @@
     .produto-info {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: 20px;
     }
 
     .produto-nome {
@@ -404,7 +405,7 @@
         font-size: 18px;
         color: #999;
         text-decoration: line-through;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
 
     .produto-parcelamento {
@@ -431,6 +432,57 @@
     .parcelamento-item i {
         color: #eb3a75;
         font-size: 16px;
+    }
+
+    /* Meios de Pagamento */
+    .meios-pagamento {
+        background-color: #f5f5f5;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border-left: 4px solid #eb3a75;
+    }
+
+    .meios-pagamento-icons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .meio-pagamento-icon {
+        width: 40px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        border-radius: 4px;
+        padding: 4px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+
+
+    .meio-pagamento-icon img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        .meios-pagamento {
+            padding: 12px;
+        }
+
+        .meio-pagamento-icon {
+            width: 35px;
+            height: 28px;
+        }
+
+        .meios-pagamento-icons {
+            gap: 6px;
+            flex-wrap: wrap;
+        }
     }
 
     .btn-pedido {
@@ -574,8 +626,7 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
-                        alt="logotipo da empresa/loja" style="width: 180px;">
+                    <img src="../recursos/identidade/logofpo.webp" alt="logotipo da empresa/loja" style="width: 140px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -687,7 +738,7 @@
             hamburger.addEventListener('click', () => {
                 hamburger.classList.toggle('active');
                 navMenu.classList.toggle('active');
-                overlay.classList.toggle('active');
+                if (overlay) overlay.classList.toggle('active');
                 document.body.classList.toggle('menu-open');
 
                 if (!navMenu.classList.contains('active')) {
@@ -727,7 +778,7 @@
                 if (!e.target.closest('nav')) {
                     hamburger.classList.remove('active');
                     navMenu.classList.remove('active');
-                    overlay.classList.remove('active');
+                    if (overlay) overlay.classList.remove('active');
                     document.body.classList.remove('menu-open');
                 }
             });
@@ -742,16 +793,73 @@
                 });
             }
 
-            // Barra de pesquisa
-            if (buscaInput && buscaClear) {
+            // Barra de pesquisa com sugestões
+            if (buscaInput && buscaClear && sugestoesList) {
+                let sugestoes = [];
+
+                // Carregar sugestões do arquivo JSON
+                fetch('../data/xrl.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data[0] && data[0].suggests) {
+                            sugestoes = data[0].suggests;
+                            console.log('✅ Sugestões carregadas:', sugestoes);
+                        }
+                    })
+                    .catch(err => console.warn('⚠️ Erro ao carregar sugestões:', err));
+
+                // Filtrar e exibir sugestões
+                function mostrarSugestoes(termo) {
+                    sugestoesList.innerHTML = '';
+
+                    if (!termo || sugestoes.length === 0) {
+                        sugestoesList.hidden = true;
+                        return;
+                    }
+
+                    const termoLower = termo.toLowerCase();
+                    const filtradas = sugestoes.filter(sug =>
+                        sug.toLowerCase().includes(termoLower)
+                    );
+
+                    if (filtradas.length === 0) {
+                        sugestoesList.hidden = true;
+                        return;
+                    }
+
+                    filtradas.forEach(sugestao => {
+                        const li = document.createElement('li');
+                        li.className = 'sugestao-item';
+                        li.role = 'option';
+                        li.innerHTML = `
+                            <span class="sug-text">${sugestao}</span>
+                            <i class="ri-arrow-right-line sugestao-icon"></i>
+                        `;
+
+                        li.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            sugestoesList.hidden = true;
+                            const encoded = encodeURIComponent(sugestao);
+                            window.location.href = `../produtos/?q=${encoded}`;
+                        });
+
+                        sugestoesList.appendChild(li);
+                    });
+
+                    sugestoesList.hidden = false;
+                }
+
                 buscaInput.addEventListener('input', (e) => {
                     const valor = e.target.value.trim();
                     buscaClear.hidden = !valor;
+                    mostrarSugestoes(valor);
                 });
 
                 buscaClear.addEventListener('click', () => {
                     buscaInput.value = '';
                     buscaClear.hidden = true;
+                    sugestoesList.hidden = true;
                     buscaInput.focus();
                 });
 
@@ -759,10 +867,25 @@
                     if (e.key === 'Enter') {
                         const termo = buscaInput.value.trim();
                         if (termo) {
+                            sugestoesList.hidden = true;
                             const encoded = encodeURIComponent(termo.replace(/\s+/g, '-'));
                             window.location.href = `../produtos/?q=${encoded}`;
                         }
                     }
+                });
+
+                // Fechar sugestões ao clicar fora
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.caixa-de-pesquisa')) {
+                        sugestoesList.hidden = true;
+                    }
+                });
+
+                // Fechar sugestões ao focar em outro elemento
+                buscaInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        sugestoesList.hidden = true;
+                    }, 200);
                 });
             }
         }
@@ -869,6 +992,11 @@
                 style: 'currency',
                 currency: 'BRL'
             }).format(valor);
+        }
+
+        function calcularPrecoComDesconto(preco, desconto) {
+            if (!desconto) return preco;
+            return (parseFloat(preco) * (1 - desconto / 100)).toFixed(2);
         }
 
         function parseParcelamento(str) {
@@ -1008,7 +1136,11 @@
             const mainContent = document.getElementById('main-content');
 
             const imagemUrl = extrairUrlImagem(produto);
-            const preco = formatarPreco(produto.PREÇO || 0);
+            const desconto = produto.DESCONTO || 0;
+            const precoOriginal = parseFloat(produto.PREÇO || 0);
+            const precoComDesconto = calcularPrecoComDesconto(precoOriginal, desconto);
+            const preco = formatarPreco(precoComDesconto);
+            const precoOriginalFormatado = formatarPreco(precoOriginal);
             const parcelamento = parseParcelamento(produto.PARCELAMENTO || '');
             const nomeProduto = produto.PRODUTO || 'Produto sem nome';
 
@@ -1034,6 +1166,14 @@
                 `;
             }
 
+            let descontoHtml = '';
+            if (desconto > 0) {
+                descontoHtml = `<div style="color: #eb3a75; font-size: 18px; font-weight: 400; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #666;">Desconto:</span>
+                    <span style="color: #eb3a75; font-weight: bold;">-${desconto}%</span>
+                </div>`;
+            }
+
             mainContent.innerHTML = `
                 <div class="breadcrumb" id="breadcrumb-container">
                     <a href="../index.html">Início</a>
@@ -1049,7 +1189,19 @@
                     <div class="produto-info">
                         <div>
                             <h1 class="produto-nome">${nomeProduto}</h1>
+                            ${descontoHtml}
+                            ${desconto > 0 ? `<div class="produto-preco-original"> ${precoOriginalFormatado}</div>` : ''}
                             <div class="produto-preco">${preco}</div>
+                            <div class="meios-pagamento">
+                                <div class="meios-pagamento-icons">
+                                    <i class="ri-bank-card-line" style="color: #eb3a75; font-size: 16px;"></i>
+                                    <span style="color: #666; font-size: 14px;">Todos os cartões de crédito e débito</span>
+                                    <span style="color: #999;">| PIX </span>
+                                    <div class="meio-pagamento-icon" title="Pix" style="margin-left: 5px;">
+                                        <img src="../meios de pagamento dos sites/pix@2x.png" alt="Pix">
+                                    </div>
+                                </div>
+                            </div>
                             ${parcelamentoHtml ? `
                                 <div class="produto-parcelamento">
                                     ${parcelamentoHtml}

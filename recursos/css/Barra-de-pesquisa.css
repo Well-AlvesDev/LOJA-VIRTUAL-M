@@ -45,7 +45,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-color: #ccc;
  }
- 
+
  /* Estilo do Ícone */
  .icon-pesquisa {
     color: #999;
@@ -186,7 +186,7 @@
     position: absolute;
     right: 12px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) rotate(-45deg);
     color: #999;
     font-size: 18px;
     transition: color 0.15s ease, transform 0.15s ease;
@@ -197,7 +197,7 @@
  .sugestao-item:hover .sugestao-icon,
  .sugestao-item[aria-selected="true"] .sugestao-icon {
     color: #2b4ef7;
-    transform: translateY(-52%);
+    transform: translateY(-52%) rotate(-45deg);
  }
 
  .sugestao-item:last-child {
