@@ -1478,30 +1478,17 @@
             return metadadosPromise;
         }
 
-        // Função otimizada para carregar APENAS categorias (uma única vez)
-        let categoriasCache = null;
-        let categoriasPromise = null;
+        // Função otimizada para carregar categorias do Supabase (palavras únicas)
         async function carregarCategorias() {
-            if (categoriasCache) return categoriasCache;
-            if (categoriasPromise) return categoriasPromise;
-
-            categoriasPromise = (async () => {
-                try {
-                    const metadados = await fetchMetadados();
-                    const categoriasObj = metadados.find(item => item.elemento === 'categorias');
-                    const categorias = (categoriasObj && categoriasObj.categorias) || [];
-                    categoriasCache = categorias;
-                    return categorias;
-                } catch (error) {
-                    console.error('Erro ao carregar categorias:', error);
-                    categoriasCache = [];
-                    return [];
-                } finally {
-                    categoriasPromise = null;
-                }
-            })();
-
-            return categoriasPromise;
+            try {
+                // Carregar palavras únicas do Supabase
+                const palavras = await carregarPalavrasUnicas();
+                // Retornar apenas as palavras já ordenadas
+                return palavras || [];
+            } catch (error) {
+                console.error('Erro ao carregar categorias:', error);
+                return [];
+            }
         }
 
         createApp({

@@ -1043,7 +1043,7 @@
                     <i class="ri-close-line" aria-hidden="true"></i>
                 </button>
 
-                <!-- Sugestões dinâmicas (preenchidas via JS a partir de data/xrl.json) -->
+                <!-- Sugestões dinâmicas (preenchidas via JS a partir do Supabase) -->
                 <ul id="sugestoes-list" class="sugestoes-list" role="listbox" aria-label="Sugestões de pesquisa" hidden>
                 </ul>
             </div>
@@ -1204,6 +1204,8 @@
             };
         }
 
+        // ===== SISTEMA AVANÇADO DE NORMALIZAÇÃO E BUSCA =====
+
         // Função para normalizar texto para comparação (remove acentos e converte para lowercase)
         function normalizarTexto(texto) {
             return String(texto || '')
@@ -1220,7 +1222,152 @@
                 .filter(palavra => palavra.length > 0);
         }
 
-        // Sistema de priorização inteligente de produtos
+        // ===== DISTÂNCIA DE LEVENSHTEIN (Detecção de Erros de Digitação) =====
+        function distanciaLevenshtein(str1, str2) {
+            const track = Array(str2.length + 1).fill(null).map(() =>
+                Array(str1.length + 1).fill(null)
+            );
+
+            for (let i = 0; i <= str1.length; i += 1) {
+                track[0][i] = i;
+            }
+            for (let j = 0; j <= str2.length; j += 1) {
+                track[j][0] = j;
+            }
+
+            for (let j = 1; j <= str2.length; j += 1) {
+                for (let i = 1; i <= str1.length; i += 1) {
+                    const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                    track[j][i] = Math.min(
+                        track[j][i - 1] + 1, // inserção
+                        track[j - 1][i] + 1, // remoção
+                        track[j - 1][i - 1] + indicator // substituição
+                    );
+                }
+            }
+
+            return track[str2.length][str1.length];
+        }
+
+        // Verifica tolerância a erros (retorna true se a distância for aceitável)
+        function tolereErroDeDigitacao(palavra, candidato, maxErros = 1) {
+            // Se a diferença de comprimento for muito grande, descartar
+            if (Math.abs(palavra.length - candidato.length) > 2) return false;
+
+            const distancia = distanciaLevenshtein(palavra, candidato);
+            // Permitir até 1 erro para palavras de 4-6 chars, até 2 para palavras maiores
+            const maxPermitido = palavra.length <= 3 ? 0 : (palavra.length <= 6 ? 1 : 2);
+            return distancia <= maxPermitido;
+        }
+
+        // ===== GERADOR DE VARIANTES APRIMORADO PARA PT-BR =====
+        function gerarVariantesCompletas(palavra) {
+            const norm = normalizarTexto(palavra);
+            const variantes = new Set([norm]);
+
+            // Regras de plural/singular em PT-BR
+            const regras = [
+                // Terminações em -ão -> -ões/-ães/-ãos
+                { pattern: /ão$/, replacements: ['ões', 'ães', 'ãos', 'ao'] },
+                { pattern: /ões$/, replacements: ['ão', 'ãe'] },
+                { pattern: /ães$/, replacements: ['ão'] },
+                { pattern: /ãos$/, replacements: ['ão'] },
+
+                // Terminações em -m -> -ns
+                { pattern: /m$/, replacements: ['ns'] },
+                { pattern: /ns$/, replacements: ['m'] },
+
+                // Terminações em -z -> -zes
+                { pattern: /z$/, replacements: ['zes'] },
+                { pattern: /zes$/, replacements: ['z'] },
+
+                // Terminações em -al -> -ais
+                { pattern: /al$/, replacements: ['ais'] },
+                { pattern: /ais$/, replacements: ['al'] },
+
+                // Terminações em -el -> -eis
+                { pattern: /el$/, replacements: ['eis'] },
+                { pattern: /eis$/, replacements: ['el'] },
+
+                // Terminações em -il -> -eis
+                { pattern: /il$/, replacements: ['eis', 'is'] },
+                { pattern: /eis$/, replacements: ['il', 'el'] },
+
+                // Terminações em -ol -> -ois
+                { pattern: /ol$/, replacements: ['ois'] },
+                { pattern: /ois$/, replacements: ['ol'] },
+
+                // Terminações em -s (singular/plural simples)
+                { pattern: /s$/, replacements: [norm.slice(0, -1)] },
+                { pattern: /[^s]$/, replacements: [norm + 's'] }
+            ];
+
+            // Aplicar regras
+            for (const regra of regras) {
+                if (regra.pattern.test(norm)) {
+                    for (const replacement of regra.replacements) {
+                        const variante = norm.replace(regra.pattern, replacement);
+                        if (variante !== norm && variante.length > 2) {
+                            variantes.add(variante);
+                        }
+                    }
+                }
+            }
+
+            // Adicionar também versões sem últimas letras (para matches parciais)
+            if (norm.length > 4) {
+                variantes.add(norm.slice(0, -1)); // remover último char
+                variantes.add(norm.slice(0, -2)); // remover últimos 2 chars
+            }
+
+            return Array.from(variantes);
+        }
+
+        // ===== BUSCA INTELIGENTE COM MÚLTIPLAS ESTRATÉGIAS =====
+        function buscarComTolerancia(palavra, candidato, maxErros = 1) {
+            const palavraNorm = normalizarTexto(palavra);
+            const candidatoNorm = normalizarTexto(candidato);
+
+            // 1. Match exato (normalizado)
+            if (palavraNorm === candidatoNorm) return { match: true, score: 100, tipo: 'exato' };
+
+            // 2. Prefixo (começa com a palavra)
+            if (candidatoNorm.startsWith(palavraNorm)) return { match: true, score: 90, tipo: 'prefixo' };
+
+            // 3. Palavra completa dentro do candidato
+            const palavras = candidatoNorm.split(/\s+/);
+            if (palavras.some(p => p === palavraNorm)) return { match: true, score: 85, tipo: 'palavra-completa' };
+
+            // 4. Prefixo de palavra
+            if (palavras.some(p => p.startsWith(palavraNorm))) return { match: true, score: 80, tipo: 'prefixo-palavra' };
+
+            // 5. Substring
+            if (candidatoNorm.includes(palavraNorm)) return { match: true, score: 70, tipo: 'substring' };
+
+            // 6. Variantes (plural/singular/acentuação)
+            const variantesRef = gerarVariantesCompletas(palavra);
+            for (const variante of variantesRef) {
+                if (candidatoNorm === variante) return { match: true, score: 88, tipo: 'variante-exata' };
+                if (candidatoNorm.startsWith(variante)) return { match: true, score: 82, tipo: 'variante-prefixo' };
+                if (candidatoNorm.includes(variante)) return { match: true, score: 75, tipo: 'variante-substring' };
+            }
+
+            // 7. Tolerância a erros de digitação (Levenshtein)
+            if (tolereErroDeDigitacao(palavraNorm, candidatoNorm, maxErros)) {
+                return { match: true, score: 65, tipo: 'tolerancia-erro' };
+            }
+
+            // 8. Testar variantes com tolerância a erros
+            for (const variante of variantesRef) {
+                if (tolereErroDeDigitacao(variante, candidatoNorm, maxErros)) {
+                    return { match: true, score: 60, tipo: 'variante-com-erro' };
+                }
+            }
+
+            return { match: false, score: 0, tipo: 'nenhum' };
+        }
+
+        // Sistema de priorização inteligente de produtos (VERSÃO MELHORADA)
         function priorizarProdutos(produtos, termo) {
             if (!termo || !termo.trim() || produtos.length === 0) {
                 // Se não houver termo, retornar embaralhados
@@ -1231,56 +1378,75 @@
             const palavrasBusca = extrairPalavras(termo);
             console.log(`🔍 PRIORIZANDO: Buscando por "${termo}" | Palavras-chave: [${palavrasBusca.join(', ')}]`);
 
-            const prioridade1 = []; // 100% match (todas as palavras)
-            const prioridade2 = []; // Match parcial (1+ palavras)
-            const prioridade3 = []; // Aleatório
-
+            const resultados = [];
             const idsUsados = new Set();
 
-            // Classificar produtos
+            // Classificar produtos com novo sistema de busca
             produtos.forEach(produto => {
-                const nomeProdutoNormalizado = normalizarTexto(produto.nome);
-                const palavrasProduto = nomeProdutoNormalizado.split(/\s+/).filter(p => p.length > 0);
+                const nomeProduto = produto.nome;
+                let scoreTotal = 0;
+                let tiposMatch = [];
+                let palavrasEncontradas = 0;
 
-                // Contar quantas palavras da busca estão no produto
-                const palavrasEncontradas = palavrasBusca.filter(palavra =>
-                    nomeProdutoNormalizado.includes(palavra)
-                );
+                // Testar cada palavra da busca contra o nome do produto
+                for (const palavra of palavrasBusca) {
+                    const resultado = buscarComTolerancia(palavra, nomeProduto, 1);
 
-                // Verificar se tem TODAS as palavras (100% match)
-                if (palavrasEncontradas.length === palavrasBusca.length) {
-                    prioridade1.push(produto);
+                    if (resultado.match) {
+                        palavrasEncontradas++;
+                        scoreTotal += resultado.score;
+                        tiposMatch.push(resultado.tipo);
+                    }
+                }
+
+                // Se teve match em alguma palavra, adicionar à lista
+                if (palavrasEncontradas > 0) {
+                    const matchPercentual = (palavrasEncontradas / palavrasBusca.length) * 100;
+                    const scoreNormalizado = (scoreTotal / palavrasBusca.length);
+
+                    resultados.push({
+                        produto,
+                        score: scoreNormalizado,
+                        matchPercentual,
+                        palavrasEncontradas,
+                        tiposMatch: tiposMatch.join(', ')
+                    });
+
                     idsUsados.add(produto.id);
-                } else if (palavrasEncontradas.length > 0) {
-                    // Tem 1 ou mais palavras - adicionar com score de quantas palavras tem
-                    produto._matchScore = palavrasEncontradas.length;
-                    prioridade2.push(produto);
-                    idsUsados.add(produto.id);
-                } else {
-                    prioridade3.push(produto);
                 }
             });
 
-            // Ordenar prioridade 2 por quantidade de palavras encontradas (decrescente)
-            prioridade2.sort((a, b) => b._matchScore - a._matchScore);
+            // Ordenar por score descendente
+            resultados.sort((a, b) => {
+                // 1. Produtos com 100% de match nas palavras têm prioridade
+                if (a.matchPercentual !== b.matchPercentual) {
+                    return b.matchPercentual - a.matchPercentual;
+                }
+                // 2. Score de relevância
+                if (a.score !== b.score) {
+                    return b.score - a.score;
+                }
+                // 3. Ordem alfabética
+                return a.produto.nome.localeCompare(b.produto.nome, 'pt-BR');
+            });
 
-            // Remover score do objeto
-            prioridade2.forEach(p => delete p._matchScore);
+            // Extrair apenas os produtos ordenados
+            const produtosOrdenados = resultados.map(r => r.produto);
 
-            // Embaralhar prioridade 3 e selecionar quantidade necessária para chegar a 500
-            const produtosAleatorios = embaralharArray([...prioridade3]);
-            const quantidadeNecessaria = Math.max(0, 500 - (prioridade1.length + prioridade2.length));
-            const prioridade3Selecionados = produtosAleatorios.slice(0, quantidadeNecessaria);
+            // Completar com produtos aleatórios até 500
+            const produtosAleatórios = embaralharArray(
+                produtos.filter(p => !idsUsados.has(p.id))
+            );
+            const quantidadeNecessaria = Math.max(0, 500 - produtosOrdenados.length);
+            const resultado_final = [...produtosOrdenados, ...produtosAleatórios.slice(0, quantidadeNecessaria)];
 
-            const resultado = [...prioridade1, ...prioridade2, ...prioridade3Selecionados];
+            console.log(`📊 RESULTADOS COM TOLERÂNCIA A ERROS:`);
+            console.log(`   ✅ Produtos encontrados: ${produtosOrdenados.length}`);
+            console.log(`   📝 Exemplos: ${produtosOrdenados.slice(0, 3).map(p => p.nome).join(', ')}${produtosOrdenados.length > 3 ? '...' : ''}`);
+            console.log(`   🎲 + ${quantidadeNecessaria} aleatórios`);
+            console.log(`   📦 TOTAL: ${resultado_final.length}`);
 
-            console.log(`📊 RESULTADOS PRIORIZADOS:`);
-            console.log(`   ✅ 100% match: ${prioridade1.length} produto(s) - ${prioridade1.map(p => p.nome).slice(0, 3).join(', ')}${prioridade1.length > 3 ? '...' : ''}`);
-            console.log(`   🔶 Match parcial: ${prioridade2.length} produto(s)`);
-            console.log(`   🎲 Aleatório: ${prioridade3Selecionados.length} produto(s)`);
-            console.log(`   📦 TOTAL RETORNADO: ${resultado.length}`);
-
-            return resultado.slice(0, 500); // Limitar a 500 resultados
+            return resultado_final.slice(0, 500);
         }
 
         // Buscar produtos do Supabase com sistema de priorização inteligente
@@ -1583,6 +1749,123 @@
             }
         }).mount('#logo-app');
 
+        // ===== CACHE DE PALAVRAS-CHAVE DO SUPABASE (5 HORAS) =====
+        // Carrega primeiras palavras e primeiras+segundas palavras dos nomes de produtos
+
+        const CACHE_KEY_PALAVRAS_UNICAS = 'palavras_unicas';
+        const CACHE_KEY_DUAS_PALAVRAS = 'duas_palavras_unicas';
+        const CACHE_TTL_5_HORAS_MS = 5 * 60 * 60 * 1000; // 5 horas em ms
+
+        let palavrasUnicasCache = null;
+        let duasPalavrasCache = null;
+
+        /**
+         * Carrega apenas a primeira palavra de cada produto
+         * (Ex: "Vestido Floral Rosa" -> "Vestido")
+         */
+        async function carregarPalavrasUnicas() {
+            if (palavrasUnicasCache) return palavrasUnicasCache;
+
+            const cached = JSONCacheManager.get(CACHE_KEY_PALAVRAS_UNICAS);
+            if (cached) {
+                palavrasUnicasCache = cached;
+                return cached;
+            }
+
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from(SUPABASE_CONFIG.table)
+                    .select('nome')
+                    .not('nome', 'is', null)
+                    .limit(1000);
+
+                if (error) throw error;
+
+                // Extrair primeiras palavras únicas
+                const palavrasSet = new Set();
+                data.forEach(item => {
+                    if (item.nome) {
+                        const primeiraPalavra = item.nome.split(/\s+/)[0].toLowerCase();
+                        if (primeiraPalavra.length > 0) {
+                            palavrasSet.add(primeiraPalavra);
+                        }
+                    }
+                });
+
+                const palavras = Array.from(palavrasSet).sort();
+                palavrasUnicasCache = palavras;
+                JSONCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, palavras, CACHE_TTL_5_HORAS_MS);
+                logManager.log(`✓ ${palavras.length} primeiras palavras carregadas do Supabase`);
+                return palavras;
+            } catch (error) {
+                console.error('Erro ao carregar palavras únicas:', error);
+                return [];
+            }
+        }
+
+        /**
+         * Carrega primeira + segunda palavra de cada produto
+         * (Ex: "Vestido Floral Rosa" -> "Vestido Floral")
+         */
+        async function carregarDuasPalavrasUnicas() {
+            if (duasPalavrasCache) return duasPalavrasCache;
+
+            const cached = JSONCacheManager.get(CACHE_KEY_DUAS_PALAVRAS);
+            if (cached) {
+                duasPalavrasCache = cached;
+                return cached;
+            }
+
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from(SUPABASE_CONFIG.table)
+                    .select('nome')
+                    .not('nome', 'is', null)
+                    .limit(1000);
+
+                if (error) throw error;
+
+                // Extrair primeiras + segundas palavras únicas
+                const duasSet = new Set();
+                data.forEach(item => {
+                    if (item.nome) {
+                        const palavras = item.nome.split(/\s+/);
+                        if (palavras.length >= 2) {
+                            const duasPalavras = `${palavras[0]} ${palavras[1]}`.toLowerCase();
+                            if (duasPalavras.length > 0) {
+                                duasSet.add(duasPalavras);
+                            }
+                        }
+                    }
+                });
+
+                const duas = Array.from(duasSet).sort();
+                duasPalavrasCache = duas;
+                JSONCacheManager.set(CACHE_KEY_DUAS_PALAVRAS, duas, CACHE_TTL_5_HORAS_MS);
+                logManager.log(`✓ ${duas.length} combinações de duas palavras carregadas do Supabase`);
+                return duas;
+            } catch (error) {
+                console.error('Erro ao carregar duas palavras:', error);
+                return [];
+            }
+        }
+
+        /**
+         * Carrega ambas as listas de palavras (otimizado com Promise.all)
+         */
+        async function carregarTodasAsPalavras() {
+            try {
+                const [palavras1, palavras2] = await Promise.all([
+                    carregarPalavrasUnicas(),
+                    carregarDuasPalavrasUnicas()
+                ]);
+                return { palavras1, palavras2 };
+            } catch (error) {
+                console.error('Erro ao carregar todas as palavras:', error);
+                return { palavras1: [], palavras2: [] };
+            }
+        }
+
         // Carregar quantidade de produtos do metadados.json
         fetchMetadados()
             .then(data => {
@@ -1691,7 +1974,7 @@
         const navItems = document.querySelectorAll('.nav-item');
         const navLinks = document.querySelectorAll('.nav-link');
 
-        /* ===== Autocomplete de sugestões (data/xrl.json) ===== */
+        /* ===== Autocomplete de sugestões (Supabase) ===== */
         const buscaInput = document.getElementById('busca-input');
         const sugestoesList = document.getElementById('sugestoes-list');
         let sugestoesCache = null;
@@ -1744,8 +2027,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             // atualizar o botão limpar
             setTimeout(updateBuscaClear, 0);
-            // pré-carregar e cachear xrl.json por 3 dias
-            prefetchX89N2().catch(() => { });
+            // pré-carregar e cachear palavras do Supabase
+            carregarTodasAsPalavras().catch(() => { });
         });
 
         // Cache simples em localStorage para JSON (TTL em ms)
@@ -1779,20 +2062,16 @@
         const CACHE_TTL_3_DIAS_MS = 3 * 24 * 60 * 60 * 1000;
 
         async function prefetchX89N2() {
-            // se já em memória, nada a fazer
+            // Função deprecated: mantida para compatibilidade com código legado
+            // Agora carrega palavras do Supabase em vez de xrl.json
             if (sugestoesCache) return sugestoesCache;
-            // verificar cache persistente
-            const cached = JSONCacheManager.get(CACHE_KEY_X89N2);
-            if (cached) {
-                sugestoesCache = cached;
-                return cached;
-            }
+
             try {
-                const res = await fetch('../data/xrl.json', { cache: 'no-store' });
-                const json = await res.json();
-                const lista = Array.isArray(json) && json[0] && Array.isArray(json[0].suggests) ? json[0].suggests : [];
+                // Carregar e cachear ambas as listas de palavras
+                const { palavras1, palavras2 } = await carregarTodasAsPalavras();
+                // Combinar ambas as listas (duas palavras primeiro para melhor UX)
+                const lista = [...new Set([...palavras2, ...palavras1])];
                 sugestoesCache = lista;
-                JSONCacheManager.set(CACHE_KEY_X89N2, lista, CACHE_TTL_3_DIAS_MS);
                 return lista;
             } catch (err) {
                 console.warn('Não foi possível pré-carregar sugestões:', err);
@@ -1920,16 +2199,6 @@
             debounceTimer = setTimeout(fn, wait);
         }
 
-        // Normalização e suporte heurístico a singular/plural (PT-BR) + tolerância pequena (Levenshtein)
-        // Objetivo: quando usuário digitar "vestido" ou "vestidos" (ou formas parciais), sugerir ambos.
-        function normalizarTermo(t) {
-            return String(t || '')
-                .normalize('NFD')               // decompor acentos
-                .replace(/\p{M}/gu, '')        // remover marcas diacríticas
-                .toLowerCase()
-                .trim();
-        }
-
         // Normaliza texto para Title Case (primeira letra de cada palavra maiúscula)
         function toTitleCase(str) {
             if (!str) return str;
@@ -1939,20 +2208,9 @@
             }).join(' ');
         }
 
+        // Função antiga mantida para compatibilidade (usa gerarVariantesCompletas)
         function gerarVariantesSimples(token) {
-            const norm = normalizarTermo(token);
-            const variants = new Set([norm]);
-
-            // heurísticas comuns para PT-BR
-            if (/ões$|ães$|ãos$/.test(norm)) variants.add(norm.replace(/(ões|ães|ãos)$/, 'ao')); // ão <-> ões/ães/ãos
-            if (/ns$/.test(norm)) variants.add(norm.replace(/ns$/, 'm'));                         // homem <- homens
-            if (/zes$/.test(norm)) variants.add(norm.replace(/zes$/, 'z'));                       // luz <- luzes
-
-            // remoção/adição simples de 's' (casas <-> casa)
-            if (norm.endsWith('s') && norm.length > 3) variants.add(norm.slice(0, -1));
-            if (!norm.endsWith('s')) variants.add(norm + 's');
-
-            return Array.from(variants);
+            return gerarVariantesCompletas(token);
         }
 
         // cache leve para as variantes normalizadas das sugestões (evita recomputar em cada tecla)
@@ -1964,77 +2222,78 @@
             // exigir pelo menos 2 caracteres para começar a sugerir
             if (raw.length < 2) return [];
 
-            const qNorm = normalizarTermo(raw);
-            const queryVariants = gerarVariantesSimples(raw);
+            const qNorm = normalizarTexto(raw);
+            const queryVariants = gerarVariantesCompletas(raw);
 
             const scored = [];
 
             for (const s of lista) {
                 const sugVars = _sugestoesNormCache.get(s) || (function () {
-                    const v = gerarVariantesSimples(s);
+                    const v = gerarVariantesCompletas(s);
                     _sugestoesNormCache.set(s, v);
                     return v;
                 })();
 
-                let score = 0;
+                let bestScore = 0;
                 let bestPos = Infinity;
+                let bestTipo = '';
 
-                // Exact match (highest priority)
+                // Testar com busca inteligente contra cada variante
                 for (const sv of sugVars) {
-                    if (sv === qNorm) {
-                        score += 200;
+                    const resultado = buscarComTolerancia(raw, sv, 1);
+                    if (resultado.match && resultado.score > bestScore) {
+                        bestScore = resultado.score;
+                        bestTipo = resultado.tipo;
+                        const idx = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().indexOf(qNorm);
+                        bestPos = Math.min(bestPos, idx === -1 ? Infinity : idx);
+                    }
+                }
+
+                // Também testar match exato de sugestão contra query (backward compatibility)
+                const sNorm = normalizarTexto(s);
+                if (bestScore === 0) {
+                    // Exact match
+                    if (sNorm === qNorm) {
+                        bestScore = 200;
                         bestPos = 0;
-                        break;
+                        bestTipo = 'exato';
                     }
-                }
-
-                // Prefix matches (start of suggestion)
-                if (score === 0) {
-                    for (const sv of sugVars) {
-                        if (sv.startsWith(qNorm)) {
-                            score += 120;
-                            bestPos = 0;
-                            break;
-                        }
+                    // Prefix match
+                    else if (sNorm.startsWith(qNorm)) {
+                        bestScore = 120;
+                        bestPos = 0;
+                        bestTipo = 'prefixo';
                     }
-                }
-
-                // Match at start of any word inside the suggestion (e.g. query='bolsa' matches 'Bolsa Baguete' and 'Mini Bolsa')
-                if (score === 0) {
-                    for (const sv of sugVars) {
-                        const parts = sv.split(/\s+/);
-                        for (const p of parts) {
-                            if (p.startsWith(qNorm)) {
-                                score += 100;
-                                bestPos = Math.min(bestPos, sv.indexOf(p));
+                    // Start of word
+                    else {
+                        const parts = sNorm.split(/\s+/);
+                        for (let i = 0; i < parts.length; i++) {
+                            if (parts[i].startsWith(qNorm)) {
+                                bestScore = 100;
+                                bestPos = sNorm.indexOf(parts[i]);
+                                bestTipo = 'inicio-palavra';
                                 break;
                             }
                         }
-                        if (score >= 100) break;
                     }
-                }
-
-                // Substring matches
-                if (score === 0) {
-                    for (const sv of sugVars) {
-                        const idx = sv.indexOf(qNorm);
+                    // Substring
+                    if (bestScore === 0) {
+                        const idx = sNorm.indexOf(qNorm);
                         if (idx !== -1) {
-                            // earlier occurrences are better
-                            score += Math.max(40, 60 - Math.min(40, idx));
-                            bestPos = Math.min(bestPos, idx);
-                            break;
+                            bestScore = Math.max(40, 60 - Math.min(40, idx));
+                            bestPos = idx;
+                            bestTipo = 'substring';
                         }
                     }
                 }
 
-
-                if (score > 0) {
+                if (bestScore > 0) {
                     // small preference for shorter labels and for suggestions where the first word equals the query
-                    const firstWord = normalizarTermo(String(s).split(/\s+/)[0] || '');
-                    if (firstWord === qNorm) score += 8;
-                    score += Math.max(0, 6 - String(s).length / 8);
+                    const firstWord = normalizarTexto(String(s).split(/\s+/)[0] || '');
+                    if (firstWord === qNorm) bestScore += 8;
+                    bestScore += Math.max(0, 6 - String(s).length / 8);
 
-                    scored.push({ s, score, pos: bestPos, len: String(s).length });
+                    scored.push({ s, score: bestScore, pos: bestPos, len: String(s).length, tipo: bestTipo });
                 }
             }
 
@@ -2806,18 +3065,14 @@
                 return;
             }
 
-            // Carregar categorias do metadados.json
+            // Carregar categorias do Supabase (palavras únicas)
             let categorias = [];
             try {
-                const metadados = await fetchMetadados();
-                const categoriasObj = metadados.find(item => item.elemento === 'categorias');
-                if (categoriasObj && categoriasObj.categorias) {
-                    categorias = categoriasObj.categorias;
-                }
+                categorias = await carregarPalavrasUnicas();
             } catch (error) {
-                console.error('Erro ao carregar categorias do metadados.json:', error);
+                console.error('Erro ao carregar categorias do Supabase:', error);
                 // Fallback para categorias padrão
-                categorias = ['BLAZER', 'BLUSA', 'BODY', 'BOLSA', 'CALÇADO', 'CINTO', 'SHORTS', 'SAIA', 'VESTIDO'];
+                categorias = ['Blazer', 'Blusa', 'Body', 'Bolsa', 'Calçado', 'Cinto', 'Shorts', 'Saia', 'Vestido'];
             }
 
             // Criar contêiner do dropdown
