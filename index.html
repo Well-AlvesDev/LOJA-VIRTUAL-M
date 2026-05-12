@@ -272,6 +272,24 @@
             }
         }
 
+        /* Telas Grandes - Footer com footer-bottom em linha separada */
+        @media (min-width: 769px) {
+            footer {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .footer-container {
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            .footer-bottom {
+                width: 100%;
+                margin-top: 0;
+            }
+        }
+
         /* Ocultar Contato em telas médias (menu desktop apertado) */
         @media (min-width: 769px) and (max-width: 1024px) {
             .nav-item-contato {
@@ -509,6 +527,8 @@
             gap: 60px;
             width: 100%;
             padding: 0 0 40px;
+            justify-items: center;
+            text-align: center;
         }
 
         .footer-section h3 {
@@ -557,6 +577,7 @@
             display: flex;
             gap: 12px;
             margin-top: 15px;
+            justify-content: center;
         }
 
         .footer-social a {
@@ -725,6 +746,8 @@
             .footer-container {
                 gap: 40px;
                 grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center;
             }
 
             .footer-section h3 {
@@ -945,12 +968,56 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            background-color: #f5f5f5;
         }
 
         .banner img {
             width: 100%;
             margin-top: -10px;
             object-fit: cover;
+        }
+
+        /* Skeleton do Banner */
+        .banner-skeleton {
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .banner-skeleton .skeleton {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 50%, #eeeeee 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s linear infinite;
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .banner-skeleton {
+                min-height: 300px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .banner-skeleton {
+                min-height: 400px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -966,6 +1033,66 @@
                 width: 130%;
                 margin-top: 0px;
                 margin-left: -10%;
+            }
+        }
+
+        /* ===== SKELETON LOADER PARA CARDS DE PRODUTOS ===== */
+        .produtos-skeleton-loader {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 1200px) and (min-width: 768px) {
+            .produtos-skeleton-loader {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .produtos-skeleton-loader {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                padding: 15px;
+            }
+        }
+
+        .skeleton-card {
+            background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 50%, #eeeeee 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s linear infinite;
+            border-radius: 8px;
+            padding-bottom: 150%;
+            /* Aspect ratio aproximado aos cards */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            animation: shimmerOverlay 2s infinite;
+        }
+
+        @keyframes shimmerOverlay {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
             }
         }
     </style>
@@ -1064,8 +1191,12 @@
                 </ul>
             </div>
         </div>
-        <div class="banner">
-            <img src="./recursos/identidade/banner.webp" alt="">
+        <div id="banner-app" class="banner">
+            <div v-if="carregando" class="banner-skeleton">
+                <div class="skeleton"></div>
+            </div>
+            <img v-show="!carregando" src="./recursos/identidade/banner.webp" alt="Banner Dona Flor" @load="imageLoad"
+                @error="imageError">
         </div>
         <div class="criptografia-desc" id="stop-point">
             <p style="text-align: center; font-size: 12px; max-width: 300px; margin: 20px auto; color: #878787;">
@@ -1088,7 +1219,15 @@
         </div>
 
         <section class="produtos-destaque">
-            <div id="produtosContainer" class="produtos-container">
+            <div id="produtosLoader" class="produtos-skeleton-loader">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+            <div id="produtosContainer" class="produtos-container" style="display: none;">
                 <!-- Cards serão gerados aqui pelo JavaScript -->
             </div>
             <div id="produtosErro" hidden style="text-align: center; padding: 40px; color: #999;">
@@ -1391,6 +1530,25 @@
             }
         }).mount('#logo-app');
 
+        // ===== VUE APP PARA BANNER COM SKELETON LOADER =====
+        const bannerApp = Vue.createApp({
+            data() {
+                return {
+                    carregando: true
+                };
+            },
+            methods: {
+                imageLoad() {
+                    this.carregando = false;
+                    console.log('🖼️ Banner carregado com sucesso');
+                },
+                imageError() {
+                    this.carregando = false;
+                    console.error('❌ Erro ao carregar banner');
+                }
+            }
+        }).mount('#banner-app');
+
         // ===== VUE APP PARA ANIMAÇÃO DE TEXTO COM TYPEWRITER =====
         const textAnimatorApp = Vue.createApp({
             data() {
@@ -1509,8 +1667,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // atualizar o botão limpar
             setTimeout(updateBuscaClear, 0);
-            // pré-carregar e cachear xrl.json por 3 dias
-            prefetchX89N2().catch(() => { });
+            // Palavras-chave são carregadas automaticamente via carregarTodasAsPalavras()
         });
 
         // Cache simples em localStorage para JSON (TTL em ms)
@@ -1540,51 +1697,171 @@
             clearAll() { try { Object.keys(localStorage).forEach(k => { if (k.startsWith(this.prefix)) localStorage.removeItem(k); }); } catch (e) { } }
         };
 
-        const CACHE_KEY_X89N2 = 'x89N2';
+        const CACHE_KEY_X89N2 = 'x89N2'; // Mantido para compatibilidade com código legado
         const CACHE_TTL_3_DIAS_MS = 3 * 24 * 60 * 60 * 1000;
 
+        // Função deprecated: mantida para compatibilidade com código legado
         async function prefetchX89N2() {
-            // se já em memória, nada a fazer
+            logManager.log('⚠️ prefetchX89N2 foi descontinuada. Use carregarTodasAsPalavras() em vez disso.');
+            return [];
+        }
+
+        async function carregarSugestoes() {
+            // Usar as palavras-chave carregadas em vez do xrl.json
             if (sugestoesCache) return sugestoesCache;
-            // verificar cache persistente
-            const cached = JSONCacheManager.get(CACHE_KEY_X89N2);
-            if (cached) {
-                sugestoesCache = cached;
-                return cached;
-            }
+
             try {
-                const res = await fetch('./data/xrl.json', { cache: 'no-store' });
-                const json = await res.json();
-                const lista = Array.isArray(json) && json[0] && Array.isArray(json[0].suggests) ? json[0].suggests : [];
+                // Carregar ambas as listas de palavras
+                const palavras1 = await carregarPalavrasUnicas();
+                const palavras2 = await carregarDuasPalavrasUnicas();
+
+                // Combinar ambas as listas (duas palavras primeiro para melhor UX)
+                const lista = [...new Set([...palavras2, ...palavras1])];
+
                 sugestoesCache = lista;
-                JSONCacheManager.set(CACHE_KEY_X89N2, lista, CACHE_TTL_3_DIAS_MS);
+                logManager.log(`✓ ${lista.length} sugestões carregadas para barra de pesquisa`);
                 return lista;
             } catch (err) {
-                console.warn('Não foi possível pré-carregar sugestões:', err);
+                logManager.warn('Não foi possível carregar sugestões da barra:', err);
                 sugestoesCache = [];
                 return [];
             }
         }
 
-        async function carregarSugestoes() {
-            if (sugestoesCache) return sugestoesCache;
-            // tentar recuperar do cache persistente
-            const cached = JSONCacheManager.get(CACHE_KEY_X89N2);
+        // ===== CACHE DE PALAVRAS-CHAVE DO SUPABASE (5 HORAS) =====
+        // Carrega primeiras palavras e primeiras+segundas palavras dos nomes de produtos
+
+        const CACHE_KEY_PALAVRAS_UNICAS = 'palavras_unicas';
+        const CACHE_KEY_DUAS_PALAVRAS = 'duas_palavras_unicas';
+        const CACHE_TTL_5_HORAS_MS = 5 * 60 * 60 * 1000; // 5 horas em ms
+
+        let palavrasUnicasCache = null;
+        let duasPalavrasCache = null;
+
+        /**
+         * Carrega a primeira palavra única de todos os produtos do Supabase
+         * Usa cache localStorage com TTL de 5 horas
+         */
+        async function carregarPalavrasUnicas() {
+            if (palavrasUnicasCache) return palavrasUnicasCache;
+
+            const cached = JSONCacheManager.get(CACHE_KEY_PALAVRAS_UNICAS);
             if (cached) {
-                sugestoesCache = cached;
+                palavrasUnicasCache = cached;
+                logManager.log('📝 Primeiras palavras carregadas do cache localStorage');
                 return cached;
             }
+
             try {
-                const res = await fetch('./data/xrl.json', { cache: 'no-store' });
-                const json = await res.json();
-                const lista = Array.isArray(json) && json[0] && Array.isArray(json[0].suggests) ? json[0].suggests : [];
-                sugestoesCache = lista;
-                JSONCacheManager.set(CACHE_KEY_X89N2, lista, CACHE_TTL_3_DIAS_MS);
-                return lista;
+                logManager.log('🔄 Carregando primeiras palavras do Supabase...');
+
+                // Query: Extrair primeira palavra única (usando aspas para preservar maiúsculas)
+                const { data, error } = await window.supabaseClient
+                    .rpc('get_palavras_unicas');
+
+                if (error) {
+                    // Se RPC não existir, usar alternativa com JavaScript
+                    logManager.log('📝 Carregando com processamento local...');
+                    const { data: produtos, error: err } = await window.supabaseClient
+                        .from('j-box')
+                        .select('"PRODUTO"')
+                        .eq('"DISPONIBILIDADE"', true);
+
+                    if (err) throw new Error(`Erro ao carregar produtos: ${err.message}`);
+                    if (!produtos || produtos.length === 0) throw new Error('Nenhum produto encontrado');
+
+                    // Processar e extrair primeiras palavras únicas
+                    const palavras = new Set();
+                    produtos.forEach(item => {
+                        if (item.PRODUTO) {
+                            const primeira = item.PRODUTO.trim().split(/\s+/)[0];
+                            if (primeira) palavras.add(primeira);
+                        }
+                    });
+
+                    const resultado = Array.from(palavras).sort();
+                    palavrasUnicasCache = resultado;
+                    JSONCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, resultado, CACHE_TTL_5_HORAS_MS);
+                    logManager.log(`✓ ${resultado.length} primeiras palavras carregadas e cacheadas`);
+                    return resultado;
+                }
+
+                // Se RPC funcionou
+                const resultado = data || [];
+                palavrasUnicasCache = resultado;
+                JSONCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, resultado, CACHE_TTL_5_HORAS_MS);
+                logManager.log(`✓ ${resultado.length} primeiras palavras carregadas e cacheadas`);
+                return resultado;
+
             } catch (err) {
-                console.warn('Não foi possível carregar sugestões:', err);
-                sugestoesCache = [];
+                logManager.error('❌ Erro ao carregar primeiras palavras:', err);
                 return [];
+            }
+        }
+
+        /**
+         * Carrega primeira + segunda palavra única de todos os produtos do Supabase
+         * Usa cache localStorage com TTL de 5 horas
+         */
+        async function carregarDuasPalavrasUnicas() {
+            if (duasPalavrasCache) return duasPalavrasCache;
+
+            const cached = JSONCacheManager.get(CACHE_KEY_DUAS_PALAVRAS);
+            if (cached) {
+                duasPalavrasCache = cached;
+                logManager.log('📝 Duas palavras carregadas do cache localStorage');
+                return cached;
+            }
+
+            try {
+                logManager.log('🔄 Carregando primeira + segunda palavras do Supabase...');
+
+                // Query: Extrair primeira + segunda palavra única
+                const { data: produtos, error } = await window.supabaseClient
+                    .from('j-box')
+                    .select('"PRODUTO"')
+                    .eq('"DISPONIBILIDADE"', true);
+
+                if (error) throw new Error(`Erro ao carregar produtos: ${error.message}`);
+                if (!produtos || produtos.length === 0) throw new Error('Nenhum produto encontrado');
+
+                // Processar e extrair primeira + segunda palavras únicas
+                const duasPalavras = new Set();
+                produtos.forEach(item => {
+                    if (item.PRODUTO) {
+                        const palavras = item.PRODUTO.trim().split(/\s+/);
+                        if (palavras.length >= 2) {
+                            const combinacao = `${palavras[0]} ${palavras[1]}`;
+                            duasPalavras.add(combinacao);
+                        }
+                    }
+                });
+
+                const resultado = Array.from(duasPalavras).sort();
+                duasPalavrasCache = resultado;
+                JSONCacheManager.set(CACHE_KEY_DUAS_PALAVRAS, resultado, CACHE_TTL_5_HORAS_MS);
+                logManager.log(`✓ ${resultado.length} combinações de duas palavras carregadas e cacheadas`);
+                return resultado;
+
+            } catch (err) {
+                logManager.error('❌ Erro ao carregar duas palavras:', err);
+                return [];
+            }
+        }
+
+        /**
+         * Carrega ambas as listas de palavras em paralelo
+         */
+        async function carregarTodasAsPalavras() {
+            try {
+                logManager.log('🔄 Pré-carregando todas as palavras-chave...');
+                await Promise.all([
+                    carregarPalavrasUnicas(),
+                    carregarDuasPalavrasUnicas()
+                ]);
+                logManager.log('✓ Palavras-chave pré-carregadas com sucesso');
+            } catch (err) {
+                logManager.error('❌ Erro ao pré-carregar palavras-chave:', err);
             }
         }
 
@@ -1611,6 +1888,15 @@
                 .replace(/\p{M}/gu, '')        // remover marcas diacríticas
                 .toLowerCase()
                 .trim();
+        }
+
+        // Normaliza texto para Title Case (primeira letra de cada palavra maiúscula)
+        function toTitleCase(str) {
+            if (!str) return str;
+            return String(str).toLowerCase().split(' ').map(word => {
+                if (word.length === 0) return word;
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
         }
 
         function gerarVariantesSimples(token) {
@@ -1758,8 +2044,8 @@
 
             sugestoesList.innerHTML = items.map((s, idx) => `
                 <li id="sug-${idx}" role="option" data-index="${idx}" class="sugestao-item" tabindex="-1" aria-selected="false">
-                    <span class="sug-text">${s}</span>
-                    <i class="ri-arrow-left-up-line sugestao-icon" aria-hidden="true"></i>
+                    <span class="sug-text">${toTitleCase(s)}</span>
+                    <i class="ri-arrow-right-line sugestao-icon" aria-hidden="true"></i>
                 </li>
             `).join('');
             sugestoesList.hidden = false;
@@ -2225,10 +2511,13 @@
         function renderizarProdutos(produtos, isAdicional = false) {
             const container = document.getElementById('produtosContainer');
             const erroDiv = document.getElementById('produtosErro');
+            const loader = document.getElementById('produtosLoader');
 
             if (!produtos || produtos.length === 0) {
                 if (!isAdicional) {
                     container.innerHTML = '';
+                    container.style.display = 'none';
+                    if (loader) loader.style.display = 'none';
                     erroDiv.hidden = false;
                 }
                 return;
@@ -2296,6 +2585,9 @@
                 container.innerHTML += html;
             } else {
                 container.innerHTML = html;
+                // Esconder loader e mostrar container
+                if (loader) loader.style.display = 'none';
+                container.style.display = 'grid';
             }
         }
 
@@ -2634,28 +2926,6 @@
                             <a href="https://wa.me/5585988881234" target="_blank" title="WhatsApp"><i class="ri-whatsapp-line"></i></a>
                         </div>
                     </div>
-
-                    <div class="footer-section">
-                        <h3><i class="ri-shopping-bag-line"></i> Compras</h3>
-                        <ul>
-                            <li><a href="#">Carrinho</a></li>
-                            <li><a href="#">Meus Pedidos</a></li>
-                            <li><a href="#">Rastrear Pedido</a></li>
-                            <li><a href="#">Trocas e Devoluções</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-section">
-                        <h3><i class="ri-customer-service-2-line"></i> Atendimento</h3>
-                        <ul>
-                            <li><a href="#">Contato</a></li>
-                            <li><a href="#">FAQ</a></li>
-                            <li><a href="#">Políticas de Privacidade</a></li>
-                            <li><a href="#">Termos de Serviço</a></li>
-                            <li><a href="#">Segurança</a></li>
-                        </ul>
-                    </div>
-                    <p style="font-size: 12px; color: #3b3b3b;"></p>
                 </div>
 
                 <div class="footer-bottom">
@@ -3099,6 +3369,9 @@
 
             // Carregar submenu de produtos primeiro
             carregarSubmenuProdutos();
+
+            // Pré-carregar palavras-chave em paralelo (cache 5h)
+            carregarTodasAsPalavras().catch(() => { });
 
             carregarProdutos().then(() => {
                 logManager.log('📦 Produtos carregados, iniciando lazy loading...');

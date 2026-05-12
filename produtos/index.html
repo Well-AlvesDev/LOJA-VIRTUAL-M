@@ -47,6 +47,72 @@
             display: block;
         }
 
+        /* ===== LOADER/SPINNER STYLES ===== */
+        .loader-overlay {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.494);
+            backdrop-filter: blur(4px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loader-overlay.hidden {
+            display: none;
+        }
+
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #eb3a75;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: 3px solid #f0f0f0;
+                border-top: 3px solid #eb3a75;
+            }
+
+            .loader-text {
+                font-size: 14px;
+            }
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -274,6 +340,24 @@
             }
         }
 
+        /* Telas Grandes - Footer com footer-bottom em linha separada */
+        @media (min-width: 769px) {
+            footer {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .footer-container {
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            .footer-bottom {
+                width: 100%;
+                margin-top: 0;
+            }
+        }
+
         /* Ocultar Contato em telas médias (menu desktop apertado) */
         @media (min-width: 769px) and (max-width: 1024px) {
             .nav-item-contato {
@@ -395,6 +479,8 @@
             gap: 60px;
             width: 100%;
             padding: 0 0 40px;
+            justify-items: center;
+            text-align: center;
         }
 
         .footer-section h3 {
@@ -443,6 +529,7 @@
             display: flex;
             gap: 12px;
             margin-top: 15px;
+            justify-content: center;
         }
 
         .footer-social a {
@@ -611,6 +698,8 @@
             .footer-container {
                 gap: 40px;
                 grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center;
             }
 
             .footer-section h3 {
@@ -869,14 +958,21 @@
     <!-- Overlay -->
     <div class="overlay"></div>
 
+    <!-- Loader/Spinner -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <p class="loader-text">Carregando produtos...</p>
+        </div>
+    </div>
+
     <header>
         <!-- BARRA DE NAVEGAÇÃO -->
         <nav>
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/logofpo.webp"
-                        alt="logotipo da empresa/loja" style="width: 140px;">
+                    <img src="../recursos/identidade/logofpo.webp" alt="logotipo da empresa/loja" style="width: 140px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -1001,6 +1097,22 @@
         let produtosCarregados = [];
         let paginaAtual = 1;
         const PRODUTOS_POR_PAGINA = 24;
+
+        // ===== CONTROLE DO LOADER =====
+        const LOADER_MIN_TIME = 1000; // 1 segundo mínimo
+        let loaderStartTime = Date.now();
+        const loaderOverlay = document.getElementById('loaderOverlay');
+
+        function esconderLoader() {
+            const tempoDecorrido = Date.now() - loaderStartTime;
+            const tempoRestante = Math.max(0, LOADER_MIN_TIME - tempoDecorrido);
+
+            setTimeout(() => {
+                if (loaderOverlay) {
+                    loaderOverlay.classList.add('hidden');
+                }
+            }, tempoRestante);
+        }
 
         // ===== INICIALIZAR TERMO DE BUSCA IMEDIATAMENTE (SÍNCRONO, antes de qualquer evento) =====
         // Isso resolve a race condition entre DOMContentLoaded e load
@@ -1690,22 +1802,22 @@
         }
 
         async function carregarSugestoes() {
+            // Usar as palavras-chave carregadas em vez do xrl.json
             if (sugestoesCache) return sugestoesCache;
-            // tentar recuperar do cache persistente
-            const cached = JSONCacheManager.get(CACHE_KEY_X89N2);
-            if (cached) {
-                sugestoesCache = cached;
-                return cached;
-            }
+
             try {
-                const res = await fetch('../data/xrl.json', { cache: 'no-store' });
-                const json = await res.json();
-                const lista = Array.isArray(json) && json[0] && Array.isArray(json[0].suggests) ? json[0].suggests : [];
+                // Carregar ambas as listas de palavras
+                const palavras1 = await carregarPalavrasUnicas();
+                const palavras2 = await carregarDuasPalavrasUnicas();
+
+                // Combinar ambas as listas (duas palavras primeiro para melhor UX)
+                const lista = [...new Set([...palavras2, ...palavras1])];
+
                 sugestoesCache = lista;
-                JSONCacheManager.set(CACHE_KEY_X89N2, lista, CACHE_TTL_3_DIAS_MS);
+                logManager.log(`✓ ${lista.length} sugestões carregadas para barra de pesquisa`);
                 return lista;
             } catch (err) {
-                console.warn('Não foi possível carregar sugestões:', err);
+                logManager.warn('Não foi possível carregar sugestões da barra:', err);
                 sugestoesCache = [];
                 return [];
             }
@@ -1816,6 +1928,15 @@
                 .replace(/\p{M}/gu, '')        // remover marcas diacríticas
                 .toLowerCase()
                 .trim();
+        }
+
+        // Normaliza texto para Title Case (primeira letra de cada palavra maiúscula)
+        function toTitleCase(str) {
+            if (!str) return str;
+            return String(str).toLowerCase().split(' ').map(word => {
+                if (word.length === 0) return word;
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
         }
 
         function gerarVariantesSimples(token) {
@@ -1963,8 +2084,8 @@
 
             sugestoesList.innerHTML = items.map((s, idx) => `
                 <li id="sug-${idx}" role="option" data-index="${idx}" class="sugestao-item" tabindex="-1" aria-selected="false">
-                    <span class="sug-text">${s}</span>
-                    <i class="ri-arrow-left-up-line sugestao-icon" aria-hidden="true"></i>
+                    <span class="sug-text">${toTitleCase(s)}</span>
+                    <i class="ri-arrow-right-line sugestao-icon" aria-hidden="true"></i>
                 </li>
             `).join('');
             sugestoesList.hidden = false;
@@ -2936,28 +3057,6 @@
                             <a href="https://wa.me/5585988881234" target="_blank" title="WhatsApp"><i class="ri-whatsapp-line"></i></a>
                         </div>
                     </div>
-
-                    <div class="footer-section">
-                        <h3><i class="ri-shopping-bag-line"></i> Compras</h3>
-                        <ul>
-                            <li><a href="#">Carrinho</a></li>
-                            <li><a href="#">Meus Pedidos</a></li>
-                            <li><a href="#">Rastrear Pedido</a></li>
-                            <li><a href="#">Trocas e Devoluções</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-section">
-                        <h3><i class="ri-customer-service-2-line"></i> Atendimento</h3>
-                        <ul>
-                            <li><a href="#">Contato</a></li>
-                            <li><a href="#">FAQ</a></li>
-                            <li><a href="#">Políticas de Privacidade</a></li>
-                            <li><a href="#">Termos de Serviço</a></li>
-                            <li><a href="#">Segurança</a></li>
-                        </ul>
-                    </div>
-                    <p style="font-size: 12px; color: #3b3b3b;"></p>
                 </div>
 
                 <div class="footer-bottom">
@@ -3307,6 +3406,7 @@
             // ✅ Produtos serão carregados com termoBuscaAtual CORRETO (inicializado sincronamente acima)
             carregarProdutos().then(() => {
                 logManager.log('📦 Produtos carregados com termo correto, iniciando lazy loading...');
+                esconderLoader(); // Esconder loader com mínimo de 1 segundo
                 setTimeout(() => {
                     iniciarLazyLoading();
                     gerarCategorias(); // Gerar categorias após carregar produtos
