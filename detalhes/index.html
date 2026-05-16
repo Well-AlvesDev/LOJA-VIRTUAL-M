@@ -921,6 +921,30 @@
                 });
             }
 
+            // ===== LISTENER PARA LINK "PROMOÇÕES" =====
+            // Encontrar e configurar o link "Promoções" para redirecionar para a página de promoções
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.textContent.includes('Promoções')) {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+
+                        // Fechar menu se estiver aberto (mobile)
+                        hamburger.classList.remove('active');
+                        navMenu.classList.remove('active');
+                        overlay.classList.remove('active');
+                        document.body.classList.remove('menu-open');
+                        navItems.forEach(item => {
+                            item.classList.remove('active');
+                            const submenu = item.querySelector('.submenu');
+                            if (submenu) submenu.classList.remove('active');
+                        });
+
+                        // Redirecionar para página de promoções
+                        window.location.href = '../produtos/?promo=true';
+                    });
+                }
+            });
+
             // Barra de pesquisa com sugestões
             if (buscaInput && buscaClear && sugestoesList) {
                 let sugestoes = [];

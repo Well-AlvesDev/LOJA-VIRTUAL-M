@@ -1094,6 +1094,7 @@
 
         // ===== VARIÁVEIS GLOBAIS PRINCIPAIS =====
         let termoBuscaAtual = null; // ✅ Declarar ANTES de qualquer IIFE que a use
+        let modoPromocao = false; // Modo para filtrar e priorizar produtos em promoção
         let produtosCarregados = [];
         let paginaAtual = 1;
         const PRODUTOS_POR_PAGINA = 24;
@@ -1114,16 +1115,31 @@
             }, tempoRestante);
         }
 
-        // ===== INICIALIZAR TERMO DE BUSCA IMEDIATAMENTE (SÍNCRONO, antes de qualquer evento) =====
+        // ===== INICIALIZAR TERMO DE BUSCA E MODO PROMOÇÃO IMEDIATAMENTE (SÍNCRONO, antes de qualquer evento) =====
         // Isso resolve a race condition entre DOMContentLoaded e load
         (function inicializarTermoDeBuscaImediatamente() {
             try {
                 const params = new URLSearchParams(window.location.search);
                 const q = params.get('q');
+                const promo = params.get('promo');
+
+                // Verificar modo promoção
+                modoPromocao = promo === 'true' || promo === '1';
+                if (modoPromocao) {
+                    console.log('🎉 Modo: PROMOÇÕES (produtos com desconto)');
+
+                    // Atualizar título da página
+                    const stopPointElement = document.getElementById('stop-point');
+                    if (stopPointElement) {
+                        stopPointElement.textContent = 'Confira promoções🏷️';
+                    }
+                }
 
                 if (!q) {
                     termoBuscaAtual = null;
-                    console.log('🔍 Modo: Todos os produtos');
+                    if (!modoPromocao) {
+                        console.log('🔍 Modo: Todos os produtos');
+                    }
                     return;
                 }
 
@@ -1368,6 +1384,44 @@
         }
 
         // Sistema de priorização inteligente de produtos (VERSÃO MELHORADA)
+        // ===== FILTRAR E PRIORIZAR PRODUTOS EM PROMOÇÃO =====
+        function priorizarPromocoes(produtos) {
+            if (!produtos || produtos.length === 0) return [];
+
+            const MAX_PRODUTOS = 500;
+
+            // Filtrar apenas produtos com desconto > 0
+            const produtosComDesconto = produtos.filter(p => p.desconto && p.desconto > 0);
+
+            console.log(`🎉 MODO PROMOÇÕES: ${produtosComDesconto.length} produtos com desconto encontrados`);
+
+            if (produtosComDesconto.length === 0) {
+                console.log('⚠️ Nenhum produto em promoção no momento');
+                return [];
+            }
+
+            // Ordenar por desconto decrescente (maior desconto primeiro)
+            produtosComDesconto.sort((a, b) => (b.desconto || 0) - (a.desconto || 0));
+
+            console.log(`📊 Top 3 descontos: ${produtosComDesconto.slice(0, 3).map(p => `${p.nome} (-${p.desconto}%)`).join(', ')}`);
+
+            // Se temos menos de 500 produtos com desconto, completar com produtos aleatórios
+            if (produtosComDesconto.length < MAX_PRODUTOS) {
+                const produtosSemDesconto = produtos.filter(p => !p.desconto || p.desconto === 0);
+                const produtosAleatoiros = embaralharArray([...produtosSemDesconto]);
+                const quantidadeNecessaria = MAX_PRODUTOS - produtosComDesconto.length;
+
+                const resultado_final = [...produtosComDesconto, ...produtosAleatoiros.slice(0, quantidadeNecessaria)];
+
+                console.log(`📦 Completados com ${Math.min(quantidadeNecessaria, produtosAleatoiros.length)} produtos aleatórios`);
+                console.log(`📊 TOTAL: ${resultado_final.length} produtos`);
+
+                return resultado_final;
+            }
+
+            return produtosComDesconto.slice(0, MAX_PRODUTOS);
+        }
+
         function priorizarProdutos(produtos, termo) {
             if (!termo || !termo.trim() || produtos.length === 0) {
                 // Se não houver termo, retornar embaralhados
@@ -1473,8 +1527,13 @@
                 // Transformar dados
                 const produtosTransformados = transformarDadosSupabase(data);
 
-                // Aplicar priorização inteligente
-                const produtosPriorizados = priorizarProdutos(produtosTransformados, termo);
+                // Aplicar priorização inteligente ou promoção
+                let produtosPriorizados;
+                if (modoPromocao) {
+                    produtosPriorizados = priorizarPromocoes(produtosTransformados);
+                } else {
+                    produtosPriorizados = priorizarProdutos(produtosTransformados, termo);
+                }
 
                 logManager.log(`✓ ${produtosPriorizados.length} produtos retornados (priorizados)`);
                 return produtosPriorizados;
@@ -2684,6 +2743,30 @@
                 const submenu = item.querySelector('.submenu');
                 if (submenu) submenu.classList.remove('active');
             });
+        });
+
+        // ===== LISTENER PARA LINK "PROMOÇÕES" =====
+        // Encontrar e configurar o link "Promoções" para redirecionar para a página de promoções
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.textContent.includes('Promoções')) {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Fechar menu se estiver aberto (mobile)
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                        const submenu = item.querySelector('.submenu');
+                        if (submenu) submenu.classList.remove('active');
+                    });
+
+                    // Redirecionar para página de promoções
+                    window.location.href = './?promo=true';
+                });
+            }
         });
 
         // Remover overlay quando o layout não for mais mobile (menu hambúrguer desaparece)
