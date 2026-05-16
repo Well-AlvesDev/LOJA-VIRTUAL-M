@@ -626,7 +626,7 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/logofpo.webp" alt="logotipo da empresa/loja" style="width: 140px;">
+                    <img src="../recursos/identidade/logofpo.webp" alt="logotipo da empresa/loja" style="width: 160px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -975,17 +975,14 @@
                             <i class="ri-arrow-right-line sugestao-icon"></i>
                         `;
 
-                        const navegarParaPesquisa = (e) => {
+                        li.addEventListener('click', (e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             sugestoesList.hidden = true;
-                            const termoFormatado = toTitleCase(sugestao).replace(/\s+/g, '-');
-                            const encoded = encodeURIComponent(termoFormatado);
-                            window.location.href = new URL(`../produtos/index.html?q=${encoded}`, window.location.href).href;
-                        };
-
-                        li.addEventListener('mousedown', navegarParaPesquisa);
-                        li.addEventListener('click', navegarParaPesquisa);
+                            // Formatar o termo com hífens e redirecionar para página de produtos
+                            const termoFormatado = sugestao.replace(/\s+/g, '-');
+                            window.location.href = `../produtos/?q=${termoFormatado}`;
+                        });
 
                         sugestoesList.appendChild(li);
                     });
@@ -1011,8 +1008,8 @@
                         const termo = buscaInput.value.trim();
                         if (termo) {
                             sugestoesList.hidden = true;
-                            const encoded = encodeURIComponent(termo.replace(/\s+/g, '-'));
-                            window.location.href = `../produtos/index.html?q=${encoded}`;
+                            const encoded = termo.replace(/\s+/g, '-');
+                            window.location.href = `../produtos/?q=${encoded}`;
                         }
                     }
                 });
@@ -1399,15 +1396,14 @@
         // ===== CARREGAR SUBMENU DE PRODUTOS =====
         async function carregarSubmenuProdutos() {
             try {
-                const metadados = await fetchMetadados();
-                const categoriasObj = metadados?.find(item => item.elemento === 'categorias');
+                // Carregar primeiras palavras dos produtos do Supabase
+                const categorias = await carregarPalavrasUnicas();
 
-                if (!categoriasObj || !categoriasObj.categorias) {
-                    console.warn('⚠️ Categorias não encontradas nos metadados');
+                if (!categorias || categorias.length === 0) {
+                    console.warn('⚠️ Categorias não encontradas no Supabase');
                     return;
                 }
 
-                const categorias = categoriasObj.categorias;
                 const submenu = document.querySelector('.submenu');
 
                 if (!submenu) return;
@@ -1422,7 +1418,8 @@
                     const a = document.createElement('a');
                     a.href = '#';
                     a.className = 'submenu-link';
-                    a.textContent = categoria;
+                    // Capitalizar primeira letra de cada palavra
+                    a.textContent = categoria.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
                     // Adicionar evento para redirecionar quando clicado
                     a.addEventListener('click', (e) => {
@@ -1435,7 +1432,7 @@
                     submenu.appendChild(li);
                 });
 
-                console.log('✅ Submenu de produtos carregado dinamicamente');
+                console.log('✅ Submenu de produtos carregado do Supabase');
             } catch (error) {
                 console.error('❌ Erro ao carregar submenu de produtos:', error);
             }
