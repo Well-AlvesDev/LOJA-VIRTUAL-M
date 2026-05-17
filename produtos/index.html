@@ -55,8 +55,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.494);
-            backdrop-filter: blur(4px);
+            background-color: rgba(255, 255, 255, 0.183);
+            backdrop-filter: blur(0px);
             z-index: 3000;
             align-items: center;
             justify-content: center;
@@ -943,6 +943,65 @@
                 font-size: 24px;
             }
         }
+
+        /* ===== SKELETON LOADER PARA CARDS DE PRODUTOS ===== */
+        .produtos-skeleton-loader {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 1200px) and (min-width: 768px) {
+            .produtos-skeleton-loader {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .produtos-skeleton-loader {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                padding: 15px;
+            }
+        }
+
+        .skeleton-card {
+            background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 50%, #eeeeee 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s linear infinite;
+            border-radius: 8px;
+            padding-bottom: 150%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            animation: shimmerOverlay 2s infinite;
+        }
+
+        @keyframes shimmerOverlay {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
     </style>
 </head>
 
@@ -1066,6 +1125,20 @@
             </p>
         </div>
         <section class="produtos-destaque">
+            <div id="produtosSkeletonLoader" class="produtos-skeleton-loader">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
             <div id="produtosContainer" class="produtos-container">
                 <!-- Cards serão gerados aqui pelo JavaScript -->
             </div>
@@ -1097,6 +1170,8 @@
         const LOADER_MIN_TIME = 1000; // 1 segundo mínimo
         let loaderStartTime = Date.now();
         const loaderOverlay = document.getElementById('loaderOverlay');
+        const produtosSkeletonLoader = document.getElementById('produtosSkeletonLoader');
+        const produtosContainer = document.getElementById('produtosContainer');
 
         function esconderLoader() {
             const tempoDecorrido = Date.now() - loaderStartTime;
@@ -1107,6 +1182,26 @@
                     loaderOverlay.classList.add('hidden');
                 }
             }, tempoRestante);
+        }
+
+        // Mostrar skeleton loader
+        function mostrarSkeletonLoader() {
+            if (produtosSkeletonLoader) {
+                produtosSkeletonLoader.style.display = 'grid';
+            }
+            if (produtosContainer) {
+                produtosContainer.style.display = 'none';
+            }
+        }
+
+        // Esconder skeleton loader
+        function esconderSkeletonLoader() {
+            if (produtosSkeletonLoader) {
+                produtosSkeletonLoader.style.display = 'none';
+            }
+            if (produtosContainer) {
+                produtosContainer.style.display = 'grid';
+            }
         }
 
         // ===== INICIALIZAR TERMO DE BUSCA E MODO PROMOÇÃO IMEDIATAMENTE (SÍNCRONO, antes de qualquer evento) =====
@@ -3410,12 +3505,14 @@
         async function carregarProdutos() {
             try {
                 logManager.log('🔄 Iniciando carregamento de produtos do Supabase...');
+                mostrarSkeletonLoader();
 
                 // Usar o termo de pesquisa já extraído da URL (termoBuscaAtual)
                 let produtos = await buscarProdutosNoSupabase(termoBuscaAtual);
 
                 if (!produtos || produtos.length === 0) {
                     logManager.warn('⚠️ Nenhum produto encontrado para o termo pesquisado');
+                    esconderSkeletonLoader();
                     document.getElementById('produtosErro').hidden = false;
                     return false;
                 }
@@ -3426,10 +3523,12 @@
 
                 // Exibir primeira página com sistema de paginação
                 exibirPagina(1);
+                esconderSkeletonLoader();
 
                 return true;
             } catch (erro) {
                 logManager.error('❌ Erro ao carregar produtos:', erro);
+                esconderSkeletonLoader();
                 document.getElementById('produtosErro').hidden = false;
                 return false;
             }

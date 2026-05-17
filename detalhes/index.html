@@ -33,10 +33,10 @@
     .overlay {
         display: none;
         position: fixed;
-        top: 0;
+        top: 140px;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: calc(100% - 140px);
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 999;
         animation: fadeIn 0.3s ease;
@@ -44,6 +44,13 @@
 
     .overlay.active {
         display: block;
+    }
+
+    @media (max-width: 768px) {
+        .overlay {
+            top: 130px;
+            height: calc(100% - 130px);
+        }
     }
 
     @keyframes fadeIn {
@@ -736,7 +743,8 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png" alt="logotipo da empresa/loja" style="width: 190px;">
+                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
+                        alt="logotipo da empresa/loja" style="width: 190px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -793,6 +801,9 @@
             </div>
         </div>
     </header>
+
+    <!-- OVERLAY PARA MENU MOBILE -->
+    <div class="overlay"></div>
 
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="container-detalhes" id="main-content">
@@ -1026,6 +1037,25 @@
                     document.body.classList.remove('menu-open');
                 });
             }
+
+            // Resetar menu quando a viewport muda (media query change)
+            const mediaQuery = window.matchMedia('(max-width: 768px)');
+            function handleMediaChange(e) {
+                if (!e.matches) {
+                    // Tela é maior que 768px (desktop) - resetar menu mobile
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    if (overlay) overlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                        const submenu = item.querySelector('.submenu');
+                        if (submenu) submenu.classList.remove('active');
+                    });
+                }
+            }
+            mediaQuery.addEventListener('change', handleMediaChange);
 
             // ===== LISTENER PARA LINK "PROMOÇÕES" =====
             // Encontrar e configurar o link "Promoções" para redirecionar para a página de promoções
