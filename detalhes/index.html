@@ -617,6 +617,116 @@
             font-size: 12px;
         }
     }
+
+    /* Estilos do Footer */
+    footer {
+        background-color: #ffffff00;
+        color: #333;
+        padding: 80px 20px 0;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+        margin-top: 30px;
+    }
+
+    .footer-container {
+        max-width: 1200px;
+        margin: -40px auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 60px;
+        width: 100%;
+        padding: 0 0 40px;
+        justify-items: center;
+        text-align: center;
+    }
+
+    .footer-section h3 {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #1a1a1a;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .footer-section ul {
+        list-style: none;
+    }
+
+    .footer-section li {
+        margin-bottom: 12px;
+    }
+
+    .footer-section a {
+        color: #666;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    .footer-section p {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.8;
+        font-weight: 400;
+    }
+
+    .footer-bottom {
+        text-align: center;
+        margin-top: auto;
+        padding: 30px 20px;
+        border-top: 1px solid #f0f0f0;
+        font-size: 10px;
+        color: #999;
+        width: 100%;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+        justify-content: center;
+    }
+
+    .footer-social a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background-color: transparent;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        color: #666;
+        font-size: 15px;
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        footer {
+            padding: 50px 15px 0px;
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            gap: 40px;
+            grid-template-columns: 1fr;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .footer-section h3 {
+            font-size: 12px;
+        }
+
+        .footer-section a,
+        .footer-section p {
+            font-size: 16px;
+        }
+    }
 </style>
 
 <body>
@@ -1362,7 +1472,7 @@
                                     <span style="color: #666; font-size: 14px;">Todos os cartões de crédito e débito</span>
                                     <span style="color: #999;">| PIX </span>
                                     <div class="meio-pagamento-icon" title="Pix" style="margin-left: 5px;">
-                                        <img src="../meios de pagamento dos sites/pix@2x.png" alt="Pix">
+                                        <img src="../recursos/icones/pix@2x.png" alt="Pix">
                                     </div>
                                 </div>
                             </div>
@@ -1415,6 +1525,36 @@
                 });
 
             return metadadosPromise;
+        }
+
+        // ===== GERAR FOOTER DINAMICAMENTE =====
+        function gerarFooter() {
+            // Verificar se o footer já existe
+            if (document.querySelector('footer')) {
+                return;
+            }
+
+            const footer = document.createElement('footer');
+            footer.innerHTML = `
+            
+                <div class="footer-container">
+                    <div class="footer-section">
+                        <h3> Juvele - moda feminina</h3>
+                        <p>Qualidade, estilo e preço justo para você.</p>
+                        <div class="footer-social">
+                            <a href="https://instagram.com" target="_blank" title="Instagram"><i class="ri-instagram-line"></i></a>
+                            <a href="https://wa.me/5585988881234" target="_blank" title="WhatsApp"><i class="ri-whatsapp-line"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Juvele.com.br <br> Todos os direitos reservados. | Desenvolvido com <i class="ri-heart-fill" style="color: #e22a8c;"></i> para você.</p>
+                </div>
+            `;
+
+            document.body.appendChild(footer);
+            console.log('✓ Footer gerado dinamicamente');
         }
 
         // ===== CARREGAR SUBMENU DE PRODUTOS =====
@@ -1485,10 +1625,12 @@
             document.addEventListener('DOMContentLoaded', () => {
                 carregarSubmenuProdutos();
                 inicializarPagina();
+                gerarFooter();
             });
         } else {
             carregarSubmenuProdutos();
             inicializarPagina();
+            gerarFooter();
         }
     </script>
 </body>
