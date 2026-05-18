@@ -407,7 +407,7 @@
             }
         }
 
-        // Comprimir imagem para WebP (40-70 KB)
+        // Comprimir imagem para WebP (40-70 KB) e redimensionar para máx 800x800
         async function compressImageToWebP(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -416,22 +416,37 @@
                     const img = new Image();
 
                     img.onload = () => {
+                        // Calcular dimensões redimensionadas mantendo a proporção
+                        let newWidth = img.width;
+                        let newHeight = img.height;
+                        const maxDimension = 800;
+
+                        if (newWidth > maxDimension || newHeight > maxDimension) {
+                            const aspectRatio = img.width / img.height;
+                            if (newWidth > newHeight) {
+                                newWidth = maxDimension;
+                                newHeight = Math.round(maxDimension / aspectRatio);
+                            } else {
+                                newHeight = maxDimension;
+                                newWidth = Math.round(maxDimension * aspectRatio);
+                            }
+                        }
+
+                        console.log(`📐 Dimensões: Original ${img.width}x${img.height} → Redimensionada ${newWidth}x${newHeight}`);
+
                         const canvas = document.createElement('canvas');
+                        canvas.width = newWidth;
+                        canvas.height = newHeight;
+
                         const ctx = canvas.getContext('2d');
-
-                        // Definir dimensões do canvas
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-
-                        // Desenhar imagem no canvas
-                        ctx.drawImage(img, 0, 0);
+                        // Desenhar a imagem redimensionada no canvas
+                        ctx.drawImage(img, 0, 0, newWidth, newHeight);
 
                         // Função para tentar compressão com diferentes qualidades
                         const tryCompress = (quality) => {
                             canvas.toBlob(
                                 (blob) => {
                                     const sizeInKB = blob.size / 1024;
-
                                     console.log(`Qualidade ${quality.toFixed(2)}: ${sizeInKB.toFixed(2)} KB`);
 
                                     // Verificar se está no intervalo desejado (40-70 KB)

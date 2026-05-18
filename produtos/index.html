@@ -732,7 +732,7 @@
             transition: all 0.3s ease;
 
             /* Liquid Glass Effect */
-            background:whitesmoke;
+            background: whitesmoke;
             border: 1.5px solid rgba(255, 143, 233, 0.31);
             box-shadow:
                 0 8px 32px rgba(42, 113, 226, 0.073),
@@ -1029,7 +1029,8 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png" alt="logotipo da empresa/loja" style="width: 190px;">
+                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
+                        alt="logotipo da empresa/loja" style="width: 190px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -1149,6 +1150,34 @@
     </main>
 
     <script>
+        // ===== LIMPAR TODOS OS TOKENS DO SUPABASE AO ENTRAR NA PÁGINA DE PESQUISA =====
+        // Remove credenciais administrativas e tokens Supabase para evitar conflitos
+        (function limparTodosOsTokens() {
+            try {
+                // Remover tokens administrativos
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+
+                // Remover tokens de autenticação do Supabase (todos começam com 'sb-')
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && (key.startsWith('sb-') || key.includes('auth') || key.includes('supabase'))) {
+                        keysToRemove.push(key);
+                    }
+                }
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+
+                if (keysToRemove.length > 0) {
+                    console.log(`✅ Removidos ${keysToRemove.length} token(s) de autenticação`);
+                } else {
+                    console.log('✅ Nenhum token de autenticação para remover');
+                }
+            } catch (err) {
+                console.warn('⚠️ Erro ao remover tokens:', err);
+            }
+        })();
+
         // ===== SISTEMA DE LOGS PROVISÓRIO =====
         // Será substituído pelo logManager completo mais abaixo
         const logManager = (() => {

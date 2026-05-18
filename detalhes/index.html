@@ -822,6 +822,34 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="../config.js"></script>
     <script>
+        // ===== LIMPAR TODOS OS TOKENS DO SUPABASE AO ENTRAR NA PÁGINA DE DETALHES =====
+        // Remove credenciais administrativas e tokens Supabase para evitar conflitos
+        (function limparTodosOsTokens() {
+            try {
+                // Remover tokens administrativos
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+
+                // Remover tokens de autenticação do Supabase (todos começam com 'sb-')
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && (key.startsWith('sb-') || key.includes('auth') || key.includes('supabase'))) {
+                        keysToRemove.push(key);
+                    }
+                }
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+
+                if (keysToRemove.length > 0) {
+                    console.log(`✅ Removidos ${keysToRemove.length} token(s) de autenticação`);
+                } else {
+                    console.log('✅ Nenhum token de autenticação para remover');
+                }
+            } catch (err) {
+                console.warn('⚠️ Erro ao remover tokens:', err);
+            }
+        })();
+
         // ===== CACHE DE PALAVRAS-CHAVE DO SUPABASE (5 HORAS) =====
         const CACHE_KEY_PALAVRAS_UNICAS = 'palavras_unicas';
         const CACHE_KEY_DUAS_PALAVRAS = 'duas_palavras_unicas';
