@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Área Administrativa</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: rgb(238, 238, 238);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        main {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        main img {
+            width: 80px;
+            background-color: rgb(255, 255, 141);
+            border-radius: 50%;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        main h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        main p {
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        main input {
+            display: block;
+            margin: 15px auto;
+            padding: 12px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        main input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        main .button-entrar {
+            display: block;
+            width: 100%;
+            margin: 25px auto 15px;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        main .button-entrar:hover {
+            background-color: #0056b3;
+        }
+
+        main .button-entrar:active {
+            transform: scale(0.98);
+        }
+
+        main .button-entrar:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-success-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .success-checkmark {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #4caf50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        .success-checkmark::before {
+            content: '✓';
+            color: white;
+            font-size: 60px;
+            font-weight: bold;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-success-animation" id="successAnimation">
+        <div class="success-checkmark"></div>
+    </div>
+
+    <main>
+        <img src="recursos/icones/User_icon_2.svg" alt="" id="userIcon">
+        <h1>Área Administrativa</h1>
+        <p>Bem-vindo ao painel administrativo! Insira suas credenciais para continuar.</p>
+
+        <div class="loading-spinner" id="loadingSpinner"></div>
+
+        <input type="text" id="username" placeholder="Digite o nome de usuário">
+        <input type="password" id="password" placeholder="Digite a senha">
+        <button class="button-entrar" id="btnEntrar">Entrar</button>
+
+        <div class="login-error" id="loginError"></div>
+    </main>
+
+    <script>
+        // Inicializar cliente Supabase
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+        const btnEntrar = document.getElementById('btnEntrar');
+        const inputUsername = document.getElementById('username');
+        const inputPassword = document.getElementById('password');
+        const loginError = document.getElementById('loginError');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const successAnimation = document.getElementById('successAnimation');
+
+        btnEntrar.addEventListener('click', handleLogin);
+
+        // Permite pressionar Enter para fazer login
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && (document.activeElement === inputUsername || document.activeElement === inputPassword)) {
+                handleLogin();
+            }
+        });
+
+        async function handleLogin() {
+            const username = inputUsername.value.trim();
+            const password = inputPassword.value.trim();
+
+            // Validação básica
+            if (!username || !password) {
+                showError('Por favor, preencha todos os campos');
+                return;
+            }
+
+            // Mostrar spinner e desabilitar botão
+            loadingSpinner.style.display = 'block';
+            btnEntrar.disabled = true;
+            loginError.style.display = 'none';
+
+            try {
+                // Usar signInWithPassword do Supabase Auth
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: username,
+                    password: password
+                });
+
+                if (error) {
+                    showError('Credenciais inválidas. Tente novamente.');
+                    console.error('Auth error:', error.message);
+                } else if (data.session) {
+                    // Login bem-sucedido, mostrar animação
+                    showSuccessAnimation();
+
+                    // Armazenar token JWT no localStorage
+                    localStorage.setItem('adminToken', data.session.access_token);
+                    localStorage.setItem('adminUser', JSON.stringify(data.user));
+
+                    // Redirecionar após animação (1.5s)
+                    setTimeout(() => {
+                        window.location.href = 'black-adm.html';
+                    }, 1500);
+                }
+            } catch (error) {
+                showError('Erro ao conectar. Tente novamente.');
+                console.error('Login error:', error);
+            } finally {
+                loadingSpinner.style.display = 'none';
+                btnEntrar.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+        }
+
+        function showSuccessAnimation() {
+            successAnimation.style.display = 'flex';
+        }
+
+        // Verificar se já está logado
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                // Já está logado, redirecionar para admin
+                window.location.href = 'black-adm.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .navbar {
+            background: #244dff;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .user-section {
+            background: rgba(175, 175, 175, 0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-email {
+            font-size: 0.9em;
+            opacity: 0.9;
+            color: #6e6e6e;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background-color: rgba(239, 136, 136, 0.2);
+            color: rgb(222, 67, 67);
+            border: 1px solid rgb(233, 108, 108);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .welcome-box h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .welcome-box p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .btn-publish-product {
+            padding: 12px 24px;
+            background-color: #244dff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .btn-publish-product:hover {
+            background-color: #1a38cc;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #244dff;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="file"],
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 0.95em;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 5px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-width: 200px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn-cancel,
+        .btn-submit {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        .btn-cancel {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background-color: #ccc;
+        }
+
+        .btn-submit {
+            background-color: #244dff;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background-color: #1a38cc;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        input:invalid {
+            border-color: #d32f2f;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <h1>🔐 Painel Administrativo</h1>
+    </div>
+
+    <div class="user-section">
+        <span class="user-email" id="userEmail">Carregando...</span>
+        <button class="btn-logout" id="btnLogout"><i class="ri-logout-box-line"></i> Logout</button>
+    </div>
+
+    <div class="container" id="mainContent"></div>
+
+    <!-- Modal Publicar Produto -->
+    <div id="publishModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📦 Publicar Produto</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+
+            <form id="publishForm">
+                <!-- Imagem do Produto -->
+                <div class="form-group form-row full">
+                    <label for="productImage">Imagem do Produto *</label>
+                    <input type="file" id="productImage" accept="image/*" required>
+                    <img id="imagePreview" class="image-preview" alt="Prévia">
+                    <span class="error-message" id="imageError">Selecione uma imagem válida</span>
+                </div>
+
+                <!-- Título e Preço -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productTitle">Título do Produto *</label>
+                        <input type="text" id="productTitle" placeholder="Nome do produto" required>
+                        <span class="error-message" id="titleError">Digite um título válido</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Preço (R$) *</label>
+                        <input type="number" id="productPrice" placeholder="0.00" min="1" step="0.01" required>
+                        <span class="error-message" id="priceError">Preço mínimo é R$ 1,00</span>
+                    </div>
+                </div>
+
+                <!-- Desconto e Parcelas -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productDiscount">Desconto (%) *</label>
+                        <input type="number" id="productDiscount" placeholder="0" min="0" max="100" step="0.01"
+                            value="0" required>
+                        <span class="error-message" id="discountError">Desconto mínimo é 0%</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="installments">Quantidade de Parcelas *</label>
+                        <input type="number" id="installments" placeholder="1" min="1" max="12" value="1" required>
+                        <span class="error-message" id="installmentsError">Mínimo 1 parcela, máximo 12</span>
+                    </div>
+                </div>
+
+                <!-- Parcelas Sem Juros -->
+                <div class="form-group">
+                    <label for="interestFreeInstallments">Parcelas Sem Juros em Até *</label>
+                    <input type="number" id="interestFreeInstallments" placeholder="1" min="0" max="12" value="0"
+                        required>
+                    <span class="error-message" id="interestFreeError">Deve ser menor ou igual às parcelas totais</span>
+                </div>
+
+                <!-- Descrição -->
+                <div class="form-group form-row full">
+                    <label for="productDescription">Descrição (Opcional)</label>
+                    <textarea id="productDescription" placeholder="Descreva detalhes do produto..."></textarea>
+                </div>
+
+                <!-- Botões -->
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="cancelBtn">Cancelar</button>
+                    <button type="submit" class="btn-submit">Publicar Produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        // Inicializar cliente Supabase
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+        const mainContent = document.getElementById('mainContent');
+        const userEmailSpan = document.getElementById('userEmail');
+        const btnLogout = document.getElementById('btnLogout');
+
+        let currentUser = null;
+        let imagekitCredentials = null;
+
+        // Modal e Formulário de Publicação
+        const publishModal = document.getElementById('publishModal');
+        const publishForm = document.getElementById('publishForm');
+        const closeModalBtn = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const productImageInput = document.getElementById('productImage');
+        const imagePreview = document.getElementById('imagePreview');
+
+        function openPublishModal() {
+            publishModal.style.display = 'block';
+            publishForm.reset();
+            imagePreview.style.display = 'none';
+        }
+
+        function closePublishModal() {
+            publishModal.style.display = 'none';
+            publishForm.reset();
+            imagePreview.style.display = 'none';
+        }
+
+        // Buscar credenciais do ImageKit do Supabase
+        async function fetchImagekitCredentials() {
+            try {
+                // Verificar autenticação
+                const { data: { session } } = await supabase.auth.getSession();
+                console.log('Usuário autenticado:', session?.user?.email);
+
+                const { data, error } = await supabase
+                    .from('credenciais-imagekit')
+                    .select('*');
+
+                if (error) {
+                    console.error('Erro ao buscar credenciais:', error);
+                    console.error('Código do erro:', error.code);
+                    console.error('Mensagem:', error.message);
+                    throw error;
+                }
+
+                console.log('Dados retornados:', data);
+
+                if (!data || data.length === 0) {
+                    console.warn('Nenhuma credencial encontrada. Verifique as políticas RLS da tabela.');
+                    alert('⚠️ Nenhuma credencial do ImageKit encontrada. Verifique as políticas RLS.');
+                    return;
+                }
+
+                const firstCredential = data[0];
+                // Mapear as credenciais com trim para remover espaços
+                imagekitCredentials = {
+                    private_key: (firstCredential.private_key || '').trim(),
+                    public_key: (firstCredential.public_key || '').trim(),
+                    imagekit_id: (firstCredential['imagekit-id'] || '').trim(),
+                    url_endpoint: (firstCredential['url-endpoint'] || '').trim()
+                };
+                console.log('✅ Credenciais ImageKit carregadas com sucesso');
+            } catch (error) {
+                console.error('Erro ao carregar credenciais ImageKit:', error);
+                alert('❌ Erro ao carregar configurações:\n' + error.message);
+            }
+        }
+
+        // Comprimir imagem para WebP (40-70 KB)
+        async function compressImageToWebP(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+                    const img = new Image();
+
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        // Definir dimensões do canvas
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        // Desenhar imagem no canvas
+                        ctx.drawImage(img, 0, 0);
+
+                        // Função para tentar compressão com diferentes qualidades
+                        const tryCompress = (quality) => {
+                            canvas.toBlob(
+                                (blob) => {
+                                    const sizeInKB = blob.size / 1024;
+
+                                    console.log(`Qualidade ${quality.toFixed(2)}: ${sizeInKB.toFixed(2)} KB`);
+
+                                    // Verificar se está no intervalo desejado (40-70 KB)
+                                    if (sizeInKB >= 40 && sizeInKB <= 70) {
+                                        console.log('✅ Tamanho ideal atingido!');
+                                        resolve(blob);
+                                    } else if (sizeInKB > 70 && quality > 0.3) {
+                                        // Se muito grande, reduzir qualidade
+                                        tryCompress(quality - 0.05);
+                                    } else if (sizeInKB < 40 && quality < 1) {
+                                        // Se muito pequeno, aumentar qualidade
+                                        tryCompress(quality + 0.05);
+                                    } else {
+                                        // Aceitar o tamanho mais próximo
+                                        console.log('✅ Melhor tamanho possível atingido!');
+                                        resolve(blob);
+                                    }
+                                },
+                                'image/webp',
+                                quality
+                            );
+                        };
+
+                        // Começar com qualidade 0.8
+                        tryCompress(0.8);
+                    };
+
+                    img.onerror = () => {
+                        reject(new Error('Erro ao carregar imagem'));
+                    };
+
+                    img.src = event.target.result;
+                };
+
+                reader.onerror = () => {
+                    reject(new Error('Erro ao ler arquivo'));
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Upload de imagem para ImageKit
+        async function uploadImageToImageKit(imageBlob) {
+            if (!imagekitCredentials) {
+                alert('❌ Credenciais do ImageKit não estão disponíveis');
+                return null;
+            }
+
+            try {
+                // Validar credenciais
+                console.log('Verificando credenciais:', {
+                    private_key: imagekitCredentials.private_key ? `[${imagekitCredentials.private_key.length} caracteres]` : 'AUSENTE',
+                    public_key: imagekitCredentials.public_key ? `[${imagekitCredentials.public_key.length} caracteres]` : 'AUSENTE',
+                    imagekit_id: imagekitCredentials.imagekit_id || 'AUSENTE',
+                    url_endpoint: imagekitCredentials.url_endpoint || 'AUSENTE'
+                });
+
+                if (!imagekitCredentials.private_key || !imagekitCredentials.public_key) {
+                    alert('❌ Credenciais incompletas. Verifique o banco de dados.');
+                    return null;
+                }
+
+                const formData = new FormData();
+                formData.append('file', imageBlob, `product-${Date.now()}.webp`);
+                formData.append('publicKey', imagekitCredentials.public_key);
+                formData.append('fileName', `product-${Date.now()}`);
+                formData.append('folder', '/produtos');
+
+                console.log('Dados sendo enviados:', {
+                    fileName: `product-${Date.now()}`,
+                    folder: '/produtos',
+                    fileSize: (imageBlob.size / 1024).toFixed(2) + ' KB',
+                    publicKey: imagekitCredentials.public_key.substring(0, 10) + '...'
+                });
+
+                // Criar string de autenticação Basic Auth
+                const authString = imagekitCredentials.private_key + ':';
+                const encodedAuth = btoa(authString);
+
+                console.log('Auth header preparado:', `Basic ${encodedAuth.substring(0, 20)}...`);
+
+                // Fazer upload para ImageKit via API
+                const response = await fetch(`https://upload.imagekit.io/api/v1/files/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Basic ${encodedAuth}`
+                    },
+                    body: formData
+                });
+
+                console.log('Resposta ImageKit:', {
+                    status: response.status,
+                    statusText: response.statusText
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    console.error('❌ Erro da API ImageKit:', result);
+                    throw new Error(`${result.message || response.statusText}`);
+                }
+
+                console.log('✅ Imagem enviada com sucesso:', result);
+                return result;
+            } catch (error) {
+                console.error('Erro ao fazer upload da imagem:', error);
+                alert('❌ Erro ao fazer upload:\n' + error.message);
+                return null;
+            }
+        }
+        productImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagePreview.src = event.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Fechar modal
+        closeModalBtn.addEventListener('click', closePublishModal);
+        cancelBtn.addEventListener('click', closePublishModal);
+
+        // Fechar ao clicar fora do modal
+        window.addEventListener('click', (event) => {
+            if (event.target === publishModal) {
+                closePublishModal();
+            }
+        });
+
+        // Validar e enviar formulário
+        publishForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Limpar mensagens de erro
+            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+            // Validar campos
+            const title = document.getElementById('productTitle').value.trim();
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const discount = parseFloat(document.getElementById('productDiscount').value);
+            const installments = parseInt(document.getElementById('installments').value);
+            const interestFreeInstallments = parseInt(document.getElementById('interestFreeInstallments').value);
+            const imageFile = productImageInput.files[0];
+
+            let isValid = true;
+
+            // Validações
+            if (!imageFile) {
+                document.getElementById('imageError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!title) {
+                document.getElementById('titleError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(price) || price < 1) {
+                document.getElementById('priceError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(discount) || discount < 0) {
+                document.getElementById('discountError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(installments) || installments < 1 || installments > 12) {
+                document.getElementById('installmentsError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(interestFreeInstallments) || interestFreeInstallments < 0 || interestFreeInstallments > installments) {
+                document.getElementById('interestFreeError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            // Mostrar feedback de upload
+            const submitBtn = publishForm.querySelector('.btn-submit');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '⏳ Comprimindo imagem...';
+            submitBtn.disabled = true;
+
+            try {
+                // Comprimir imagem para WebP (40-70 KB)
+                console.log('Iniciando compressão de imagem...');
+                const compressedImage = await compressImageToWebP(imageFile);
+                const sizeInKB = (compressedImage.size / 1024).toFixed(2);
+                console.log(`✅ Imagem comprimida: ${sizeInKB} KB`);
+
+                // Atualizar feedback
+                submitBtn.textContent = '⏳ Enviando para ImageKit...';
+
+                // Fazer upload da imagem comprimida
+                const uploadResult = await uploadImageToImageKit(compressedImage);
+
+                if (uploadResult) {
+                    // Preparar dados do produto para inserir no Supabase
+                    const productData = {
+                        PRODUTO: title,
+                        PREÇO: price.toString(),
+                        'IMAGE-URL': uploadResult.url,
+                        DESCONTO: discount.toString(),
+                        PARCELAMENTO: `${installments},${interestFreeInstallments}`,
+                        DESCRIPTION: document.getElementById('productDescription').value,
+                        DISPONIBILIDADE: true
+                    };
+
+                    // Inserir produto na tabela 'j-box'
+                    const { error: insertError } = await supabase
+                        .from('j-box')
+                        .insert([productData]);
+
+                    if (insertError) {
+                        console.error('❌ Erro ao inserir produto:', insertError);
+                        alert('❌ Imagem publicada, mas erro ao salvar produto:\n' + insertError.message);
+                    } else {
+                        console.log('✅ Produto salvo com sucesso:', productData);
+                        alert('✅ Produto publicado com sucesso!\n\nTítulo: ' + title + '\nTamanho: ' + sizeInKB + ' KB\nURL: ' + uploadResult.url);
+                        closePublishModal();
+                    }
+                }
+            } catch (error) {
+                console.error('Erro durante compressão ou upload:', error);
+                alert('❌ Erro ao processar imagem:\n' + error.message);
+            }
+
+            // Restaurar botão
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+
+        async function checkAuth() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+
+                if (!session) {
+                    // Não está logado, redirecionar para login
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = session.user;
+                userEmailSpan.innerHTML = `<i class="ri-user-line"></i> ${currentUser.email}`;
+                loadAdminContent();
+            } catch (error) {
+                console.error('Auth check error:', error);
+                redirectToLogin();
+            }
+        }
+
+        function loadAdminContent() {
+            mainContent.innerHTML = `
+                <button class="btn-publish-product" id="btnPublishProduct"> <i class="ri-upload-cloud-2-line"></i> Publicar Produto</button>
+                <div class="welcome-box">
+                    <h2>Bem-vindo,<br> ${currentUser.email}!🔥</h2>
+                    <p>Você está na área administrativa do sistema. Aqui você pode gerenciar produtos, pedidos e outras operações do painel.</p>
+                </div>
+            `;
+
+            // Adicionar evento ao botão de publicar produto
+            document.getElementById('btnPublishProduct').addEventListener('click', openPublishModal);
+
+            // Carregar credenciais do ImageKit
+            fetchImagekitCredentials();
+        }
+
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        // Logout
+        btnLogout.addEventListener('click', async () => {
+            try {
+                await supabase.auth.signOut();
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Erro ao fazer logout');
+            }
+        });
+
+        // Monitorar mudanças de autenticação
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+                redirectToLogin();
+            }
+        });
+
+        // Verificar autenticação ao carregar a página
+        checkAuth();
+    </script>
+</body>
+
+</html>
