@@ -278,6 +278,197 @@
         input:invalid {
             border-color: #d32f2f;
         }
+
+        /* Estilos para Modal de Busca de Produtos */
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        .search-button {
+            padding: 12px 24px;
+            background-color: #244dff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        .search-button:hover {
+            background-color: #1a38cc;
+        }
+
+        .search-button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .product-card:hover {
+            border-color: #244dff;
+            box-shadow: 0 4px 12px rgba(36, 77, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .product-card.selected {
+            border-color: #244dff;
+            background-color: #f0f4ff;
+        }
+
+        .product-card-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background-color: #f5f5f5;
+        }
+
+        .product-card-info {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .product-card-name {
+            font-weight: bold;
+            font-size: 0.85em;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+
+        .product-card-price {
+            color: #244dff;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: background-color 0.3s;
+            flex: 1;
+        }
+
+        .btn-edit {
+            background-color: #244dff;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #1a38cc;
+        }
+
+        .btn-delete {
+            background-color: #d32f2f;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #b71c1c;
+        }
+
+        .btn-delete:disabled,
+        .btn-edit:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #244dff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .success-message {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .current-product-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .current-product-info.show {
+            display: block;
+        }
+
+        .current-product-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
@@ -290,7 +481,8 @@
         <span class="user-email" id="userEmail">Carregando...</span>
         <button class="btn-logout" id="btnLogout"><i class="ri-logout-box-line"></i> Logout</button>
     </div>
-    <section><img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="" style="width: 200px; margin: 10px auto; display: block;"></section>
+    <section><img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt=""
+            style="width: 200px; margin: 10px auto; display: block;"></section>
 
     <div class="container" id="mainContent"></div>
     <!-- Modal Publicar Produto -->
@@ -361,6 +553,116 @@
                 <div class="form-actions">
                     <button type="button" class="btn-cancel" id="cancelBtn">Cancelar</button>
                     <button type="submit" class="btn-submit">Publicar Produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Gerenciar/Buscar Produtos -->
+    <div id="manageProductsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔍 Buscar Produtos</h2>
+                <button class="close-btn" id="closeManageModal">&times;</button>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="productSearch" class="search-input"
+                    placeholder="Digite o ID ou nome do produto...">
+                <button class="search-button" id="btnSearch">Buscar</button>
+            </div>
+
+            <div id="searchResults"></div>
+
+            <div id="successMessage" class="success-message"></div>
+            <div id="currentProductInfo" class="current-product-info"></div>
+
+            <div class="form-actions" id="manageActions" style="display: none;">
+                <button type="button" class="btn-cancel" id="closeBtnManage">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Produto -->
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Produto</h2>
+                <button class="close-btn" id="closeEditModal">&times;</button>
+            </div>
+
+            <form id="editForm">
+                <!-- Imagem do Produto -->
+                <div class="form-group form-row full">
+                    <label for="editProductImage">Imagem do Produto</label>
+                    <div style="margin-bottom: 10px;">
+                        <img id="currentEditImage" class="current-product-image" alt="Imagem atual"
+                            style="display: none;">
+                    </div>
+                    <input type="file" id="editProductImage" accept="image/*">
+                    <div class="image-preview-container" id="editImagePreviewContainer">
+                        <img id="editImagePreview" class="image-preview" alt="Nova prévia">
+                        <button type="button" class="remove-image-btn" id="removeEditImageBtn"
+                            title="Remover imagem">×</button>
+                    </div>
+                    <span class="error-message" id="editImageError">Erro ao processar imagem</span>
+                </div>
+
+                <!-- Título e Preço -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editProductTitle">Título do Produto *</label>
+                        <input type="text" id="editProductTitle" required>
+                        <span class="error-message" id="editTitleError">Digite um título válido</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductPrice">Preço (R$) *</label>
+                        <input type="number" id="editProductPrice" min="1" step="0.01" required>
+                        <span class="error-message" id="editPriceError">Preço mínimo é R$ 1,00</span>
+                    </div>
+                </div>
+
+                <!-- Desconto e Parcelas -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editProductDiscount">Desconto (%) *</label>
+                        <input type="number" id="editProductDiscount" min="0" max="100" step="0.01" required>
+                        <span class="error-message" id="editDiscountError">Desconto deve estar entre 0 e 100</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editInstallments">Quantidade de Parcelas *</label>
+                        <input type="number" id="editInstallments" min="1" max="12" required>
+                        <span class="error-message" id="editInstallmentsError">Mínimo 1 parcela, máximo 12</span>
+                    </div>
+                </div>
+
+                <!-- Parcelas Sem Juros -->
+                <div class="form-group">
+                    <label for="editInterestFreeInstallments">Parcelas Sem Juros em Até *</label>
+                    <input type="number" id="editInterestFreeInstallments" min="0" max="12" required>
+                    <span class="error-message" id="editInterestFreeError">Deve ser menor ou igual às parcelas
+                        totais</span>
+                </div>
+
+                <!-- Descrição -->
+                <div class="form-group form-row full">
+                    <label for="editProductDescription">Descrição</label>
+                    <textarea id="editProductDescription" placeholder="Descreva detalhes do produto..."></textarea>
+                </div>
+
+                <!-- Disponibilidade -->
+                <div class="form-group">
+                    <label for="editProductAvailability">
+                        <input type="checkbox" id="editProductAvailability" checked style="margin-right: 8px;">
+                        Produto Disponível
+                    </label>
+                </div>
+
+                <!-- Botões -->
+                <div class="form-actions">
+                    <button type="button" class="btn-delete" id="btnDeleteProduct">Deletar Produto</button>
+                    <button type="button" class="btn-cancel" id="cancelEditBtn">Cancelar</button>
+                    <button type="submit" class="btn-submit">Salvar Alterações</button>
                 </div>
             </form>
         </div>
@@ -742,6 +1044,432 @@
             submitBtn.disabled = false;
         });
 
+        // ===== GERENCIAMENTO DE PRODUTOS =====
+        const manageProductsModal = document.getElementById('manageProductsModal');
+        const editProductModal = document.getElementById('editProductModal');
+        const closeManageModalBtn = document.getElementById('closeManageModal');
+        const closeEditModalBtn = document.getElementById('closeEditModal');
+        const closeBtnManage = document.getElementById('closeBtnManage');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const productSearchInput = document.getElementById('productSearch');
+        const btnSearch = document.getElementById('btnSearch');
+        const editForm = document.getElementById('editForm');
+        const editProductImageInput = document.getElementById('editProductImage');
+        const editImagePreview = document.getElementById('editImagePreview');
+        const editImagePreviewContainer = document.getElementById('editImagePreviewContainer');
+        const removeEditImageBtn = document.getElementById('removeEditImageBtn');
+        const btnDeleteProduct = document.getElementById('btnDeleteProduct');
+
+        let selectedProductData = null;
+        let currentEditingProduct = null;
+        let newImageSelected = false;
+
+        function openManageProductsModal() {
+            manageProductsModal.style.display = 'block';
+            productSearchInput.value = '';
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('currentProductInfo').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('manageActions').style.display = 'none';
+            selectedProductData = null;
+            productSearchInput.focus();
+        }
+
+        function closeManageProductsModal() {
+            manageProductsModal.style.display = 'none';
+            productSearchInput.value = '';
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('currentProductInfo').classList.remove('show');
+            selectedProductData = null;
+        }
+
+        function closeEditProductModal() {
+            editProductModal.style.display = 'none';
+            editForm.reset();
+            document.getElementById('editImagePreviewContainer').style.display = 'none';
+            document.getElementById('currentEditImage').style.display = 'none';
+            newImageSelected = false;
+            currentEditingProduct = null;
+        }
+
+        async function searchProducts() {
+            const searchTerm = productSearchInput.value.trim();
+
+            if (!searchTerm) {
+                alert('Digite um ID ou nome do produto');
+                return;
+            }
+
+            btnSearch.disabled = true;
+            btnSearch.innerHTML = '<span class="loading-spinner"></span>';
+            document.getElementById('searchResults').innerHTML = '';
+
+            try {
+                // Verificar sessão do usuário
+                const { data: { session } } = await supabase.auth.getSession();
+                console.log('Sessão do usuário:', session?.user?.email);
+
+                let allResults = [];
+
+                // Tentar como ID primeiro (se for número)
+                if (!isNaN(searchTerm)) {
+                    console.log('Buscando por ID:', parseInt(searchTerm));
+                    const { data: idResults, error: idError } = await supabase
+                        .from('j-box')
+                        .select('*')
+                        .eq('ID', parseInt(searchTerm));
+
+                    if (idError) {
+                        console.error('Erro ao buscar por ID:', {
+                            code: idError.code,
+                            message: idError.message
+                        });
+                    } else {
+                        console.log('Resultado da busca por ID:', idResults);
+                        if (idResults && idResults.length > 0) {
+                            allResults = idResults;
+                        }
+                    }
+                }
+
+                // Se não encontrou por ID, buscar por nome
+                if (allResults.length === 0) {
+                    console.log('Buscando por nome:', searchTerm);
+                    const { data: nameResults, error: nameError } = await supabase
+                        .from('j-box')
+                        .select('*')
+                        .ilike('PRODUTO', `%${searchTerm}%`);
+
+                    if (nameError) {
+                        console.error('Erro ao buscar por nome:', {
+                            code: nameError.code,
+                            message: nameError.message
+                        });
+                        throw nameError;
+                    }
+
+                    console.log('Resultado da busca por nome:', nameResults);
+                    if (nameResults && nameResults.length > 0) {
+                        allResults = nameResults;
+                    }
+                }
+
+                // Exibir resultados
+                if (allResults.length > 0) {
+                    displayProductResults(allResults);
+                } else {
+                    document.getElementById('searchResults').innerHTML =
+                        '<div class="no-results">📭 Nenhum produto encontrado</div>';
+                }
+            } catch (error) {
+                console.error('Erro completo ao buscar produtos:', error);
+                alert('❌ Erro ao buscar produtos:\n\n' + error.message);
+                document.getElementById('searchResults').innerHTML = '';
+            }
+
+            btnSearch.disabled = false;
+            btnSearch.textContent = 'Buscar';
+        }
+
+        function displayProductResults(products) {
+            const resultsContainer = document.getElementById('searchResults');
+
+            if (products.length === 1) {
+                // Se houver apenas um produto, selecioná-lo automaticamente
+                selectProduct(products[0]);
+                resultsContainer.innerHTML = '';
+            } else {
+                // Mostrar grid de produtos para seleção
+                resultsContainer.innerHTML = '<div class="products-grid" id="productsGrid"></div>';
+                const grid = document.getElementById('productsGrid');
+
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <img src="${product['IMAGE-URL']}" alt="${product.PRODUTO}" class="product-card-image" onerror="this.src='https://via.placeholder.com/150?text=Sem+Imagem'">
+                        <div class="product-card-info">
+                            <div class="product-card-name">${product.PRODUTO}</div>
+                            <div class="product-card-price">R$ ${parseFloat(product.PREÇO).toFixed(2)}</div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => selectProduct(product));
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function selectProduct(product) {
+            selectedProductData = product;
+
+            // Mostrar informações do produto selecionado
+            const currentProductInfo = document.getElementById('currentProductInfo');
+            currentProductInfo.innerHTML = `
+                <div>
+                    <img src="${product['IMAGE-URL']}" alt="${product.PRODUTO}" class="current-product-image" onerror="this.src='https://via.placeholder.com/150?text=Sem+Imagem'">
+                    <h3>${product.PRODUTO}</h3>
+                    <p><strong>ID:</strong> ${product.ID}</p>
+                    <p><strong>Preço:</strong> R$ ${parseFloat(product.PREÇO).toFixed(2)}</p>
+                    <p><strong>Desconto:</strong> ${product.DESCONTO}%</p>
+                    <p><strong>Disponível:</strong> ${product.DISPONIBILIDADE ? '✅ Sim' : '❌ Não'}</p>
+                </div>
+            `;
+            currentProductInfo.classList.add('show');
+
+            // Mostrar botões de ação
+            document.getElementById('manageActions').style.display = 'flex';
+
+            // Remover seleção anterior das cards
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Marcar card como selecionado
+            event?.target?.closest('.product-card')?.classList.add('selected');
+
+            // Limpar a zona de busca
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        function openEditModal() {
+            if (!selectedProductData) {
+                alert('Nenhum produto selecionado');
+                return;
+            }
+
+            currentEditingProduct = { ...selectedProductData };
+            closeManageProductsModal();
+
+            // Preencher formulário com dados do produto
+            document.getElementById('editProductTitle').value = selectedProductData.PRODUTO;
+            document.getElementById('editProductPrice').value = parseFloat(selectedProductData.PREÇO);
+            document.getElementById('editProductDiscount').value = parseFloat(selectedProductData.DESCONTO);
+            document.getElementById('editProductDescription').value = selectedProductData.DESCRIPTION || '';
+            document.getElementById('editProductAvailability').checked = selectedProductData.DISPONIBILIDADE !== false;
+
+            // Parsear parcelas
+            const parcelas = selectedProductData.PARCELAMENTO?.split(',') || ['1', '0'];
+            document.getElementById('editInstallments').value = parseInt(parcelas[0]) || 1;
+            document.getElementById('editInterestFreeInstallments').value = parseInt(parcelas[1]) || 0;
+
+            // Mostrar imagem atual
+            document.getElementById('currentEditImage').src = selectedProductData['IMAGE-URL'];
+            document.getElementById('currentEditImage').style.display = 'block';
+            document.getElementById('editImagePreviewContainer').style.display = 'none';
+
+            newImageSelected = false;
+
+            // Abrir modal de edição
+            editProductModal.style.display = 'block';
+        }
+
+        async function saveProductChanges() {
+            if (!currentEditingProduct) {
+                alert('Nenhum produto selecionado');
+                return;
+            }
+
+            // Validar campos
+            const title = document.getElementById('editProductTitle').value.trim();
+            const price = parseFloat(document.getElementById('editProductPrice').value);
+            const discount = parseFloat(document.getElementById('editProductDiscount').value);
+            const installments = parseInt(document.getElementById('editInstallments').value);
+            const interestFreeInstallments = parseInt(document.getElementById('editInterestFreeInstallments').value);
+
+            let isValid = true;
+            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+            if (!title) {
+                document.getElementById('editTitleError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(price) || price < 1) {
+                document.getElementById('editPriceError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(discount) || discount < 0 || discount > 100) {
+                document.getElementById('editDiscountError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(installments) || installments < 1 || installments > 12) {
+                document.getElementById('editInstallmentsError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isNaN(interestFreeInstallments) || interestFreeInstallments < 0 || interestFreeInstallments > installments) {
+                document.getElementById('editInterestFreeError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            const submitBtn = editForm.querySelector('.btn-submit');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+
+            try {
+                let imageUrl = currentEditingProduct['IMAGE-URL'];
+
+                // Se uma nova imagem foi selecionada, fazer upload
+                if (newImageSelected) {
+                    submitBtn.textContent = '⏳ Comprimindo imagem...';
+                    const imageFile = editProductImageInput.files[0];
+                    const compressedImage = await compressImageToWebP(imageFile);
+
+                    submitBtn.textContent = '⏳ Enviando imagem...';
+                    const uploadResult = await uploadImageToImageKit(compressedImage);
+
+                    if (!uploadResult) {
+                        throw new Error('Erro ao fazer upload da imagem');
+                    }
+
+                    imageUrl = uploadResult.url;
+                }
+
+                submitBtn.textContent = '⏳ Salvando produto...';
+
+                // Preparar dados para atualizar
+                const updateData = {
+                    PRODUTO: title,
+                    PREÇO: price.toString(),
+                    DESCONTO: discount.toString(),
+                    'IMAGE-URL': imageUrl,
+                    PARCELAMENTO: `${installments},${interestFreeInstallments}`,
+                    DESCRIPTION: document.getElementById('editProductDescription').value,
+                    DISPONIBILIDADE: document.getElementById('editProductAvailability').checked
+                };
+
+                // Atualizar no Supabase
+                const { error } = await supabase
+                    .from('j-box')
+                    .update(updateData)
+                    .eq('ID', currentEditingProduct.ID);
+
+                if (error) {
+                    console.error('❌ Erro ao atualizar:', error);
+                    throw error;
+                }
+
+                alert('✅ Produto atualizado com sucesso!');
+                closeEditProductModal();
+                openManageProductsModal();
+            } catch (error) {
+                console.error('Erro ao salvar produto:', error);
+                alert('❌ Erro ao salvar:\n' + error.message);
+            }
+
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+
+        async function deleteProduct() {
+            if (!currentEditingProduct) {
+                alert('Nenhum produto selecionado');
+                return;
+            }
+
+            if (!confirm(`Tem certeza que deseja deletar "${currentEditingProduct.PRODUTO}"? Esta ação não pode ser desfeita.`)) {
+                return;
+            }
+
+            const deleteBtn = document.getElementById('btnDeleteProduct');
+            const originalText = deleteBtn.textContent;
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = '⏳ Deletando...';
+
+            try {
+                const { error } = await supabase
+                    .from('j-box')
+                    .delete()
+                    .eq('ID', currentEditingProduct.ID);
+
+                if (error) {
+                    console.error('❌ Erro ao deletar:', error);
+                    throw error;
+                }
+
+                alert('✅ Produto deletado com sucesso!');
+                closeEditProductModal();
+                openManageProductsModal();
+            } catch (error) {
+                console.error('Erro ao deletar produto:', error);
+                alert('❌ Erro ao deletar:\n' + error.message);
+            }
+
+            deleteBtn.textContent = originalText;
+            deleteBtn.disabled = false;
+        }
+
+        // Event listeners para Gerenciamento de Produtos
+        closeManageModalBtn.addEventListener('click', closeManageProductsModal);
+        closeBtnManage.addEventListener('click', closeManageProductsModal);
+        closeEditModalBtn.addEventListener('click', closeEditProductModal);
+        cancelEditBtn.addEventListener('click', closeEditProductModal);
+
+        productSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchProducts();
+            }
+        });
+
+        btnSearch.addEventListener('click', searchProducts);
+
+        editProductImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                newImageSelected = true;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    editImagePreview.src = event.target.result;
+                    editImagePreviewContainer.style.display = 'block';
+                    document.getElementById('currentEditImage').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeEditImageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            editProductImageInput.value = '';
+            editImagePreviewContainer.style.display = 'none';
+            document.getElementById('currentEditImage').style.display = 'block';
+            newImageSelected = false;
+        });
+
+        btnDeleteProduct.addEventListener('click', deleteProduct);
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await saveProductChanges();
+        });
+
+        // Fechar modais ao clicar fora
+        window.addEventListener('click', (event) => {
+            if (event.target === manageProductsModal) {
+                closeManageProductsModal();
+            }
+            if (event.target === editProductModal) {
+                closeEditProductModal();
+            }
+        });
+
+        // Criar função para abrir modal de gerenciar (será chamada pelo botão)
+        function openManageProductsModalFromButton() {
+            openManageProductsModal();
+        }
+
+        // Adicionar um ID temporário para o botão
+        setTimeout(() => {
+            const btnManage = document.getElementById('btnManageProducts');
+            if (btnManage) {
+                btnManage.removeEventListener('click', openPublishModal);
+                btnManage.addEventListener('click', openManageProductsModal);
+            }
+        }, 100);
+
         async function checkAuth() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -764,6 +1492,7 @@
         function loadAdminContent() {
             mainContent.innerHTML = `
                 <button class="btn-publish-product" id="btnPublishProduct"> <i class="ri-upload-cloud-2-line"></i> Publicar Produto</button>
+                <button class="btn-publish-product" id="btnManageProducts" style="background-color: #ff9800; margin-left: 10px;"> <i class="ri-edit-line"></i> Gerenciar Produtos</button>
                 <div class="welcome-box">
                     <h2>Bem-vindo,<br> ${currentUser.email}!🔥</h2>
                     <p>Você está na área administrativa do sistema. Aqui você pode gerenciar produtos, pedidos e outras operações do painel.</p>
@@ -772,6 +1501,7 @@
 
             // Adicionar evento ao botão de publicar produto
             document.getElementById('btnPublishProduct').addEventListener('click', openPublishModal);
+            document.getElementById('btnManageProducts').addEventListener('click', openManageProductsModal);
 
             // Carregar credenciais do ImageKit
             fetchImagekitCredentials();
