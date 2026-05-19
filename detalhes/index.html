@@ -397,8 +397,18 @@
         font-size: 28px;
         font-weight: 400;
         color: #333;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         text-transform: capitalize;
+    }
+
+    .produto-uuid {
+        font-size: 12px;
+        color: #999;
+        font-weight: 400;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+        font-family: 'Courier New', monospace;
+        text-transform: uppercase;
     }
 
     .produto-preco {
@@ -439,6 +449,55 @@
     .parcelamento-item i {
         color: #eb3a75;
         font-size: 16px;
+    }
+
+    .produto-descricao {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 6px;
+        border-left: 4px solid #eb3a75;
+        font-size: 15px;
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .produto-descricao strong {
+        color: #333;
+        display: block;
+        margin-bottom: 10px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #1a1a1a;
+    }
+
+    .produto-descricao-texto {
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .produto-descricao-texto.truncado {
+        max-height: 100px;
+    }
+
+    .produto-descricao-texto.expandido {
+        max-height: none;
+    }
+
+    .ver-mais-link {
+        color: #0066cc;
+        cursor: pointer;
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        margin-top: 10px;
+        display: inline-block;
+    }
+
+    .ver-mais-link:hover {
+        color: #0052a3;
+        text-decoration: underline;
     }
 
     /* Meios de Pagamento */
@@ -587,6 +646,15 @@
     }
 
     @media (max-width: 768px) {
+        .produto-descricao {
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .ver-mais-link {
+            font-size: 14px;
+        }
+
         .produto-container {
             grid-template-columns: 1fr;
             gap: 20px;
@@ -599,6 +667,10 @@
 
         .produto-nome {
             font-size: 20px;
+        }
+
+        .produto-uuid {
+            font-size: 11px;
         }
 
         .produto-preco {
@@ -860,7 +932,7 @@
 
         // Cache simples em localStorage para JSON (TTL em ms)
         const JSONCacheManager = {
-            prefix: 'juvele_json_',
+            prefix: 'CPS34_json_',
             set(key, data, ttlMs) {
                 try {
                     localStorage.setItem(this.prefix + key, JSON.stringify({
@@ -892,6 +964,39 @@
             clearAll() { try { Object.keys(localStorage).forEach(k => { if (k.startsWith(this.prefix)) localStorage.removeItem(k); }); } catch (e) { } }
         };
 
+        const SessionCacheManager = {
+            prefix: 'CPS34_json_',
+            set(key, data, ttlMs) {
+                try {
+                    sessionStorage.setItem(this.prefix + key, JSON.stringify({
+                        data: data,
+                        expiration: Date.now() + ttlMs
+                    }));
+                    return true;
+                } catch (e) {
+                    console.warn('SessionCacheManager.set falhou', e);
+                    return false;
+                }
+            },
+            get(key) {
+                try {
+                    const item = sessionStorage.getItem(this.prefix + key);
+                    if (!item) return null;
+                    const parsed = JSON.parse(item);
+                    if (Date.now() > parsed.expiration) {
+                        sessionStorage.removeItem(this.prefix + key);
+                        return null;
+                    }
+                    return parsed.data;
+                } catch (e) {
+                    console.warn('SessionCacheManager.get falhou', e);
+                    return null;
+                }
+            },
+            remove(key) { try { sessionStorage.removeItem(this.prefix + key); } catch (e) { } },
+            clearAll() { try { Object.keys(sessionStorage).forEach(k => { if (k.startsWith(this.prefix)) sessionStorage.removeItem(k); }); } catch (e) { } }
+        };
+
         /**
          * Carrega apenas a primeira palavra de cada produto
          * (Ex: "Vestido Floral Rosa" -> "Vestido")
@@ -899,7 +1004,7 @@
         async function carregarPalavrasUnicas() {
             if (palavrasUnicasCache) return palavrasUnicasCache;
 
-            const cached = JSONCacheManager.get(CACHE_KEY_PALAVRAS_UNICAS);
+            const cached = SessionCacheManager.get(CACHE_KEY_PALAVRAS_UNICAS);
             if (cached) {
                 palavrasUnicasCache = cached;
                 return cached;
@@ -928,7 +1033,7 @@
 
                 const palavras = Array.from(palavrasSet).sort();
                 palavrasUnicasCache = palavras;
-                JSONCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, palavras, CACHE_TTL_5_HORAS_MS);
+                SessionCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, palavras, CACHE_TTL_5_HORAS_MS);
                 console.log(`✓ ${palavras.length} primeiras palavras carregadas do Supabase`);
                 return palavras;
             } catch (error) {
@@ -944,7 +1049,7 @@
         async function carregarDuasPalavrasUnicas() {
             if (duasPalavrasCache) return duasPalavrasCache;
 
-            const cached = JSONCacheManager.get(CACHE_KEY_DUAS_PALAVRAS);
+            const cached = SessionCacheManager.get(CACHE_KEY_DUAS_PALAVRAS);
             if (cached) {
                 duasPalavrasCache = cached;
                 return cached;
@@ -976,7 +1081,7 @@
 
                 const duas = Array.from(duasSet).sort();
                 duasPalavrasCache = duas;
-                JSONCacheManager.set(CACHE_KEY_DUAS_PALAVRAS, duas, CACHE_TTL_5_HORAS_MS);
+                SessionCacheManager.set(CACHE_KEY_DUAS_PALAVRAS, duas, CACHE_TTL_5_HORAS_MS);
                 console.log(`✓ ${duas.length} combinações de duas palavras carregadas do Supabase`);
                 return duas;
             } catch (error) {
@@ -1228,27 +1333,72 @@
     <script>
         // ===== SISTEMA DE CACHE PARA IMAGENS =====
         const CacheManager = (() => {
-            const CACHE_VERSION = 1;
-            const CACHE_NAME = `produto-cache-v${CACHE_VERSION}`;
-            const DB_NAME = 'DonaFlorDB';
-            const DB_VERSION = 1;
+            const DB_NAME = 'CPS34DB';
+            const DB_VERSION = 2; // Incrementar versão para forçar upgrade
             const OBJECT_STORE = 'images';
+            let dbInstance = null;
 
-            // Inicializar IndexedDB
+            // Inicializar IndexedDB com tratamento robusto
             function initDB() {
                 return new Promise((resolve, reject) => {
+                    // Se já tem uma instância aberta, retornar
+                    if (dbInstance && dbInstance.objectStoreNames.contains(OBJECT_STORE)) {
+                        resolve(dbInstance);
+                        return;
+                    }
+
                     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-                    request.onerror = () => reject(request.error);
-                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => {
+                        console.error('❌ Erro ao abrir IndexedDB:', request.error);
+                        reject(request.error);
+                    };
+
+                    request.onsuccess = () => {
+                        const db = request.result;
+                        dbInstance = db;
+                        resolve(db);
+                    };
 
                     request.onupgradeneeded = (event) => {
                         const db = event.target.result;
-                        if (!db.objectStoreNames.contains(OBJECT_STORE)) {
-                            db.createObjectStore(OBJECT_STORE, { keyPath: 'id' });
+                        console.log('🔄 Atualizando IndexedDB...');
+
+                        // Deletar objeto store antigo se existir
+                        if (db.objectStoreNames.contains(OBJECT_STORE)) {
+                            db.deleteObjectStore(OBJECT_STORE);
                         }
+
+                        // Criar novo object store
+                        db.createObjectStore(OBJECT_STORE, { keyPath: 'id' });
+                        console.log('✅ Object store criado com sucesso');
+                    };
+
+                    request.onblocked = () => {
+                        console.warn('⚠️ Upgrade do IndexedDB foi bloqueado - feche as abas duplicadas');
                     };
                 });
+            }
+
+            // Limpar cache (útil para resolver conflitos)
+            async function clearCache() {
+                try {
+                    const db = await initDB();
+                    const transaction = db.transaction(OBJECT_STORE, 'readwrite');
+                    const store = transaction.objectStore(OBJECT_STORE);
+                    store.clear();
+
+                    return new Promise((resolve, reject) => {
+                        transaction.oncomplete = () => {
+                            console.log('🗑️ Cache limpo com sucesso');
+                            resolve(true);
+                        };
+                        transaction.onerror = () => reject(transaction.error);
+                    });
+                } catch (err) {
+                    console.warn('⚠️ Erro ao limpar cache:', err);
+                    return false;
+                }
             }
 
             // Salvar imagem no cache
@@ -1268,8 +1418,14 @@
                     store.put(cacheEntry);
 
                     return new Promise((resolve, reject) => {
-                        transaction.oncomplete = () => resolve(true);
-                        transaction.onerror = () => reject(transaction.error);
+                        transaction.oncomplete = () => {
+                            console.log(`✅ Imagem ${productId} salva em cache`);
+                            resolve(true);
+                        };
+                        transaction.onerror = () => {
+                            console.error('❌ Erro na transação de escrita:', transaction.error);
+                            reject(transaction.error);
+                        };
                     });
                 } catch (err) {
                     console.warn('⚠️ Erro ao salvar imagem em cache:', err);
@@ -1286,8 +1442,16 @@
                     const request = store.get(productId);
 
                     return new Promise((resolve, reject) => {
-                        request.onsuccess = () => resolve(request.result);
-                        request.onerror = () => reject(request.error);
+                        request.onsuccess = () => {
+                            if (request.result) {
+                                console.log(`✅ Imagem ${productId} recuperada do cache`);
+                            }
+                            resolve(request.result);
+                        };
+                        request.onerror = () => {
+                            console.error('❌ Erro na transação de leitura:', request.error);
+                            reject(request.error);
+                        };
                     });
                 } catch (err) {
                     console.warn('⚠️ Erro ao buscar imagem do cache:', err);
@@ -1298,7 +1462,8 @@
             return {
                 saveImageToCache,
                 getImageFromCache,
-                initDB
+                initDB,
+                clearCache
             };
         })();
 
@@ -1471,6 +1636,7 @@
             const precoOriginalFormatado = formatarPreco(precoOriginal);
             const parcelamento = parseParcelamento(produto.PARCELAMENTO || '');
             const nomeProduto = produto.PRODUTO || 'Produto sem nome';
+            const descricao = produto.DESCRIPTION || null;
 
             const linkWhatsApp = gerarLinkWhatsApp(nomeProduto, preco);
 
@@ -1502,6 +1668,43 @@
                 </div>`;
             }
 
+            // Função para truncar descrição
+            // Função para formatar UUID
+            function formatarUUID(id) {
+                const numericId = parseInt(id) || 0;
+                const paddedId = String(numericId).padStart(8, '0');
+                return `C${paddedId}PS`;
+            }
+
+            function gerarDescricaoHtml(textoDescricao) {
+                const LIMITE_CARACTERES = 200;
+                const temDescricaoLonga = textoDescricao && textoDescricao.trim().length > LIMITE_CARACTERES;
+                
+                if (!textoDescricao || !textoDescricao.trim()) {
+                    return '';
+                }
+
+                const textoTruncado = temDescricaoLonga 
+                    ? textoDescricao.trim().substring(0, LIMITE_CARACTERES) + '...'
+                    : textoDescricao.trim();
+
+                const botaoVerMais = temDescricaoLonga 
+                    ? `<span class="ver-mais-link" onclick="expandirDescricao(this)">Ver mais</span>`
+                    : '';
+
+                return `
+                    <div class="produto-descricao">
+                        <strong>Descrição</strong>
+                        <div class="produto-descricao-texto ${temDescricaoLonga ? 'truncado' : 'expandido'}" data-texto-completo="${textoDescricao.trim().replace(/"/g, '&quot;')}">
+                            ${textoTruncado}
+                        </div>
+                        ${botaoVerMais}
+                    </div>
+                `;
+            }
+
+            let descricaoHtml = gerarDescricaoHtml(descricao);
+
             mainContent.innerHTML = `
                 <div class="breadcrumb" id="breadcrumb-container">
                     <a href="../index.html">Início</a>
@@ -1517,6 +1720,7 @@
                     <div class="produto-info">
                         <div>
                             <h1 class="produto-nome">${nomeProduto}</h1>
+                            <div class="produto-uuid">${formatarUUID(productId)}</div>
                             ${descontoHtml}
                             ${desconto > 0 ? `<div class="produto-preco-original"> ${precoOriginalFormatado}</div>` : ''}
                             <div class="produto-preco">${preco}</div>
@@ -1535,6 +1739,7 @@
                                     ${parcelamentoHtml}
                                 </div>
                             ` : ''}
+                            ${descricaoHtml}
                         </div>
                         <a href="${linkWhatsApp}" target="_blank" rel="noopener noreferrer" class="btn-pedido">
                             <i class="ri-whatsapp-line"></i>
@@ -1653,6 +1858,31 @@
                 console.log('✅ Submenu de produtos carregado do Supabase');
             } catch (error) {
                 console.error('❌ Erro ao carregar submenu de produtos:', error);
+            }
+        }
+
+        // ===== EXPANDIR/RETRAIR DESCRIÇÃO =====
+        function expandirDescricao(linkElement) {
+            const descricaoDiv = linkElement.closest('.produto-descricao');
+            const textoDiv = descricaoDiv.querySelector('.produto-descricao-texto');
+            
+            if (!textoDiv) return;
+
+            const isExpanded = textoDiv.classList.contains('expandido');
+            const textoCompleto = textoDiv.getAttribute('data-texto-completo');
+
+            if (isExpanded) {
+                // Retrair
+                textoDiv.classList.remove('expandido');
+                textoDiv.classList.add('truncado');
+                textoDiv.textContent = textoCompleto.substring(0, 200) + '...';
+                linkElement.textContent = 'Ver mais';
+            } else {
+                // Expandir
+                textoDiv.classList.remove('truncado');
+                textoDiv.classList.add('expandido');
+                textoDiv.textContent = textoCompleto;
+                linkElement.textContent = 'Ver menos';
             }
         }
 

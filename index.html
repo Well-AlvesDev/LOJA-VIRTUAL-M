@@ -1266,9 +1266,9 @@
         // ===== SISTEMA DE CACHE DE IMAGENS (10 DIAS) =====
         class ImagemCacheManager {
             constructor() {
-                this.dbName = 'JuveleCacheDB';
+                this.dbName = 'CPS34DB';
                 this.storeName = 'imagensProdutos';
-                this.metadataKey = 'juvele_cache_metadata';
+                this.metadataKey = 'CPS34_cache_metadata';
                 this.DURACAO_CACHE = 10 * 24 * 60 * 60 * 1000; // 10 dias em ms
                 this.db = null;
                 this.inicializado = false;
@@ -1565,7 +1565,10 @@
             data() {
                 return {
                     textoAnimado: '',
-                    frases: ['Bem vinda à Juvele!', 'Moda feminina de qualidade', 'Compra 100% segura'],
+                    frases: ["Ei, vem dar uma olhadinha... 👀",
+                        "🫢 Esses looks estão um ARRASO, vem ver!",
+                        "Temos o look perfeito para você! ✨",
+                        "Floresça com nossos looks incríveis! 🌸"],
                     indiceAtual: 0,
                     velocidadeDigitacao: 20,
                     velocidadeApagamento: 19,
@@ -1683,7 +1686,7 @@
 
         // Cache simples em localStorage para JSON (TTL em ms)
         const JSONCacheManager = {
-            prefix: 'juvele_json_',
+            prefix: 'CPS34_json_',
             set(key, data, ttlMs) {
                 try {
                     const rec = { ts: Date.now(), ttl: ttlMs, data };
@@ -1706,6 +1709,33 @@
             },
             remove(key) { try { localStorage.removeItem(this.prefix + key); } catch (e) { } },
             clearAll() { try { Object.keys(localStorage).forEach(k => { if (k.startsWith(this.prefix)) localStorage.removeItem(k); }); } catch (e) { } }
+        };
+
+        // Cache simples em sessionStorage para JSON (TTL em ms)
+        const SessionCacheManager = {
+            prefix: 'CPS34_json_',
+            set(key, data, ttlMs) {
+                try {
+                    const rec = { ts: Date.now(), ttl: ttlMs, data };
+                    sessionStorage.setItem(this.prefix + key, JSON.stringify(rec));
+                    return true;
+                } catch (e) { console.warn('SessionCacheManager.set falhou', e); return false; }
+            },
+            get(key) {
+                try {
+                    const raw = sessionStorage.getItem(this.prefix + key);
+                    if (!raw) return null;
+                    const rec = JSON.parse(raw);
+                    if (!rec || !rec.ts || !('ttl' in rec)) return null;
+                    if (Date.now() > rec.ts + rec.ttl) {
+                        sessionStorage.removeItem(this.prefix + key);
+                        return null;
+                    }
+                    return rec.data;
+                } catch (e) { console.warn('SessionCacheManager.get falhou', e); return null; }
+            },
+            remove(key) { try { sessionStorage.removeItem(this.prefix + key); } catch (e) { } },
+            clearAll() { try { Object.keys(sessionStorage).forEach(k => { if (k.startsWith(this.prefix)) sessionStorage.removeItem(k); }); } catch (e) { } }
         };
 
         const CACHE_KEY_X89N2 = 'x89N2'; // Mantido para compatibilidade com código legado
@@ -1756,10 +1786,10 @@
         async function carregarPalavrasUnicas() {
             if (palavrasUnicasCache) return palavrasUnicasCache;
 
-            const cached = JSONCacheManager.get(CACHE_KEY_PALAVRAS_UNICAS);
+            const cached = SessionCacheManager.get(CACHE_KEY_PALAVRAS_UNICAS);
             if (cached) {
                 palavrasUnicasCache = cached;
-                logManager.log('📝 Primeiras palavras carregadas do cache localStorage');
+                logManager.log('📝 Primeiras palavras carregadas do cache sessionStorage');
                 return cached;
             }
 
@@ -1792,7 +1822,7 @@
 
                     const resultado = Array.from(palavras).sort();
                     palavrasUnicasCache = resultado;
-                    JSONCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, resultado, CACHE_TTL_5_HORAS_MS);
+                    SessionCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, resultado, CACHE_TTL_5_HORAS_MS);
                     logManager.log(`✓ ${resultado.length} primeiras palavras carregadas e cacheadas`);
                     return resultado;
                 }
@@ -1800,7 +1830,7 @@
                 // Se RPC funcionou
                 const resultado = data || [];
                 palavrasUnicasCache = resultado;
-                JSONCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, resultado, CACHE_TTL_5_HORAS_MS);
+                SessionCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, resultado, CACHE_TTL_5_HORAS_MS);
                 logManager.log(`✓ ${resultado.length} primeiras palavras carregadas e cacheadas`);
                 return resultado;
 
@@ -1817,10 +1847,10 @@
         async function carregarDuasPalavrasUnicas() {
             if (duasPalavrasCache) return duasPalavrasCache;
 
-            const cached = JSONCacheManager.get(CACHE_KEY_DUAS_PALAVRAS);
+            const cached = SessionCacheManager.get(CACHE_KEY_DUAS_PALAVRAS);
             if (cached) {
                 duasPalavrasCache = cached;
-                logManager.log('📝 Duas palavras carregadas do cache localStorage');
+                logManager.log('📝 Duas palavras carregadas do cache sessionStorage');
                 return cached;
             }
 
@@ -1850,7 +1880,7 @@
 
                 const resultado = Array.from(duasPalavras).sort();
                 duasPalavrasCache = resultado;
-                JSONCacheManager.set(CACHE_KEY_DUAS_PALAVRAS, resultado, CACHE_TTL_5_HORAS_MS);
+                SessionCacheManager.set(CACHE_KEY_DUAS_PALAVRAS, resultado, CACHE_TTL_5_HORAS_MS);
                 logManager.log(`✓ ${resultado.length} combinações de duas palavras carregadas e cacheadas`);
                 return resultado;
 
@@ -2925,8 +2955,8 @@
                     const a = document.createElement('a');
                     a.href = '#';
                     a.className = 'submenu-link';
-                    // Capitalizar primeira letra de cada palavra
-                    a.textContent = categoria.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    // Converter para maiúsculo completo
+                    a.textContent = categoria.toUpperCase();
 
                     // Adicionar evento para redirecionar quando clicado
                     a.addEventListener('click', (e) => {
@@ -3439,7 +3469,7 @@
 
         // ===== UTILITÁRIOS DE GERENCIAMENTO DE CACHE PARA O CONSOLE =====
         // O desenvolvedor pode chamar essas funções no console para monitorar e gerenciar o cache
-        window.JuveleCacheTools = {
+        window.CPS34DBTools = {
             // Verificar tamanho do cache
             async tamanho() {
                 const mb = await imagemCache.obterTamanhoCacheEmMB();
@@ -3529,7 +3559,7 @@
                 const tamanho = await imagemCache.obterTamanhoCacheEmMB();
                 console.log(`%c✅ Sistema de Cache Iniciado`, 'color: green; font-weight: bold;');
                 console.log(`%c📦 Cache atual: ${tamanho} MB | Duração: 10 dias`, 'color: blue;');
-                console.log(`%c💡 Use window.JuveleCacheTools.info() para ver detalhes do cache`, 'color: orange;');
+                console.log(`%c💡 Use window.CPS34DBTools.info() para ver detalhes do cache`, 'color: orange;');
             }, 500);
         });
     </script>
