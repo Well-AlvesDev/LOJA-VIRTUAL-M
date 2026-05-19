@@ -27,7 +27,7 @@
         main {
             background-color: white;
             border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(158, 103, 142, 0.198);
             padding: 40px;
             width: 100%;
             max-width: 400px;
@@ -35,9 +35,7 @@
         }
 
         main img {
-            width: 80px;
-            background-color: rgb(255, 255, 141);
-            border-radius: 50%;
+            width: 240px;
             padding: 10px;
             margin-bottom: 20px;
         }
@@ -126,75 +124,12 @@
                 transform: rotate(360deg);
             }
         }
-
-        .login-success-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .success-checkmark {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #4caf50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: scaleIn 0.6s ease-out;
-        }
-
-        .success-checkmark::before {
-            content: '✓';
-            color: white;
-            font-size: 60px;
-            font-weight: bold;
-        }
-
-        @keyframes scaleIn {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOut {
-            0% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
     </style>
 </head>
 
 <body>
-    <div class="login-success-animation" id="successAnimation">
-        <div class="success-checkmark"></div>
-    </div>
-
     <main>
-        <img src="recursos/icones/User_icon_2.svg" alt="" id="userIcon">
+        <img src="recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="" id="userIcon">
         <h1>Área Administrativa</h1>
         <p>Bem-vindo ao painel administrativo! Insira suas credenciais para continuar.</p>
 
@@ -217,7 +152,6 @@
         const inputPassword = document.getElementById('password');
         const loginError = document.getElementById('loginError');
         const loadingSpinner = document.getElementById('loadingSpinner');
-        const successAnimation = document.getElementById('successAnimation');
 
         btnEntrar.addEventListener('click', handleLogin);
 
@@ -254,17 +188,13 @@
                     showError('Credenciais inválidas. Tente novamente.');
                     console.error('Auth error:', error.message);
                 } else if (data.session) {
-                    // Login bem-sucedido, mostrar animação
-                    showSuccessAnimation();
-
+                    // Login bem-sucedido
                     // Armazenar token JWT no localStorage
                     localStorage.setItem('adminToken', data.session.access_token);
                     localStorage.setItem('adminUser', JSON.stringify(data.user));
 
-                    // Redirecionar após animação (1.5s)
-                    setTimeout(() => {
-                        window.location.href = 'black-adm.html';
-                    }, 1500);
+                    // Redirecionar imediatamente
+                    window.location.href = 'black-adm.html';
                 }
             } catch (error) {
                 showError('Erro ao conectar. Tente novamente.');
@@ -278,10 +208,6 @@
         function showError(message) {
             loginError.textContent = message;
             loginError.style.display = 'block';
-        }
-
-        function showSuccessAnimation() {
-            successAnimation.style.display = 'flex';
         }
 
         // Verificar se já está logado

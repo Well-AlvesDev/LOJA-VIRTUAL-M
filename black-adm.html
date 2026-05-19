@@ -196,12 +196,41 @@
             grid-template-columns: 1fr;
         }
 
-        .image-preview {
+        .image-preview-container {
+            position: relative;
             width: 100%;
             max-width: 200px;
             margin-top: 10px;
-            border-radius: 5px;
             display: none;
+        }
+
+        .image-preview {
+            width: 100%;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #d32f2fbe;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .remove-image-btn:hover {
+            background-color: #b71c1c;
         }
 
         .form-actions {
@@ -261,9 +290,9 @@
         <span class="user-email" id="userEmail">Carregando...</span>
         <button class="btn-logout" id="btnLogout"><i class="ri-logout-box-line"></i> Logout</button>
     </div>
+    <section><img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="" style="width: 200px; margin: 10px auto; display: block;"></section>
 
     <div class="container" id="mainContent"></div>
-
     <!-- Modal Publicar Produto -->
     <div id="publishModal" class="modal">
         <div class="modal-content">
@@ -277,7 +306,11 @@
                 <div class="form-group form-row full">
                     <label for="productImage">Imagem do Produto *</label>
                     <input type="file" id="productImage" accept="image/*" required>
-                    <img id="imagePreview" class="image-preview" alt="Prévia">
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <img id="imagePreview" class="image-preview" alt="Prévia">
+                        <button type="button" class="remove-image-btn" id="removeImageBtn"
+                            title="Remover imagem">×</button>
+                    </div>
                     <span class="error-message" id="imageError">Selecione uma imagem válida</span>
                 </div>
 
@@ -353,17 +386,21 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const productImageInput = document.getElementById('productImage');
         const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const removeImageBtn = document.getElementById('removeImageBtn');
 
         function openPublishModal() {
             publishModal.style.display = 'block';
             publishForm.reset();
-            imagePreview.style.display = 'none';
+            imagePreviewContainer.style.display = 'none';
+            productImageInput.value = '';
         }
 
         function closePublishModal() {
             publishModal.style.display = 'none';
             publishForm.reset();
-            imagePreview.style.display = 'none';
+            imagePreviewContainer.style.display = 'none';
+            productImageInput.value = '';
         }
 
         // Buscar credenciais do ImageKit do Supabase
@@ -489,6 +526,16 @@
             });
         }
 
+        // Gerar código único para renomear arquivo (C + 54 caracteres aleatórios + PS)
+        function generateUniqueFileCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let randomPart = '';
+            for (let i = 0; i < 54; i++) {
+                randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return 'C' + randomPart + 'PS';
+        }
+
         // Upload de imagem para ImageKit
         async function uploadImageToImageKit(imageBlob) {
             if (!imagekitCredentials) {
@@ -511,13 +558,14 @@
                 }
 
                 const formData = new FormData();
-                formData.append('file', imageBlob, `product-${Date.now()}.webp`);
+                const uniqueFileName = generateUniqueFileCode();
+                formData.append('file', imageBlob, `${uniqueFileName}.webp`);
                 formData.append('publicKey', imagekitCredentials.public_key);
-                formData.append('fileName', `product-${Date.now()}`);
+                formData.append('fileName', uniqueFileName);
                 formData.append('folder', '/produtos');
 
                 console.log('Dados sendo enviados:', {
-                    fileName: `product-${Date.now()}`,
+                    fileName: uniqueFileName,
                     folder: '/produtos',
                     fileSize: (imageBlob.size / 1024).toFixed(2) + ' KB',
                     publicKey: imagekitCredentials.public_key.substring(0, 10) + '...'
@@ -564,13 +612,19 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     imagePreview.src = event.target.result;
-                    imagePreview.style.display = 'block';
+                    imagePreviewContainer.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Fechar modal
+        // Remover imagem selecionada
+        removeImageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            productImageInput.value = '';
+            imagePreviewContainer.style.display = 'none';
+            imagePreview.src = '';
+        });
         closeModalBtn.addEventListener('click', closePublishModal);
         cancelBtn.addEventListener('click', closePublishModal);
 
