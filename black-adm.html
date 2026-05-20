@@ -578,6 +578,7 @@
             <div id="currentProductInfo" class="current-product-info"></div>
 
             <div class="form-actions" id="manageActions" style="display: none;">
+                <button type="button" class="btn-edit" id="btnEditProduct">✏️ Editar Produto</button>
                 <button type="button" class="btn-cancel" id="closeBtnManage">Fechar</button>
             </div>
         </div>
@@ -827,6 +828,8 @@
                 reader.readAsDataURL(file);
             });
         }
+
+
 
         // Gerar código único para renomear arquivo (C + 54 caracteres aleatórios + PS)
         function generateUniqueFileCode() {
@@ -1200,6 +1203,7 @@
         }
 
         function selectProduct(product) {
+            console.log('✅ Produto selecionado:', product);
             selectedProductData = product;
 
             // Mostrar informações do produto selecionado
@@ -1217,6 +1221,7 @@
             currentProductInfo.classList.add('show');
 
             // Mostrar botões de ação
+            console.log('📌 Mostrando botão de edição');
             document.getElementById('manageActions').style.display = 'flex';
 
             // Remover seleção anterior das cards
@@ -1232,42 +1237,56 @@
         }
 
         function openEditModal() {
+            console.log('🔓 openEditModal chamada');
+            console.log('selectedProductData:', selectedProductData);
+
             if (!selectedProductData) {
                 alert('Nenhum produto selecionado');
+                console.error('Erro: selectedProductData é null');
                 return;
             }
 
+            // Copiar dados ANTES de fechar o modal
             currentEditingProduct = { ...selectedProductData };
-            closeManageProductsModal();
+            console.log('📦 currentEditingProduct:', currentEditingProduct);
 
             // Preencher formulário com dados do produto
-            document.getElementById('editProductTitle').value = selectedProductData.PRODUTO;
-            document.getElementById('editProductPrice').value = parseFloat(selectedProductData.PREÇO);
-            document.getElementById('editProductDiscount').value = parseFloat(selectedProductData.DESCONTO);
-            document.getElementById('editProductDescription').value = selectedProductData.DESCRIPTION || '';
-            document.getElementById('editProductAvailability').checked = selectedProductData.DISPONIBILIDADE !== false;
+            document.getElementById('editProductTitle').value = currentEditingProduct.PRODUTO;
+            document.getElementById('editProductPrice').value = parseFloat(currentEditingProduct.PREÇO);
+            document.getElementById('editProductDiscount').value = parseFloat(currentEditingProduct.DESCONTO);
+            document.getElementById('editProductDescription').value = currentEditingProduct.DESCRIPTION || '';
+            document.getElementById('editProductAvailability').checked = currentEditingProduct.DISPONIBILIDADE !== false;
 
             // Parsear parcelas
-            const parcelas = selectedProductData.PARCELAMENTO?.split(',') || ['1', '0'];
+            const parcelas = currentEditingProduct.PARCELAMENTO?.split(',') || ['1', '0'];
             document.getElementById('editInstallments').value = parseInt(parcelas[0]) || 1;
             document.getElementById('editInterestFreeInstallments').value = parseInt(parcelas[1]) || 0;
 
             // Mostrar imagem atual
-            document.getElementById('currentEditImage').src = selectedProductData['IMAGE-URL'];
+            document.getElementById('currentEditImage').src = currentEditingProduct['IMAGE-URL'];
             document.getElementById('currentEditImage').style.display = 'block';
             document.getElementById('editImagePreviewContainer').style.display = 'none';
 
             newImageSelected = false;
 
+            // Fechar modal de busca DEPOIS de ter copiado tudo
+            closeManageProductsModal();
+
             // Abrir modal de edição
+            console.log('🔴 Abrindo modal de edição');
             editProductModal.style.display = 'block';
         }
 
         async function saveProductChanges() {
+            console.log('💾 Iniciando salvamento...');
+
             if (!currentEditingProduct) {
                 alert('Nenhum produto selecionado');
+                console.error('Erro: currentEditingProduct é null');
                 return;
             }
+
+            console.log('📦 Produto a editar:', currentEditingProduct);
 
             // Validar campos
             const title = document.getElementById('editProductTitle').value.trim();
@@ -1275,6 +1294,8 @@
             const discount = parseFloat(document.getElementById('editProductDiscount').value);
             const installments = parseInt(document.getElementById('editInstallments').value);
             const interestFreeInstallments = parseInt(document.getElementById('editInterestFreeInstallments').value);
+
+            console.log('📝 Dados do formulário:', { title, price, discount, installments, interestFreeInstallments });
 
             let isValid = true;
             document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
@@ -1304,7 +1325,12 @@
                 isValid = false;
             }
 
-            if (!isValid) return;
+            if (!isValid) {
+                console.error('❌ Validação falhou');
+                return;
+            }
+
+            console.log('✅ Validação passou');
 
             const submitBtn = editForm.querySelector('.btn-submit');
             const originalText = submitBtn.textContent;
@@ -1315,6 +1341,7 @@
 
                 // Se uma nova imagem foi selecionada, fazer upload
                 if (newImageSelected) {
+                    console.log('🖼️ Nova imagem selecionada, fazendo upload...');
                     submitBtn.textContent = '⏳ Comprimindo imagem...';
                     const imageFile = editProductImageInput.files[0];
                     const compressedImage = await compressImageToWebP(imageFile);
@@ -1327,6 +1354,7 @@
                     }
 
                     imageUrl = uploadResult.url;
+                    console.log('✅ Imagem enviada:', imageUrl);
                 }
 
                 submitBtn.textContent = '⏳ Salvando produto...';
@@ -1342,22 +1370,29 @@
                     DISPONIBILIDADE: document.getElementById('editProductAvailability').checked
                 };
 
+                console.log('📊 Dados para atualizar:', updateData);
+                console.log('🔑 ID do produto:', currentEditingProduct.ID);
+
                 // Atualizar no Supabase
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('j-box')
                     .update(updateData)
-                    .eq('ID', currentEditingProduct.ID);
+                    .eq('ID', currentEditingProduct.ID)
+                    .select();
+
+                console.log('📡 Resposta do Supabase:', { data, error });
 
                 if (error) {
                     console.error('❌ Erro ao atualizar:', error);
                     throw error;
                 }
 
+                console.log('✅ Produto atualizado com sucesso!');
                 alert('✅ Produto atualizado com sucesso!');
                 closeEditProductModal();
                 openManageProductsModal();
             } catch (error) {
-                console.error('Erro ao salvar produto:', error);
+                console.error('❌ Erro geral ao salvar produto:', error);
                 alert('❌ Erro ao salvar:\n' + error.message);
             }
 
@@ -1408,6 +1443,19 @@
         closeBtnManage.addEventListener('click', closeManageProductsModal);
         closeEditModalBtn.addEventListener('click', closeEditProductModal);
         cancelEditBtn.addEventListener('click', closeEditProductModal);
+
+        // Usar setTimeout para garantir que o botão existe
+        setTimeout(() => {
+            const btnEditProduct = document.getElementById('btnEditProduct');
+            if (btnEditProduct) {
+                btnEditProduct.addEventListener('click', () => {
+                    console.log('Botão Editar clicado');
+                    openEditModal();
+                });
+            } else {
+                console.warn('Botão btnEditProduct não encontrado');
+            }
+        }, 100);
 
         productSearchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
