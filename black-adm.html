@@ -1017,6 +1017,7 @@
                         PRODUTO: title,
                         PREÇO: price.toString(),
                         'IMAGE-URL': uploadResult.url,
+                        'IMAGE-ID': uploadResult.fileId,
                         DESCONTO: discount.toString(),
                         PARCELAMENTO: `${installments},${interestFreeInstallments}`,
                         DESCRIPTION: document.getElementById('productDescription').value,
@@ -1338,15 +1339,23 @@
 
             try {
                 let imageUrl = currentEditingProduct['IMAGE-URL'];
+                let imageId = currentEditingProduct['IMAGE-ID']; // 👈 Recupera o ID da imagem atual
 
-                // Se uma nova imagem foi selecionada, fazer upload
+                // Se uma nova imagem foi selecionada, fazer upload e deletar a antiga
                 if (newImageSelected) {
+
+                    // 1. Deletar a imagem antiga primeiro
+                    if (imageId) {
+                        submitBtn.textContent = '⏳ Apagando imagem antiga...';
+                        await deleteOldImage(imageId);
+                    }
+
                     console.log('🖼️ Nova imagem selecionada, fazendo upload...');
                     submitBtn.textContent = '⏳ Comprimindo imagem...';
                     const imageFile = editProductImageInput.files[0];
                     const compressedImage = await compressImageToWebP(imageFile);
 
-                    submitBtn.textContent = '⏳ Enviando imagem...';
+                    submitBtn.textContent = '⏳ Enviando nova imagem...';
                     const uploadResult = await uploadImageToImageKit(compressedImage);
 
                     if (!uploadResult) {
@@ -1354,17 +1363,19 @@
                     }
 
                     imageUrl = uploadResult.url;
+                    imageId = uploadResult.fileId; // 👈 Atualiza com o novo ID
                     console.log('✅ Imagem enviada:', imageUrl);
                 }
 
                 submitBtn.textContent = '⏳ Salvando produto...';
 
-                // Preparar dados para atualizar
+                // Preparar dados para atualizar (agora incluindo o IMAGE-ID)
                 const updateData = {
                     PRODUTO: title,
                     PREÇO: price.toString(),
                     DESCONTO: discount.toString(),
                     'IMAGE-URL': imageUrl,
+                    'IMAGE-ID': imageId, // 👈 Não esqueça de adicionar no update
                     PARCELAMENTO: `${installments},${interestFreeInstallments}`,
                     DESCRIPTION: document.getElementById('editProductDescription').value,
                     DISPONIBILIDADE: document.getElementById('editProductAvailability').checked
@@ -1408,6 +1419,7 @@
 
             if (!confirm(`Tem certeza que deseja deletar "${currentEditingProduct.PRODUTO}"? Esta ação não pode ser desfeita.`)) {
                 return;
+
             }
 
             const deleteBtn = document.getElementById('btnDeleteProduct');
@@ -1416,6 +1428,12 @@
             deleteBtn.textContent = '⏳ Deletando...';
 
             try {
+                // Deletar imagem do ImageKit antes de deletar o produto
+                const imageFileId = currentEditingProduct['IMAGE-ID'];
+                if (imageFileId) {
+                    await deleteOldImage(imageFileId);
+                }
+
                 const { error } = await supabase
                     .from('j-box')
                     .delete()
@@ -1581,6 +1599,23 @@
 
         // Verificar autenticação ao carregar a página
         checkAuth();
+
+        async function deleteOldImage(fileId) {
+            try {
+                // Acionamos o backend (Edge Function) para contornar o bloqueio de segurança
+                const { data, error } = await supabase.functions.invoke('delete-imagekit', {
+                    body: {
+                        fileId: fileId,
+                        privateKey: imagekitCredentials.private_key
+                    }
+                });
+
+                if (error) throw error;
+                console.log('✅ Imagem antiga removida da nuvem!');
+            } catch (err) {
+                console.error('⚠️ Erro ao remover imagem antiga (ficará órfã no ImageKit):', err);
+            }
+        }
     </script>
 </body>
 
