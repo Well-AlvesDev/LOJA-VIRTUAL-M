@@ -711,23 +711,16 @@
             try {
                 // Verificar autenticação
                 const { data: { session } } = await supabase.auth.getSession();
-                console.log('Usuário autenticado:', session?.user?.email);
 
                 const { data, error } = await supabase
                     .from('credenciais-imagekit')
                     .select('*');
 
                 if (error) {
-                    console.error('Erro ao buscar credenciais:', error);
-                    console.error('Código do erro:', error.code);
-                    console.error('Mensagem:', error.message);
                     throw error;
                 }
 
-                console.log('Dados retornados:', data);
-
                 if (!data || data.length === 0) {
-                    console.warn('Nenhuma credencial encontrada. Verifique as políticas RLS da tabela.');
                     alert('⚠️ Nenhuma credencial do ImageKit encontrada. Verifique as políticas RLS.');
                     return;
                 }
@@ -740,9 +733,7 @@
                     imagekit_id: (firstCredential['imagekit-id'] || '').trim(),
                     url_endpoint: (firstCredential['url-endpoint'] || '').trim()
                 };
-                console.log('✅ Credenciais ImageKit carregadas com sucesso');
             } catch (error) {
-                console.error('Erro ao carregar credenciais ImageKit:', error);
                 alert('❌ Erro ao carregar configurações:\n' + error.message);
             }
         }
@@ -772,8 +763,6 @@
                             }
                         }
 
-                        console.log(`📐 Dimensões: Original ${img.width}x${img.height} → Redimensionada ${newWidth}x${newHeight}`);
-
                         const canvas = document.createElement('canvas');
                         canvas.width = newWidth;
                         canvas.height = newHeight;
@@ -787,11 +776,9 @@
                             canvas.toBlob(
                                 (blob) => {
                                     const sizeInKB = blob.size / 1024;
-                                    console.log(`Qualidade ${quality.toFixed(2)}: ${sizeInKB.toFixed(2)} KB`);
 
                                     // Verificar se está no intervalo desejado (40-70 KB)
                                     if (sizeInKB >= 40 && sizeInKB <= 70) {
-                                        console.log('✅ Tamanho ideal atingido!');
                                         resolve(blob);
                                     } else if (sizeInKB > 70 && quality > 0.3) {
                                         // Se muito grande, reduzir qualidade
@@ -801,7 +788,6 @@
                                         tryCompress(quality + 0.05);
                                     } else {
                                         // Aceitar o tamanho mais próximo
-                                        console.log('✅ Melhor tamanho possível atingido!');
                                         resolve(blob);
                                     }
                                 },
@@ -850,12 +836,6 @@
 
             try {
                 // Validar credenciais
-                console.log('Verificando credenciais:', {
-                    private_key: imagekitCredentials.private_key ? `[${imagekitCredentials.private_key.length} caracteres]` : 'AUSENTE',
-                    public_key: imagekitCredentials.public_key ? `[${imagekitCredentials.public_key.length} caracteres]` : 'AUSENTE',
-                    imagekit_id: imagekitCredentials.imagekit_id || 'AUSENTE',
-                    url_endpoint: imagekitCredentials.url_endpoint || 'AUSENTE'
-                });
 
                 if (!imagekitCredentials.private_key || !imagekitCredentials.public_key) {
                     alert('❌ Credenciais incompletas. Verifique o banco de dados.');
@@ -869,18 +849,9 @@
                 formData.append('fileName', uniqueFileName);
                 formData.append('folder', '/produtos');
 
-                console.log('Dados sendo enviados:', {
-                    fileName: uniqueFileName,
-                    folder: '/produtos',
-                    fileSize: (imageBlob.size / 1024).toFixed(2) + ' KB',
-                    publicKey: imagekitCredentials.public_key.substring(0, 10) + '...'
-                });
-
                 // Criar string de autenticação Basic Auth
                 const authString = imagekitCredentials.private_key + ':';
                 const encodedAuth = btoa(authString);
-
-                console.log('Auth header preparado:', `Basic ${encodedAuth.substring(0, 20)}...`);
 
                 // Fazer upload para ImageKit via API
                 const response = await fetch(`https://upload.imagekit.io/api/v1/files/upload`, {
@@ -891,22 +862,14 @@
                     body: formData
                 });
 
-                console.log('Resposta ImageKit:', {
-                    status: response.status,
-                    statusText: response.statusText
-                });
-
                 const result = await response.json();
 
                 if (!response.ok) {
-                    console.error('❌ Erro da API ImageKit:', result);
                     throw new Error(`${result.message || response.statusText}`);
                 }
 
-                console.log('✅ Imagem enviada com sucesso:', result);
                 return result;
             } catch (error) {
-                console.error('Erro ao fazer upload da imagem:', error);
                 alert('❌ Erro ao fazer upload:\n' + error.message);
                 return null;
             }
@@ -1000,10 +963,8 @@
 
             try {
                 // Comprimir imagem para WebP (40-70 KB)
-                console.log('Iniciando compressão de imagem...');
                 const compressedImage = await compressImageToWebP(imageFile);
                 const sizeInKB = (compressedImage.size / 1024).toFixed(2);
-                console.log(`✅ Imagem comprimida: ${sizeInKB} KB`);
 
                 // Atualizar feedback
                 submitBtn.textContent = '⏳ Enviando para ImageKit...';
@@ -1030,16 +991,13 @@
                         .insert([productData]);
 
                     if (insertError) {
-                        console.error('❌ Erro ao inserir produto:', insertError);
                         alert('❌ Imagem publicada, mas erro ao salvar produto:\n' + insertError.message);
                     } else {
-                        console.log('✅ Produto salvo com sucesso:', productData);
                         alert('✅ Produto publicado com sucesso!\n\nTítulo: ' + title + '\nTamanho: ' + sizeInKB + ' KB\nURL: ' + uploadResult.url);
                         closePublishModal();
                     }
                 }
             } catch (error) {
-                console.error('Erro durante compressão ou upload:', error);
                 alert('❌ Erro ao processar imagem:\n' + error.message);
             }
 
@@ -1109,27 +1067,16 @@
             document.getElementById('searchResults').innerHTML = '';
 
             try {
-                // Verificar sessão do usuário
-                const { data: { session } } = await supabase.auth.getSession();
-                console.log('Sessão do usuário:', session?.user?.email);
-
                 let allResults = [];
 
                 // Tentar como ID primeiro (se for número)
                 if (!isNaN(searchTerm)) {
-                    console.log('Buscando por ID:', parseInt(searchTerm));
                     const { data: idResults, error: idError } = await supabase
                         .from('j-box')
                         .select('*')
                         .eq('ID', parseInt(searchTerm));
 
-                    if (idError) {
-                        console.error('Erro ao buscar por ID:', {
-                            code: idError.code,
-                            message: idError.message
-                        });
-                    } else {
-                        console.log('Resultado da busca por ID:', idResults);
+                    if (!idError) {
                         if (idResults && idResults.length > 0) {
                             allResults = idResults;
                         }
@@ -1138,21 +1085,15 @@
 
                 // Se não encontrou por ID, buscar por nome
                 if (allResults.length === 0) {
-                    console.log('Buscando por nome:', searchTerm);
                     const { data: nameResults, error: nameError } = await supabase
                         .from('j-box')
                         .select('*')
                         .ilike('PRODUTO', `%${searchTerm}%`);
 
                     if (nameError) {
-                        console.error('Erro ao buscar por nome:', {
-                            code: nameError.code,
-                            message: nameError.message
-                        });
                         throw nameError;
                     }
 
-                    console.log('Resultado da busca por nome:', nameResults);
                     if (nameResults && nameResults.length > 0) {
                         allResults = nameResults;
                     }
@@ -1166,7 +1107,6 @@
                         '<div class="no-results">📭 Nenhum produto encontrado</div>';
                 }
             } catch (error) {
-                console.error('Erro completo ao buscar produtos:', error);
                 alert('❌ Erro ao buscar produtos:\n\n' + error.message);
                 document.getElementById('searchResults').innerHTML = '';
             }
@@ -1204,7 +1144,6 @@
         }
 
         function selectProduct(product) {
-            console.log('✅ Produto selecionado:', product);
             selectedProductData = product;
 
             // Mostrar informações do produto selecionado
@@ -1222,7 +1161,6 @@
             currentProductInfo.classList.add('show');
 
             // Mostrar botões de ação
-            console.log('📌 Mostrando botão de edição');
             document.getElementById('manageActions').style.display = 'flex';
 
             // Remover seleção anterior das cards
@@ -1238,18 +1176,13 @@
         }
 
         function openEditModal() {
-            console.log('🔓 openEditModal chamada');
-            console.log('selectedProductData:', selectedProductData);
-
             if (!selectedProductData) {
                 alert('Nenhum produto selecionado');
-                console.error('Erro: selectedProductData é null');
                 return;
             }
 
             // Copiar dados ANTES de fechar o modal
             currentEditingProduct = { ...selectedProductData };
-            console.log('📦 currentEditingProduct:', currentEditingProduct);
 
             // Preencher formulário com dados do produto
             document.getElementById('editProductTitle').value = currentEditingProduct.PRODUTO;
@@ -1274,20 +1207,14 @@
             closeManageProductsModal();
 
             // Abrir modal de edição
-            console.log('🔴 Abrindo modal de edição');
             editProductModal.style.display = 'block';
         }
 
         async function saveProductChanges() {
-            console.log('💾 Iniciando salvamento...');
-
             if (!currentEditingProduct) {
                 alert('Nenhum produto selecionado');
-                console.error('Erro: currentEditingProduct é null');
                 return;
             }
-
-            console.log('📦 Produto a editar:', currentEditingProduct);
 
             // Validar campos
             const title = document.getElementById('editProductTitle').value.trim();
@@ -1295,8 +1222,6 @@
             const discount = parseFloat(document.getElementById('editProductDiscount').value);
             const installments = parseInt(document.getElementById('editInstallments').value);
             const interestFreeInstallments = parseInt(document.getElementById('editInterestFreeInstallments').value);
-
-            console.log('📝 Dados do formulário:', { title, price, discount, installments, interestFreeInstallments });
 
             let isValid = true;
             document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
@@ -1327,11 +1252,8 @@
             }
 
             if (!isValid) {
-                console.error('❌ Validação falhou');
                 return;
             }
-
-            console.log('✅ Validação passou');
 
             const submitBtn = editForm.querySelector('.btn-submit');
             const originalText = submitBtn.textContent;
@@ -1344,13 +1266,11 @@
                 // Se uma nova imagem foi selecionada, fazer upload e deletar a antiga
                 if (newImageSelected) {
 
-                    // 1. Deletar a imagem antiga primeiro
+                    // 1. Deletar a imagem antiga em background (não bloqueia o fluxo)
                     if (imageId) {
-                        submitBtn.textContent = '⏳ Apagando imagem antiga...';
-                        await deleteOldImage(imageId);
+                        deleteOldImage(imageId); // Sem await - executa em background
                     }
 
-                    console.log('🖼️ Nova imagem selecionada, fazendo upload...');
                     submitBtn.textContent = '⏳ Comprimindo imagem...';
                     const imageFile = editProductImageInput.files[0];
                     const compressedImage = await compressImageToWebP(imageFile);
@@ -1364,7 +1284,6 @@
 
                     imageUrl = uploadResult.url;
                     imageId = uploadResult.fileId; // 👈 Atualiza com o novo ID
-                    console.log('✅ Imagem enviada:', imageUrl);
                 }
 
                 submitBtn.textContent = '⏳ Salvando produto...';
@@ -1381,9 +1300,6 @@
                     DISPONIBILIDADE: document.getElementById('editProductAvailability').checked
                 };
 
-                console.log('📊 Dados para atualizar:', updateData);
-                console.log('🔑 ID do produto:', currentEditingProduct.ID);
-
                 // Atualizar no Supabase
                 const { data, error } = await supabase
                     .from('j-box')
@@ -1391,19 +1307,14 @@
                     .eq('ID', currentEditingProduct.ID)
                     .select();
 
-                console.log('📡 Resposta do Supabase:', { data, error });
-
                 if (error) {
-                    console.error('❌ Erro ao atualizar:', error);
                     throw error;
                 }
 
-                console.log('✅ Produto atualizado com sucesso!');
                 alert('✅ Produto atualizado com sucesso!');
                 closeEditProductModal();
                 openManageProductsModal();
             } catch (error) {
-                console.error('❌ Erro geral ao salvar produto:', error);
                 alert('❌ Erro ao salvar:\n' + error.message);
             }
 
@@ -1428,10 +1339,10 @@
             deleteBtn.textContent = '⏳ Deletando...';
 
             try {
-                // Deletar imagem do ImageKit antes de deletar o produto
+                // Deletar imagem do ImageKit em background (não bloqueia o fluxo)
                 const imageFileId = currentEditingProduct['IMAGE-ID'];
                 if (imageFileId) {
-                    await deleteOldImage(imageFileId);
+                    deleteOldImage(imageFileId); // Sem await - executa em background
                 }
 
                 const { error } = await supabase
@@ -1440,7 +1351,6 @@
                     .eq('ID', currentEditingProduct.ID);
 
                 if (error) {
-                    console.error('❌ Erro ao deletar:', error);
                     throw error;
                 }
 
@@ -1448,7 +1358,6 @@
                 closeEditProductModal();
                 openManageProductsModal();
             } catch (error) {
-                console.error('Erro ao deletar produto:', error);
                 alert('❌ Erro ao deletar:\n' + error.message);
             }
 
@@ -1467,11 +1376,8 @@
             const btnEditProduct = document.getElementById('btnEditProduct');
             if (btnEditProduct) {
                 btnEditProduct.addEventListener('click', () => {
-                    console.log('Botão Editar clicado');
                     openEditModal();
                 });
-            } else {
-                console.warn('Botão btnEditProduct não encontrado');
             }
         }, 100);
 
@@ -1550,7 +1456,6 @@
                 userEmailSpan.innerHTML = `<i class="ri-user-line"></i> ${currentUser.email}`;
                 loadAdminContent();
             } catch (error) {
-                console.error('Auth check error:', error);
                 redirectToLogin();
             }
         }
@@ -1585,7 +1490,6 @@
                 localStorage.removeItem('adminUser');
                 window.location.href = 'login.html';
             } catch (error) {
-                console.error('Logout error:', error);
                 alert('Erro ao fazer logout');
             }
         });
@@ -1611,9 +1515,8 @@
                 });
 
                 if (error) throw error;
-                console.log('✅ Imagem antiga removida da nuvem!');
             } catch (err) {
-                console.error('⚠️ Erro ao remover imagem antiga (ficará órfã no ImageKit):', err);
+                // Erro silencioso ao remover imagem (não afeta o fluxo principal)
             }
         }
     </script>
