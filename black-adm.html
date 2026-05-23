@@ -21,7 +21,7 @@
         }
 
         .navbar {
-            background: #244dff;
+            background: #1d63d3;
             color: white;
             padding: 20px;
             display: flex;
@@ -31,8 +31,44 @@
         }
 
         .navbar h1 {
-            font-size: 1.5em;
+            font-size: 1.3em;
             margin: 0;
+            font-weight: 400;
+            color: rgb(248, 248, 248);
+        }
+
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .status-text {
+            color: #4caf50;
+            font-weight: 500;
         }
 
         .user-section {
@@ -138,8 +174,9 @@
         }
 
         .modal-header h2 {
-            color: #244dff;
+            color: #1f81f0;
             margin: 0;
+            font-weight: 400;
         }
 
         .close-btn {
@@ -462,19 +499,61 @@
             display: block;
         }
 
-        .current-product-image {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-bottom: 10px;
+        .breadcrumb-nav {
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .breadcrumb-nav a {
+            color: #1d63d3;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 3px;
+        }
+
+        .breadcrumb-nav a:hover {
+            color: #244dff;
+            border-bottom-color: #244dff;
+        }
+
+        .breadcrumb-separator {
+            color: #999;
+            margin: 0 8px;
+        }
+
+        .site-url {
+            text-align: center;
+            margin-top: 10px;
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+        }
+
+        .site-url a {
+            color: #1d63d3;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .site-url a:hover {
+            color: #244dff;
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
     <div class="navbar">
-        <h1>🔐 Painel Administrativo</h1>
+        <div>
+            <h1>/ dona-flor.adm@khlss.vs</h1>
+            <div class="online-status">
+                <span class="status-dot"></span>
+                <span class="status-text">online</span>
+            </div>
+        </div>
     </div>
 
     <div class="user-section">
@@ -482,7 +561,15 @@
         <button class="btn-logout" id="btnLogout"><i class="ri-logout-box-line"></i> Logout</button>
     </div>
     <section><img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt=""
-            style="width: 200px; margin: 10px auto; display: block;"></section>
+            style="width: 130px; margin: 10px auto; display: block;">
+             <p class="site-url">admin-to: <a href="index.html" target="_blank">dona-flor.com.br</a></p>
+        <div class="breadcrumb-nav">
+            <a href="index.html">← Voltar à Loja</a>
+            <span class="breadcrumb-separator">|</span>
+            <span style="color: #666;">Painel Administrativo</span>
+        </div>
+       
+    </section>
 
     <div class="container" id="mainContent"></div>
     <!-- Modal Publicar Produto -->
@@ -562,7 +649,7 @@
     <div id="manageProductsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>🔍 Buscar Produtos</h2>
+                <h2>Buscar Produtos</h2>
                 <button class="close-btn" id="closeManageModal">&times;</button>
             </div>
 

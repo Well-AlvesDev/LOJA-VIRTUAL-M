@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Área Administrativa</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css">
     <script src="config.js"></script>
     <style>
         * {
@@ -69,6 +71,65 @@
             box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
         }
 
+        .password-container {
+            position: relative;
+            margin: 15px auto;
+            width: 100%;
+        }
+
+        .password-container input {
+            margin: 0;
+            padding-right: 45px;
+            width: 100%;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #666;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+        }
+
+        .password-toggle-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .password-toggle-btn i {
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .password-toggle-btn.hidden i {
+            animation: blink 0.4s ease-in-out;
+        }
+
+        .input-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px auto 8px;
+            font-size: 0.95em;
+            color: #333;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .input-label i {
+            font-size: 1.1em;
+            color: #616161;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
         main .button-entrar {
             display: block;
             width: 100%;
@@ -124,99 +185,131 @@
                 transform: rotate(360deg);
             }
         }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: rotateY(0deg);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: rotateY(90deg);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <main>
-        <img src="recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="" id="userIcon">
-        <h1>Área Administrativa</h1>
-        <p>Bem-vindo ao painel administrativo! Insira suas credenciais para continuar.</p>
+    <div id="app">
+        <main>
+            <img src="recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="" id="userIcon">
+            <h1>Área Administrativa</h1>
+            <p>Bem-vindo ao painel administrativo! Insira suas credenciais para continuar.</p>
 
-        <div class="loading-spinner" id="loadingSpinner"></div>
+            <div class="loading-spinner" id="loadingSpinner"></div>
 
-        <input type="text" id="username" placeholder="Digite o nome de usuário">
-        <input type="password" id="password" placeholder="Digite a senha">
-        <button class="button-entrar" id="btnEntrar">Entrar</button>
+            <label class="input-label">
+                <i class="ri-user-line"></i>
+                <span>Usuário</span>
+            </label>
+            <input type="text" id="username" placeholder="Digite o nome de usuário" v-model="username">
 
-        <div class="login-error" id="loginError"></div>
-    </main>
+            <label class="input-label">
+                <i class="ri-lock-line"></i>
+                <span>Senha</span>
+            </label>
+            <div class="password-container">
+                <input :type="passwordVisible ? 'text' : 'password'" id="password" placeholder="Digite a senha"
+                    v-model="password" @keyup.enter="handleLogin">
+                <button type="button" class="password-toggle-btn" :class="{ hidden: passwordVisible }"
+                    @click="togglePasswordVisibility" :title="passwordVisible ? 'Ocultar senha' : 'Mostrar senha'">
+                    <i :class="passwordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"></i>
+                </button>
+            </div>
+
+            <button class="button-entrar" id="btnEntrar" @click="handleLogin">Entrar</button>
+
+            <div class="login-error" id="loginError"></div>
+            <div class="returnhome">
+                <a href="index.html" style=" font-size: 15px; text-decoration: none;"><i class="ri-arrow-left-line"></i>
+                    Voltar para loja</a>
+            </div>
+        </main>
+    </div>
 
     <script>
-        // Inicializar cliente Supabase
+        const { createApp } = window.Vue;
         const { createClient } = window.supabase;
-        const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
-        const btnEntrar = document.getElementById('btnEntrar');
-        const inputUsername = document.getElementById('username');
-        const inputPassword = document.getElementById('password');
-        const loginError = document.getElementById('loginError');
-        const loadingSpinner = document.getElementById('loadingSpinner');
+        createApp({
+            data() {
+                return {
+                    username: '',
+                    password: '',
+                    passwordVisible: false,
+                    isLoading: false,
+                    loginError: '',
+                    supabase: createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey)
+                };
+            },
+            methods: {
+                togglePasswordVisibility() {
+                    this.passwordVisible = !this.passwordVisible;
+                },
+                async handleLogin() {
+                    const username = this.username.trim();
+                    const password = this.password.trim();
 
-        btnEntrar.addEventListener('click', handleLogin);
+                    if (!username || !password) {
+                        this.showError('Por favor, preencha todos os campos');
+                        return;
+                    }
 
-        // Permite pressionar Enter para fazer login
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && (document.activeElement === inputUsername || document.activeElement === inputPassword)) {
-                handleLogin();
-            }
-        });
+                    this.isLoading = true;
+                    this.loginError = '';
+                    document.getElementById('loadingSpinner').style.display = 'block';
+                    document.getElementById('btnEntrar').disabled = true;
 
-        async function handleLogin() {
-            const username = inputUsername.value.trim();
-            const password = inputPassword.value.trim();
+                    try {
+                        const { data, error } = await this.supabase.auth.signInWithPassword({
+                            email: username,
+                            password: password
+                        });
 
-            // Validação básica
-            if (!username || !password) {
-                showError('Por favor, preencha todos os campos');
-                return;
-            }
-
-            // Mostrar spinner e desabilitar botão
-            loadingSpinner.style.display = 'block';
-            btnEntrar.disabled = true;
-            loginError.style.display = 'none';
-
-            try {
-                // Usar signInWithPassword do Supabase Auth
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: username,
-                    password: password
-                });
-
-                if (error) {
-                    showError('Credenciais inválidas. Tente novamente.');
-                    console.error('Auth error:', error.message);
-                } else if (data.session) {
-                    // Login bem-sucedido
-                    // Armazenar token JWT no localStorage
-                    localStorage.setItem('adminToken', data.session.access_token);
-                    localStorage.setItem('adminUser', JSON.stringify(data.user));
-
-                    // Redirecionar imediatamente
-                    window.location.href = 'black-adm.html';
+                        if (error) {
+                            this.showError('Credenciais inválidas. Tente novamente.');
+                            console.error('Auth error:', error.message);
+                        } else if (data.session) {
+                            localStorage.setItem('adminToken', data.session.access_token);
+                            localStorage.setItem('adminUser', JSON.stringify(data.user));
+                            window.location.href = 'black-adm.html';
+                        }
+                    } catch (error) {
+                        this.showError('Erro ao conectar. Tente novamente.');
+                        console.error('Login error:', error);
+                    } finally {
+                        this.isLoading = false;
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        document.getElementById('btnEntrar').disabled = false;
+                    }
+                },
+                showError(message) {
+                    this.loginError = message;
+                    document.getElementById('loginError').textContent = message;
+                    document.getElementById('loginError').style.display = 'block';
                 }
-            } catch (error) {
-                showError('Erro ao conectar. Tente novamente.');
-                console.error('Login error:', error);
-            } finally {
-                loadingSpinner.style.display = 'none';
-                btnEntrar.disabled = false;
+            },
+            mounted() {
+                this.supabase.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' && session) {
+                        window.location.href = 'black-adm.html';
+                    }
+                });
             }
-        }
-
-        function showError(message) {
-            loginError.textContent = message;
-            loginError.style.display = 'block';
-        }
-
-        // Verificar se já está logado
-        supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-                // Já está logado, redirecionar para admin
-                window.location.href = 'black-adm.html';
-            }
-        });
+        }).mount('#app');
     </script>
 </body>
 
