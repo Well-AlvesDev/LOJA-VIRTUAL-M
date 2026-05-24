@@ -29,8 +29,8 @@
             --danger: #e53935;
             --success: #16a34a;
             --radius: 10px;
-            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
 
         body {
@@ -87,7 +87,7 @@
             background: var(--border);
         }
 
-  
+
 
         .navbar-right {
             display: flex;
@@ -114,8 +114,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.85); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.85);
+            }
         }
 
         .btn-logout {
@@ -141,7 +150,9 @@
         }
 
         /* ── HIDE old user-section ── */
-        .user-section { display: none; }
+        .user-section {
+            display: none;
+        }
 
         /* ── PAGE SHELL ── */
         .page-shell {
@@ -174,7 +185,10 @@
             background: var(--white);
         }
 
-        .site-header-info { flex: 1; min-width: 0; }
+        .site-header-info {
+            flex: 1;
+            min-width: 0;
+        }
 
         .site-header-label {
             font-size: 0.7rem;
@@ -203,7 +217,10 @@
             opacity: 0.85;
         }
 
-        .site-header-url a:hover { opacity: 1; text-decoration: underline; }
+        .site-header-url a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
 
         .site-header-back {
             padding: 7px 14px;
@@ -237,7 +254,7 @@
             margin-bottom: 20px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(29,99,211,0.25);
+            box-shadow: 0 4px 20px rgba(29, 99, 211, 0.25);
         }
 
         .welcome-card::before {
@@ -247,7 +264,7 @@
             right: -40px;
             width: 160px;
             height: 160px;
-            background: rgba(255,255,255,0.07);
+            background: rgba(255, 255, 255, 0.07);
             border-radius: 50%;
         }
 
@@ -258,7 +275,7 @@
             right: 60px;
             width: 200px;
             height: 200px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
         }
 
@@ -321,11 +338,13 @@
 
         .action-card:hover {
             border-color: var(--blue);
-            box-shadow: 0 4px 16px rgba(29,99,211,0.12);
+            box-shadow: 0 4px 16px rgba(29, 99, 211, 0.12);
             transform: translateY(-2px);
         }
 
-        .action-card:active { transform: translateY(0); }
+        .action-card:active {
+            transform: translateY(0);
+        }
 
         .action-card-icon {
             width: 40px;
@@ -348,7 +367,9 @@
             color: #ea580c;
         }
 
-        .action-card-body { min-width: 0; }
+        .action-card-body {
+            min-width: 0;
+        }
 
         .action-card-title {
             font-size: 0.9rem;
@@ -377,7 +398,9 @@
             box-shadow: var(--shadow-sm);
         }
 
-        .info-strip i { color: var(--blue); }
+        .info-strip i {
+            color: var(--blue);
+        }
 
         /* ── USER BADGE in navbar ── */
         .navbar-user-badge {
@@ -492,13 +515,25 @@
             }
         }
 
-        .container { max-width: 860px; margin: 32px auto; padding: 0 20px; }
+        .container {
+            max-width: 860px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
 
         /* legacy compat */
-        .welcome-box { display: none; }
-        .btn-publish-product { display: none; }
+        .welcome-box {
+            display: none;
+        }
 
-        .breadcrumb-nav, .site-url { display: none; }
+        .btn-publish-product {
+            display: none;
+        }
+
+        .breadcrumb-nav,
+        .site-url {
+            display: none;
+        }
 
         /* ===== MODAL SYSTEM — redesigned ===== */
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
@@ -515,7 +550,7 @@
             --modal-text: #1a1d23;
             --modal-muted: #6b7280;
             --modal-input-bg: #f9fafb;
-            --modal-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+            --modal-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
@@ -540,13 +575,25 @@
 
 
         @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(16px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .modal-content {
@@ -643,7 +690,7 @@
         }
 
         /* form inside modal-content must also be a flex column so footer is always visible */
-        .modal-content > form {
+        .modal-content>form {
             display: flex;
             flex-direction: column;
             flex: 1;
@@ -783,7 +830,7 @@
             position: absolute;
             top: 6px;
             right: 6px;
-            background: rgba(0,0,0,0.65);
+            background: rgba(0, 0, 0, 0.65);
             color: white;
             border: none;
             border-radius: 50%;
@@ -864,14 +911,14 @@
             top: 3px;
             left: 3px;
             transition: transform var(--transition);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        .toggle-switch input:checked + .toggle-track {
+        .toggle-switch input:checked+.toggle-track {
             background: var(--modal-accent);
         }
 
-        .toggle-switch input:checked + .toggle-track::after {
+        .toggle-switch input:checked+.toggle-track::after {
             transform: translateX(18px);
         }
 
@@ -882,7 +929,9 @@
             align-items: center;
         }
 
-        .form-actions .spacer { flex: 1; }
+        .form-actions .spacer {
+            flex: 1;
+        }
 
         .btn-cancel,
         .btn-submit,
@@ -925,7 +974,9 @@
             transform: translateY(-1px);
         }
 
-        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:active {
+            transform: translateY(0);
+        }
 
         .btn-edit {
             background: var(--modal-accent);
@@ -935,7 +986,9 @@
             box-shadow: 0 2px 8px rgba(29, 99, 211, 0.2);
         }
 
-        .btn-edit:hover { background: #1550b8; }
+        .btn-edit:hover {
+            background: #1550b8;
+        }
 
         .btn-delete {
             background: var(--modal-danger-light);
@@ -968,7 +1021,9 @@
             gap: 4px;
         }
 
-        input:invalid { border-color: var(--modal-danger); }
+        input:invalid {
+            border-color: var(--modal-danger);
+        }
 
         /* ===== MANAGE MODAL ===== */
         .search-container {
@@ -1010,7 +1065,9 @@
             white-space: nowrap;
         }
 
-        .search-button:hover { background: #1550b8; }
+        .search-button:hover {
+            background: #1550b8;
+        }
 
         .search-button:disabled {
             opacity: 0.5;
@@ -1148,7 +1205,7 @@
             border-radius: var(--radius-sm);
             object-fit: cover;
             border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
 
@@ -1229,7 +1286,7 @@
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 2px solid rgba(255,255,255,0.35);
+            border: 2px solid rgba(255, 255, 255, 0.35);
             border-top: 2px solid white;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -1321,7 +1378,8 @@
         @media (max-width: 640px) {
             .modal {
                 padding: 12px;
-                align-items: flex-end; /* sobe do fundo como sheet */
+                align-items: flex-end;
+                /* sobe do fundo como sheet */
             }
 
             .modal-content {
@@ -1333,8 +1391,15 @@
             }
 
             @keyframes modalSlideUp {
-                from { opacity: 0; transform: translateY(40px); }
-                to   { opacity: 1; transform: translateY(0); }
+                from {
+                    opacity: 0;
+                    transform: translateY(40px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
 
             .modal-header {
@@ -1370,7 +1435,9 @@
             }
 
             /* Spacer some modais usam para empurrar botão p/ direita — não faz sentido em mobile */
-            .form-actions .spacer { display: none; }
+            .form-actions .spacer {
+                display: none;
+            }
 
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -1510,9 +1577,8 @@
 
         <!-- SITE HEADER -->
         <div class="site-header">
-            <img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp"
-                 class="site-header-logo" alt="Dona Flor"
-                 onerror="this.style.display='none'">
+            <img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" class="site-header-logo"
+                alt="Dona Flor" onerror="this.style.display='none'">
             <div class="site-header-info">
                 <div class="site-header-label">Gerenciando loja</div>
                 <div class="site-header-name">Dona Flor</div>
@@ -1552,11 +1618,13 @@
                         <div class="file-upload-zone" id="publishDropZone">
                             <input type="file" id="productImage" accept="image/*" required>
                             <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
-                            <div class="file-upload-text"><strong>Clique para selecionar</strong> ou arraste aqui<br><span style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
+                            <div class="file-upload-text"><strong>Clique para selecionar</strong> ou arraste
+                                aqui<br><span style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
                         </div>
                         <div class="image-preview-container" id="imagePreviewContainer">
                             <img id="imagePreview" class="image-preview" alt="Prévia">
-                            <button type="button" class="remove-image-btn" id="removeImageBtn" title="Remover">&times;</button>
+                            <button type="button" class="remove-image-btn" id="removeImageBtn"
+                                title="Remover">&times;</button>
                         </div>
                         <span class="error-message" id="imageError">Selecione uma imagem válida</span>
                     </div>
@@ -1583,7 +1651,8 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="productDiscount">Desconto (%)</label>
-                            <input type="number" id="productDiscount" placeholder="0" min="0" max="100" step="0.01" value="0" required>
+                            <input type="number" id="productDiscount" placeholder="0" min="0" max="100" step="0.01"
+                                value="0" required>
                             <span class="error-message" id="discountError">Entre 0 e 100%</span>
                         </div>
                         <div class="form-group">
@@ -1593,8 +1662,10 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="interestFreeInstallments">Parcelas Sem Juros <span class="required-star">*</span></label>
-                        <input type="number" id="interestFreeInstallments" placeholder="0" min="0" max="12" value="0" required>
+                        <label for="interestFreeInstallments">Parcelas Sem Juros <span
+                                class="required-star">*</span></label>
+                        <input type="number" id="interestFreeInstallments" placeholder="0" min="0" max="12" value="0"
+                            required>
                         <span class="error-message" id="interestFreeError">Deve ser menor ou igual ao total</span>
                     </div>
                 </div>
@@ -1603,7 +1674,8 @@
                     <div class="form-actions">
                         <button type="button" class="btn-cancel" id="cancelBtn">Cancelar</button>
                         <div class="spacer"></div>
-                        <button type="submit" class="btn-submit"><i class="ri-upload-cloud-2-line"></i> Publicar Produto</button>
+                        <button type="submit" class="btn-submit"><i class="ri-upload-cloud-2-line"></i> Publicar
+                            Produto</button>
                     </div>
                 </div>
             </form>
@@ -1641,7 +1713,8 @@
                         <strong id="selectedProductName"></strong>
                         <span id="selectedProductPrice"></span>
                     </div>
-                    <i class="ri-checkbox-circle-fill" style="color: var(--modal-accent); font-size: 20px; flex-shrink:0;"></i>
+                    <i class="ri-checkbox-circle-fill"
+                        style="color: var(--modal-accent); font-size: 20px; flex-shrink:0;"></i>
                 </div>
             </div>
 
@@ -1649,7 +1722,8 @@
                 <div class="form-actions">
                     <button type="button" class="btn-cancel" id="closeBtnManage">Fechar</button>
                     <div class="spacer"></div>
-                    <button type="button" class="btn-edit" id="btnEditProduct"><i class="ri-edit-line"></i> Editar Produto</button>
+                    <button type="button" class="btn-edit" id="btnEditProduct"><i class="ri-edit-line"></i> Editar
+                        Produto</button>
                 </div>
             </div>
         </div>
@@ -1676,18 +1750,21 @@
                         <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 10px;">
                             <img id="currentEditImage" class="current-product-image" alt="Imagem atual">
                             <div style="font-size:0.8rem; color: var(--modal-muted); line-height: 1.5;">
-                                <strong style="color: var(--modal-text); display:block; margin-bottom: 2px;">Imagem atual</strong>
+                                <strong style="color: var(--modal-text); display:block; margin-bottom: 2px;">Imagem
+                                    atual</strong>
                                 Selecione abaixo para substituir
                             </div>
                         </div>
                         <div class="file-upload-zone" id="editDropZone">
                             <input type="file" id="editProductImage" accept="image/*">
                             <div class="file-upload-icon"><i class="ri-image-edit-line"></i></div>
-                            <div class="file-upload-text"><strong>Clique para trocar a imagem</strong><br><span style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
+                            <div class="file-upload-text"><strong>Clique para trocar a imagem</strong><br><span
+                                    style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
                         </div>
                         <div class="image-preview-container" id="editImagePreviewContainer">
                             <img id="editImagePreview" class="image-preview" alt="Nova prévia">
-                            <button type="button" class="remove-image-btn" id="removeEditImageBtn" title="Remover">&times;</button>
+                            <button type="button" class="remove-image-btn" id="removeEditImageBtn"
+                                title="Remover">&times;</button>
                         </div>
                         <span class="error-message" id="editImageError">Erro ao processar imagem</span>
                     </div>
@@ -1724,7 +1801,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="editInterestFreeInstallments">Parcelas Sem Juros <span class="required-star">*</span></label>
+                        <label for="editInterestFreeInstallments">Parcelas Sem Juros <span
+                                class="required-star">*</span></label>
                         <input type="number" id="editInterestFreeInstallments" min="0" max="12" required>
                         <span class="error-message" id="editInterestFreeError">Deve ser menor ou igual ao total</span>
                     </div>
@@ -1744,7 +1822,8 @@
 
                 <div class="modal-footer">
                     <div class="form-actions">
-                        <button type="button" class="btn-delete" id="btnDeleteProduct"><i class="ri-delete-bin-line"></i> Deletar</button>
+                        <button type="button" class="btn-delete" id="btnDeleteProduct"><i
+                                class="ri-delete-bin-line"></i> Deletar</button>
                         <div class="spacer"></div>
                         <button type="button" class="btn-cancel" id="cancelEditBtn">Cancelar</button>
                         <button type="submit" class="btn-submit"><i class="ri-save-line"></i> Salvar Alterações</button>
@@ -2198,6 +2277,9 @@
 
             btnSearch.disabled = false;
             btnSearch.textContent = 'Buscar';
+
+            // Fechar teclado mobile
+            productSearchInput.blur();
         }
 
         function displayProductResults(products) {
@@ -2455,6 +2537,7 @@
 
         productSearchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 searchProducts();
             }
         });
