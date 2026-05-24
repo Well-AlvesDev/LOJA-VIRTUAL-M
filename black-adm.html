@@ -9,459 +9,1157 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <script src="config.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+        :root {
+            --blue: #1d63d3;
+            --blue-dark: #1550b8;
+            --blue-light: #eef2ff;
+            --text: #1a1d23;
+            --muted: #6b7280;
+            --border: #e8eaed;
+            --surface: #f7f8fa;
+            --white: #ffffff;
+            --danger: #e53935;
+            --success: #16a34a;
+            --radius: 10px;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
         }
 
+        body {
+            font-family: 'DM Sans', Arial, sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ── */
         .navbar {
-            background: #1d63d3;
-            color: white;
-            padding: 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-logo-dot {
+            width: 28px;
+            height: 28px;
+            background: var(--blue);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            flex-shrink: 0;
         }
 
         .navbar h1 {
-            font-size: 1.3em;
-            margin: 0;
-            font-weight: 400;
-            color: rgb(248, 248, 248);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .navbar-divider {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+        }
+
+        .navbar-env-badge {
+            padding: 3px 9px;
+            background: var(--blue-light);
+            color: var(--blue);
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .online-status {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: white;
-            font-size: 0.85em;
-            margin-top: 5px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #4caf50;
-            border-radius: 50%;
-            animation: blink 1.5s infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        .status-text {
-            color: #4caf50;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--success);
             font-weight: 500;
         }
 
-        .user-section {
-            background: rgba(175, 175, 175, 0.1);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease infinite;
+            flex-shrink: 0;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-email {
-            font-size: 0.9em;
-            opacity: 0.9;
-            color: #6e6e6e;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
         }
 
         .btn-logout {
-            padding: 8px 16px;
-            background-color: rgba(239, 136, 136, 0.2);
-            color: rgb(222, 67, 67);
-            border: 1px solid rgb(233, 108, 108);
-            border-radius: 5px;
+            padding: 6px 14px;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 7px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            font-size: 0.82rem;
+            font-family: 'DM Sans', Arial, sans-serif;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s ease;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
+        .btn-logout:hover {
+            background: #fff0f0;
+            color: var(--danger);
+            border-color: #fca5a5;
         }
 
-        .welcome-box {
-            background: white;
-            padding: 30px;
+        /* ── HIDE old user-section ── */
+        .user-section { display: none; }
+
+        /* ── PAGE SHELL ── */
+        .page-shell {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ── SITE HEADER ── */
+        .site-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding: 20px 24px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .site-header-logo {
+            width: 52px;
+            height: 52px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            object-fit: contain;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            padding: 4px;
+            background: var(--white);
         }
 
-        .welcome-box h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 18px;
+        .site-header-info { flex: 1; min-width: 0; }
+
+        .site-header-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 2px;
         }
 
-        .welcome-box p {
-            color: #666;
-            line-height: 1.6;
+        .site-header-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
         }
 
-        .btn-publish-product {
-            padding: 12px 24px;
-            background-color: #244dff;
+        .site-header-url a {
+            font-size: 0.78rem;
+            color: var(--blue);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'DM Mono', monospace;
+            opacity: 0.85;
+        }
+
+        .site-header-url a:hover { opacity: 1; text-decoration: underline; }
+
+        .site-header-back {
+            padding: 7px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            font-family: 'DM Sans', Arial, sans-serif;
+        }
+
+        .site-header-back:hover {
+            background: var(--blue-light);
+            color: var(--blue);
+            border-color: #c7d7f8;
+        }
+
+        /* ── WELCOME CARD ── */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--blue) 0%, #2d7ef0 60%, #4a9eff 100%);
+            border-radius: var(--radius);
+            padding: 28px 28px 24px;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(29,99,211,0.25);
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+        }
+
+        .welcome-card::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            right: 60px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .welcome-greeting {
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0.75;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .welcome-card h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+
+        .welcome-card p {
+            font-size: 0.83rem;
+            opacity: 0.75;
+            line-height: 1.5;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .welcome-card-icon {
+            position: absolute;
+            right: 28px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 52px;
+            opacity: 0.12;
+        }
+
+        /* ── ACTION CARDS ── */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
-        .btn-publish-product:hover {
-            background-color: #1a38cc;
+        .action-card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: all 0.18s ease;
+            text-align: left;
+            font-family: 'DM Sans', Arial, sans-serif;
+            box-shadow: var(--shadow-sm);
         }
 
-        /* Modal Styles */
+        .action-card:hover {
+            border-color: var(--blue);
+            box-shadow: 0 4px 16px rgba(29,99,211,0.12);
+            transform: translateY(-2px);
+        }
+
+        .action-card:active { transform: translateY(0); }
+
+        .action-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .action-card-icon.blue {
+            background: var(--blue-light);
+            color: var(--blue);
+        }
+
+        .action-card-icon.orange {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .action-card-body { min-width: 0; }
+
+        .action-card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+
+        .action-card-desc {
+            font-size: 0.76rem;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        /* ── INFO STRIP ── */
+        .info-strip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-strip i { color: var(--blue); }
+
+        /* ── USER BADGE in navbar ── */
+        .navbar-user-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px 5px 6px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+        }
+
+        .navbar-avatar {
+            width: 22px;
+            height: 22px;
+            background: var(--blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user-email {
+            font-size: 0.78rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .container { max-width: 860px; margin: 32px auto; padding: 0 20px; }
+
+        /* legacy compat */
+        .welcome-box { display: none; }
+        .btn-publish-product { display: none; }
+
+        .breadcrumb-nav, .site-url { display: none; }
+
+        /* ===== MODAL SYSTEM — redesigned ===== */
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+        :root {
+            --modal-bg: #ffffff;
+            --modal-surface: #f7f8fa;
+            --modal-border: #e8eaed;
+            --modal-accent: #1d63d3;
+            --modal-accent-light: #eef2ff;
+            --modal-danger: #e53935;
+            --modal-danger-light: #fff5f5;
+            --modal-success: #1a8a4a;
+            --modal-text: #1a1d23;
+            --modal-muted: #6b7280;
+            --modal-input-bg: #f9fafb;
+            --modal-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: 0.18s ease;
+        }
+
         .modal {
             display: none;
             position: fixed;
             z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: rgba(15, 20, 35, 0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            animation: modalFadeIn 0.22s ease;
+            /* flex centering so modal-content never overflows viewport */
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            max-height: 85vh;
-            overflow-y: auto;
+            background: var(--modal-bg);
+            padding: 0;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 620px;
+            box-shadow: var(--modal-shadow);
+            /* key: height is bounded by the flex container (viewport - padding) */
+            max-height: calc(100vh - 32px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: modalSlideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: 'DM Sans', Arial, sans-serif;
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            padding: 20px 24px 18px;
+            border-bottom: 1px solid var(--modal-border);
+            background: var(--modal-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .modal-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--modal-accent-light);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--modal-accent);
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
         .modal-header h2 {
-            color: #1f81f0;
+            color: var(--modal-text);
             margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-header p.modal-subtitle {
+            color: var(--modal-muted);
+            font-size: 0.78rem;
+            margin: 1px 0 0;
             font-weight: 400;
         }
 
         .close-btn {
-            background: none;
-            border: none;
-            font-size: 28px;
+            background: var(--modal-surface);
+            border: 1px solid var(--modal-border);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            color: #666;
+            color: var(--modal-muted);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+            line-height: 1;
+            flex-shrink: 0;
         }
 
         .close-btn:hover {
-            color: #000;
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: var(--modal-danger);
         }
 
+        /* Modal scrollable body */
+        .modal-body {
+            padding: 22px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* form inside modal-content must also be a flex column so footer is always visible */
+        .modal-content > form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--modal-border);
+            background: var(--modal-surface);
+            flex-shrink: 0;
+        }
+
+        /* ---- Form groups ---- */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: bold;
+            margin-bottom: 6px;
+            color: var(--modal-text);
+            font-weight: 500;
+            font-size: 0.83rem;
+            letter-spacing: 0.01em;
+        }
+
+        .form-group label .required-star {
+            color: var(--modal-danger);
+            margin-left: 2px;
         }
 
         .form-group input[type="text"],
         .form-group input[type="number"],
-        .form-group input[type="file"],
         .form-group textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
-            font-size: 0.95em;
+            padding: 9px 12px;
+            border: 1.5px solid var(--modal-border);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', Arial, sans-serif;
+            font-size: 0.9rem;
+            color: var(--modal-text);
+            background: var(--modal-input-bg);
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+            outline: none;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus,
+        .form-group textarea:focus {
+            border-color: var(--modal-accent);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(29, 99, 211, 0.1);
         }
 
         .form-group textarea {
             resize: vertical;
             min-height: 80px;
+            line-height: 1.5;
         }
 
-        .form-group input[type="file"] {
-            padding: 5px;
+        /* Custom file upload */
+        .file-upload-zone {
+            border: 2px dashed var(--modal-border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: var(--modal-surface);
+            position: relative;
+        }
+
+        .file-upload-zone:hover,
+        .file-upload-zone.drag-over {
+            border-color: var(--modal-accent);
+            background: var(--modal-accent-light);
+        }
+
+        .file-upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-upload-icon {
+            font-size: 26px;
+            color: var(--modal-muted);
+            margin-bottom: 6px;
+        }
+
+        .file-upload-text {
+            font-size: 0.83rem;
+            color: var(--modal-muted);
+            font-weight: 400;
+        }
+
+        .file-upload-text strong {
+            color: var(--modal-accent);
+            font-weight: 600;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         .form-row.full {
             grid-template-columns: 1fr;
         }
 
+        /* Image preview */
         .image-preview-container {
             position: relative;
             width: 100%;
-            max-width: 200px;
             margin-top: 10px;
             display: none;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1.5px solid var(--modal-border);
+            max-width: 160px;
         }
 
         .image-preview {
             width: 100%;
-            border-radius: 5px;
             display: block;
+            aspect-ratio: 1;
+            object-fit: cover;
         }
 
         .remove-image-btn {
             position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: #d32f2fbe;
+            top: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.65);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background var(--transition);
+            backdrop-filter: blur(4px);
         }
 
         .remove-image-btn:hover {
-            background-color: #b71c1c;
+            background: var(--modal-danger);
         }
 
+        /* Availability toggle */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: var(--modal-surface);
+            border: 1.5px solid var(--modal-border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+
+        .toggle-label-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .toggle-label-text span:first-child {
+            font-size: 0.87rem;
+            font-weight: 500;
+            color: var(--modal-text);
+        }
+
+        .toggle-label-text span:last-child {
+            font-size: 0.76rem;
+            color: var(--modal-muted);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 42px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .toggle-track {
+            position: absolute;
+            inset: 0;
+            background: #d1d5db;
+            border-radius: 100px;
+            transition: background var(--transition);
+            cursor: pointer;
+        }
+
+        .toggle-track::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform var(--transition);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-track {
+            background: var(--modal-accent);
+        }
+
+        .toggle-switch input:checked + .toggle-track::after {
+            transform: translateX(18px);
+        }
+
+        /* Buttons */
         .form-actions {
             display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 30px;
+            gap: 8px;
+            align-items: center;
         }
 
+        .form-actions .spacer { flex: 1; }
+
         .btn-cancel,
-        .btn-submit {
-            padding: 10px 20px;
+        .btn-submit,
+        .btn-edit,
+        .btn-delete {
+            padding: 9px 18px;
             border: none;
-            border-radius: 5px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
+            font-size: 0.87rem;
+            font-weight: 500;
+            font-family: 'DM Sans', Arial, sans-serif;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         .btn-cancel {
-            background-color: #ddd;
-            color: #333;
+            background: var(--modal-surface);
+            color: var(--modal-muted);
+            border: 1.5px solid var(--modal-border);
         }
 
         .btn-cancel:hover {
-            background-color: #ccc;
+            background: #f0f0f0;
+            color: var(--modal-text);
         }
 
         .btn-submit {
-            background-color: #244dff;
+            background: var(--modal-accent);
             color: white;
+            box-shadow: 0 2px 8px rgba(29, 99, 211, 0.25);
         }
 
         .btn-submit:hover {
-            background-color: #1a38cc;
+            background: #1550b8;
+            box-shadow: 0 4px 12px rgba(29, 99, 211, 0.35);
+            transform: translateY(-1px);
         }
 
+        .btn-submit:active { transform: translateY(0); }
+
+        .btn-edit {
+            background: var(--modal-accent);
+            color: white;
+            flex: 1;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(29, 99, 211, 0.2);
+        }
+
+        .btn-edit:hover { background: #1550b8; }
+
+        .btn-delete {
+            background: var(--modal-danger-light);
+            color: var(--modal-danger);
+            border: 1.5px solid #fca5a5;
+        }
+
+        .btn-delete:hover {
+            background: var(--modal-danger);
+            color: white;
+            border-color: var(--modal-danger);
+        }
+
+        .btn-delete:disabled,
+        .btn-edit:disabled,
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Error messages */
         .error-message {
-            color: #d32f2f;
-            font-size: 0.9em;
-            margin-top: 5px;
+            color: var(--modal-danger);
+            font-size: 0.78rem;
+            margin-top: 4px;
             display: none;
+            align-items: center;
+            gap: 4px;
         }
 
-        input:invalid {
-            border-color: #d32f2f;
-        }
+        input:invalid { border-color: var(--modal-danger); }
 
-        /* Estilos para Modal de Busca de Produtos */
+        /* ===== MANAGE MODAL ===== */
         .search-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
         .search-input {
             flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 0.95em;
+            padding: 9px 12px 9px 36px;
+            border: 1.5px solid var(--modal-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-family: 'DM Sans', Arial, sans-serif;
+            background: var(--modal-input-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") 11px center no-repeat;
+            outline: none;
+            color: var(--modal-text);
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--modal-accent);
+            box-shadow: 0 0 0 3px rgba(29, 99, 211, 0.1);
+            background-color: white;
         }
 
         .search-button {
-            padding: 12px 24px;
-            background-color: #244dff;
+            padding: 9px 18px;
+            background: var(--modal-accent);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
+            font-size: 0.87rem;
+            font-weight: 500;
+            font-family: 'DM Sans', Arial, sans-serif;
+            transition: all var(--transition);
+            white-space: nowrap;
         }
 
-        .search-button:hover {
-            background-color: #1a38cc;
-        }
+        .search-button:hover { background: #1550b8; }
 
         .search-button:disabled {
-            background-color: #999;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
+        /* Products grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
         }
 
         .product-card {
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            border: 1.5px solid var(--modal-border);
+            border-radius: var(--radius-md);
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s;
-            background: white;
+            transition: all 0.2s ease;
+            background: var(--modal-bg);
+            position: relative;
         }
 
         .product-card:hover {
-            border-color: #244dff;
-            box-shadow: 0 4px 12px rgba(36, 77, 255, 0.2);
+            border-color: var(--modal-accent);
+            box-shadow: 0 4px 16px rgba(29, 99, 211, 0.15);
             transform: translateY(-2px);
         }
 
         .product-card.selected {
-            border-color: #244dff;
-            background-color: #f0f4ff;
+            border-color: var(--modal-accent);
+            background: var(--modal-accent-light);
+            box-shadow: 0 0 0 3px rgba(29, 99, 211, 0.15);
+        }
+
+        .product-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            background: var(--modal-accent);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
         }
 
         .product-card-image {
             width: 100%;
-            height: 120px;
+            height: 110px;
             object-fit: cover;
-            background-color: #f5f5f5;
+            background: var(--modal-surface);
+            display: block;
         }
 
         .product-card-info {
-            padding: 10px;
-            text-align: center;
+            padding: 8px 10px 10px;
         }
 
         .product-card-name {
-            font-weight: bold;
-            font-size: 0.85em;
-            color: #333;
+            font-weight: 600;
+            font-size: 0.78rem;
+            color: var(--modal-text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            line-height: 1.3;
         }
 
         .product-card-price {
-            color: #244dff;
-            font-weight: bold;
-            font-size: 0.9em;
+            color: var(--modal-accent);
+            font-weight: 700;
+            font-size: 0.82rem;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .product-card-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .badge-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-unavailable {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
         .no-results {
             text-align: center;
-            padding: 30px;
-            color: #666;
-            font-size: 1.1em;
+            padding: 40px 20px;
+            color: var(--modal-muted);
+            font-size: 0.9rem;
         }
 
-        .edit-actions {
+        .no-results-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* Selected product panel */
+        .selected-product-panel {
+            background: var(--modal-accent-light);
+            border: 1.5px solid rgba(29, 99, 211, 0.2);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .selected-product-panel.show {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
         }
 
-        .btn-edit,
-        .btn-delete {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: background-color 0.3s;
+        .selected-product-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .selected-product-info {
             flex: 1;
+            min-width: 0;
         }
 
-        .btn-edit {
-            background-color: #244dff;
-            color: white;
+        .selected-product-info strong {
+            display: block;
+            font-size: 0.87rem;
+            color: var(--modal-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .btn-edit:hover {
-            background-color: #1a38cc;
+        .selected-product-info span {
+            font-size: 0.78rem;
+            color: var(--modal-muted);
         }
 
-        .btn-delete {
-            background-color: #d32f2f;
-            color: white;
+        /* Current image in edit modal */
+        .current-product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--modal-border);
+            display: none;
         }
 
-        .btn-delete:hover {
-            background-color: #b71c1c;
+        /* Section divider inside modal */
+        .form-section-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--modal-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 18px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--modal-border);
         }
 
-        .btn-delete:disabled,
-        .btn-edit:disabled {
-            background-color: #999;
-            cursor: not-allowed;
+        /* ===== success message ===== */
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+            display: none;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border: 1px solid #a7f3d0;
+            align-items: center;
+            gap: 8px;
         }
 
+        .success-message.show {
+            display: flex;
+        }
+
+        .current-product-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .current-product-info.show {
+            display: block;
+        }
+
+        /* Loading spinner */
         .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #244dff;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.35);
+            border-top: 2px solid white;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
+            flex-shrink: 0;
         }
 
         @keyframes spin {
@@ -546,100 +1244,132 @@
 </head>
 
 <body>
-    <div class="navbar">
-        <div>
-            <h1>/ dona-flor.adm@khlss.vs</h1>
+    <!-- TOPBAR -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="navbar-logo-dot"><i class="ri-settings-3-line"></i></div>
+            <h1>Painel Admin</h1>
+            <div class="navbar-divider"></div>
+            <span class="navbar-env-badge">dona-flor.com.br</span>
+        </div>
+        <div class="navbar-right">
             <div class="online-status">
                 <span class="status-dot"></span>
-                <span class="status-text">online</span>
+                online
             </div>
+            <div class="navbar-user-badge">
+                <div class="navbar-avatar"><i class="ri-user-line" style="font-size:11px;"></i></div>
+                <span class="user-email" id="userEmail">Carregando...</span>
+            </div>
+            <button class="btn-logout" id="btnLogout"><i class="ri-logout-box-line"></i> Sair</button>
         </div>
+    </nav>
+
+    <!-- hidden legacy user-section kept for JS compat -->
+    <div class="user-section" style="display:none;">
+        <span id="userEmailLegacy"></span>
     </div>
 
-    <div class="user-section">
-        <span class="user-email" id="userEmail">Carregando...</span>
-        <button class="btn-logout" id="btnLogout"><i class="ri-logout-box-line"></i> Logout</button>
-    </div>
-    <section><img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt=""
-            style="width: 130px; margin: 10px auto; display: block;">
-             <p class="site-url">admin-to: <a href="index.html" target="_blank">dona-flor.com.br</a></p>
-        <div class="breadcrumb-nav">
-            <a href="index.html">← Voltar à Loja</a>
-            <span class="breadcrumb-separator">|</span>
-            <span style="color: #666;">Painel Administrativo</span>
-        </div>
-       
-    </section>
+    <!-- PAGE SHELL -->
+    <div class="page-shell">
 
-    <div class="container" id="mainContent"></div>
+        <!-- SITE HEADER -->
+        <div class="site-header">
+            <img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp"
+                 class="site-header-logo" alt="Dona Flor"
+                 onerror="this.style.display='none'">
+            <div class="site-header-info">
+                <div class="site-header-label">Gerenciando loja</div>
+                <div class="site-header-name">Dona Flor</div>
+                <div class="site-header-url">
+                    <a href="index.html" target="_blank">
+                        <i class="ri-external-link-line"></i>dona-flor.com.br
+                    </a>
+                </div>
+            </div>
+            <a href="index.html" class="site-header-back">
+                <i class="ri-arrow-left-line"></i> Ver loja
+            </a>
+        </div>
+
+        <!-- MAIN CONTENT injected here -->
+        <div id="mainContent"></div>
+
+    </div>
     <!-- Modal Publicar Produto -->
     <div id="publishModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📦 Publicar Produto</h2>
-                <button class="close-btn" id="closeModal">&times;</button>
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i class="ri-upload-cloud-2-line"></i></div>
+                    <div>
+                        <h2>Publicar Produto</h2>
+                        <p class="modal-subtitle">Preencha os dados do novo produto</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeModal" title="Fechar">&times;</button>
             </div>
 
             <form id="publishForm">
-                <!-- Imagem do Produto -->
-                <div class="form-group form-row full">
-                    <label for="productImage">Imagem do Produto *</label>
-                    <input type="file" id="productImage" accept="image/*" required>
-                    <div class="image-preview-container" id="imagePreviewContainer">
-                        <img id="imagePreview" class="image-preview" alt="Prévia">
-                        <button type="button" class="remove-image-btn" id="removeImageBtn"
-                            title="Remover imagem">×</button>
+                <div class="modal-body">
+                    <p class="form-section-title">Imagem</p>
+                    <div class="form-group">
+                        <div class="file-upload-zone" id="publishDropZone">
+                            <input type="file" id="productImage" accept="image/*" required>
+                            <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
+                            <div class="file-upload-text"><strong>Clique para selecionar</strong> ou arraste aqui<br><span style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
+                        </div>
+                        <div class="image-preview-container" id="imagePreviewContainer">
+                            <img id="imagePreview" class="image-preview" alt="Prévia">
+                            <button type="button" class="remove-image-btn" id="removeImageBtn" title="Remover">&times;</button>
+                        </div>
+                        <span class="error-message" id="imageError">Selecione uma imagem válida</span>
                     </div>
-                    <span class="error-message" id="imageError">Selecione uma imagem válida</span>
-                </div>
 
-                <!-- Título e Preço -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productTitle">Título do Produto *</label>
-                        <input type="text" id="productTitle" placeholder="Nome do produto" required>
-                        <span class="error-message" id="titleError">Digite um título válido</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="productPrice">Preço (R$) *</label>
-                        <input type="number" id="productPrice" placeholder="0.00" min="1" step="0.01" required>
-                        <span class="error-message" id="priceError">Preço mínimo é R$ 1,00</span>
-                    </div>
-                </div>
-
-                <!-- Desconto e Parcelas -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productDiscount">Desconto (%) *</label>
-                        <input type="number" id="productDiscount" placeholder="0" min="0" max="100" step="0.01"
-                            value="0" required>
-                        <span class="error-message" id="discountError">Desconto mínimo é 0%</span>
+                    <p class="form-section-title">Informações</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productTitle">Título <span class="required-star">*</span></label>
+                            <input type="text" id="productTitle" placeholder="Nome do produto" required>
+                            <span class="error-message" id="titleError">Digite um título válido</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="productPrice">Preço (R$) <span class="required-star">*</span></label>
+                            <input type="number" id="productPrice" placeholder="0,00" min="1" step="0.01" required>
+                            <span class="error-message" id="priceError">Preço mínimo R$ 1,00</span>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="installments">Quantidade de Parcelas *</label>
-                        <input type="number" id="installments" placeholder="1" min="1" max="12" value="1" required>
-                        <span class="error-message" id="installmentsError">Mínimo 1 parcela, máximo 12</span>
+                        <label for="productDescription">Descrição</label>
+                        <textarea id="productDescription" placeholder="Descreva o produto..."></textarea>
+                    </div>
+
+                    <p class="form-section-title">Pagamento</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productDiscount">Desconto (%)</label>
+                            <input type="number" id="productDiscount" placeholder="0" min="0" max="100" step="0.01" value="0" required>
+                            <span class="error-message" id="discountError">Entre 0 e 100%</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="installments">Total de Parcelas <span class="required-star">*</span></label>
+                            <input type="number" id="installments" placeholder="1" min="1" max="12" value="1" required>
+                            <span class="error-message" id="installmentsError">Máximo 12 parcelas</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="interestFreeInstallments">Parcelas Sem Juros <span class="required-star">*</span></label>
+                        <input type="number" id="interestFreeInstallments" placeholder="0" min="0" max="12" value="0" required>
+                        <span class="error-message" id="interestFreeError">Deve ser menor ou igual ao total</span>
                     </div>
                 </div>
 
-                <!-- Parcelas Sem Juros -->
-                <div class="form-group">
-                    <label for="interestFreeInstallments">Parcelas Sem Juros em Até *</label>
-                    <input type="number" id="interestFreeInstallments" placeholder="1" min="0" max="12" value="0"
-                        required>
-                    <span class="error-message" id="interestFreeError">Deve ser menor ou igual às parcelas totais</span>
-                </div>
-
-                <!-- Descrição -->
-                <div class="form-group form-row full">
-                    <label for="productDescription">Descrição (Opcional)</label>
-                    <textarea id="productDescription" placeholder="Descreva detalhes do produto..."></textarea>
-                </div>
-
-                <!-- Botões -->
-                <div class="form-actions">
-                    <button type="button" class="btn-cancel" id="cancelBtn">Cancelar</button>
-                    <button type="submit" class="btn-submit">Publicar Produto</button>
+                <div class="modal-footer">
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancelBtn">Cancelar</button>
+                        <div class="spacer"></div>
+                        <button type="submit" class="btn-submit"><i class="ri-upload-cloud-2-line"></i> Publicar Produto</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -649,24 +1379,43 @@
     <div id="manageProductsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Buscar Produtos</h2>
-                <button class="close-btn" id="closeManageModal">&times;</button>
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i class="ri-store-2-line"></i></div>
+                    <div>
+                        <h2>Gerenciar Produtos</h2>
+                        <p class="modal-subtitle">Busque e selecione um produto para editar</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeManageModal" title="Fechar">&times;</button>
             </div>
 
-            <div class="search-container">
-                <input type="text" id="productSearch" class="search-input"
-                    placeholder="Digite o ID ou nome do produto...">
-                <button class="search-button" id="btnSearch">Buscar</button>
+            <div class="modal-body">
+                <div class="search-container">
+                    <input type="text" id="productSearch" class="search-input" placeholder="Buscar por nome ou ID...">
+                    <button class="search-button" id="btnSearch"><i class="ri-search-line"></i> Buscar</button>
+                </div>
+
+                <div id="successMessage" class="success-message"></div>
+                <div id="currentProductInfo" class="current-product-info"></div>
+                <div id="searchResults"></div>
+
+                <!-- Selected product panel -->
+                <div class="selected-product-panel" id="selectedProductPanel">
+                    <img class="selected-product-thumb" id="selectedProductThumb" src="" alt="">
+                    <div class="selected-product-info">
+                        <strong id="selectedProductName"></strong>
+                        <span id="selectedProductPrice"></span>
+                    </div>
+                    <i class="ri-checkbox-circle-fill" style="color: var(--modal-accent); font-size: 20px; flex-shrink:0;"></i>
+                </div>
             </div>
 
-            <div id="searchResults"></div>
-
-            <div id="successMessage" class="success-message"></div>
-            <div id="currentProductInfo" class="current-product-info"></div>
-
-            <div class="form-actions" id="manageActions" style="display: none;">
-                <button type="button" class="btn-edit" id="btnEditProduct">✏️ Editar Produto</button>
-                <button type="button" class="btn-cancel" id="closeBtnManage">Fechar</button>
+            <div class="modal-footer" id="manageActions" style="display: none;">
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="closeBtnManage">Fechar</button>
+                    <div class="spacer"></div>
+                    <button type="button" class="btn-edit" id="btnEditProduct"><i class="ri-edit-line"></i> Editar Produto</button>
+                </div>
             </div>
         </div>
     </div>
@@ -675,82 +1424,96 @@
     <div id="editProductModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>✏️ Editar Produto</h2>
-                <button class="close-btn" id="closeEditModal">&times;</button>
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i class="ri-edit-line"></i></div>
+                    <div>
+                        <h2>Editar Produto</h2>
+                        <p class="modal-subtitle">Atualize as informações do produto</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeEditModal" title="Fechar">&times;</button>
             </div>
 
             <form id="editForm">
-                <!-- Imagem do Produto -->
-                <div class="form-group form-row full">
-                    <label for="editProductImage">Imagem do Produto</label>
-                    <div style="margin-bottom: 10px;">
-                        <img id="currentEditImage" class="current-product-image" alt="Imagem atual"
-                            style="display: none;">
+                <div class="modal-body">
+                    <p class="form-section-title">Imagem</p>
+                    <div class="form-group">
+                        <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 10px;">
+                            <img id="currentEditImage" class="current-product-image" alt="Imagem atual">
+                            <div style="font-size:0.8rem; color: var(--modal-muted); line-height: 1.5;">
+                                <strong style="color: var(--modal-text); display:block; margin-bottom: 2px;">Imagem atual</strong>
+                                Selecione abaixo para substituir
+                            </div>
+                        </div>
+                        <div class="file-upload-zone" id="editDropZone">
+                            <input type="file" id="editProductImage" accept="image/*">
+                            <div class="file-upload-icon"><i class="ri-image-edit-line"></i></div>
+                            <div class="file-upload-text"><strong>Clique para trocar a imagem</strong><br><span style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
+                        </div>
+                        <div class="image-preview-container" id="editImagePreviewContainer">
+                            <img id="editImagePreview" class="image-preview" alt="Nova prévia">
+                            <button type="button" class="remove-image-btn" id="removeEditImageBtn" title="Remover">&times;</button>
+                        </div>
+                        <span class="error-message" id="editImageError">Erro ao processar imagem</span>
                     </div>
-                    <input type="file" id="editProductImage" accept="image/*">
-                    <div class="image-preview-container" id="editImagePreviewContainer">
-                        <img id="editImagePreview" class="image-preview" alt="Nova prévia">
-                        <button type="button" class="remove-image-btn" id="removeEditImageBtn"
-                            title="Remover imagem">×</button>
-                    </div>
-                    <span class="error-message" id="editImageError">Erro ao processar imagem</span>
-                </div>
 
-                <!-- Título e Preço -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editProductTitle">Título do Produto *</label>
-                        <input type="text" id="editProductTitle" required>
-                        <span class="error-message" id="editTitleError">Digite um título válido</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="editProductPrice">Preço (R$) *</label>
-                        <input type="number" id="editProductPrice" min="1" step="0.01" required>
-                        <span class="error-message" id="editPriceError">Preço mínimo é R$ 1,00</span>
-                    </div>
-                </div>
-
-                <!-- Desconto e Parcelas -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editProductDiscount">Desconto (%) *</label>
-                        <input type="number" id="editProductDiscount" min="0" max="100" step="0.01" required>
-                        <span class="error-message" id="editDiscountError">Desconto deve estar entre 0 e 100</span>
+                    <p class="form-section-title">Informações</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editProductTitle">Título <span class="required-star">*</span></label>
+                            <input type="text" id="editProductTitle" required>
+                            <span class="error-message" id="editTitleError">Digite um título válido</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductPrice">Preço (R$) <span class="required-star">*</span></label>
+                            <input type="number" id="editProductPrice" min="1" step="0.01" required>
+                            <span class="error-message" id="editPriceError">Preço mínimo R$ 1,00</span>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="editInstallments">Quantidade de Parcelas *</label>
-                        <input type="number" id="editInstallments" min="1" max="12" required>
-                        <span class="error-message" id="editInstallmentsError">Mínimo 1 parcela, máximo 12</span>
+                        <label for="editProductDescription">Descrição</label>
+                        <textarea id="editProductDescription" placeholder="Descreva o produto..."></textarea>
                     </div>
-                </div>
 
-                <!-- Parcelas Sem Juros -->
-                <div class="form-group">
-                    <label for="editInterestFreeInstallments">Parcelas Sem Juros em Até *</label>
-                    <input type="number" id="editInterestFreeInstallments" min="0" max="12" required>
-                    <span class="error-message" id="editInterestFreeError">Deve ser menor ou igual às parcelas
-                        totais</span>
-                </div>
+                    <p class="form-section-title">Pagamento</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editProductDiscount">Desconto (%)</label>
+                            <input type="number" id="editProductDiscount" min="0" max="100" step="0.01" required>
+                            <span class="error-message" id="editDiscountError">Entre 0 e 100%</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="editInstallments">Total de Parcelas <span class="required-star">*</span></label>
+                            <input type="number" id="editInstallments" min="1" max="12" required>
+                            <span class="error-message" id="editInstallmentsError">Máximo 12 parcelas</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editInterestFreeInstallments">Parcelas Sem Juros <span class="required-star">*</span></label>
+                        <input type="number" id="editInterestFreeInstallments" min="0" max="12" required>
+                        <span class="error-message" id="editInterestFreeError">Deve ser menor ou igual ao total</span>
+                    </div>
 
-                <!-- Descrição -->
-                <div class="form-group form-row full">
-                    <label for="editProductDescription">Descrição</label>
-                    <textarea id="editProductDescription" placeholder="Descreva detalhes do produto..."></textarea>
-                </div>
-
-                <!-- Disponibilidade -->
-                <div class="form-group">
-                    <label for="editProductAvailability">
-                        <input type="checkbox" id="editProductAvailability" checked style="margin-right: 8px;">
-                        Produto Disponível
+                    <p class="form-section-title">Disponibilidade</p>
+                    <label class="toggle-group" for="editProductAvailability">
+                        <div class="toggle-label-text">
+                            <span>Produto disponível para venda</span>
+                            <span>Quando desativado, o produto fica oculto da loja</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="editProductAvailability" checked>
+                            <span class="toggle-track"></span>
+                        </div>
                     </label>
                 </div>
 
-                <!-- Botões -->
-                <div class="form-actions">
-                    <button type="button" class="btn-delete" id="btnDeleteProduct">Deletar Produto</button>
-                    <button type="button" class="btn-cancel" id="cancelEditBtn">Cancelar</button>
-                    <button type="submit" class="btn-submit">Salvar Alterações</button>
+                <div class="modal-footer">
+                    <div class="form-actions">
+                        <button type="button" class="btn-delete" id="btnDeleteProduct"><i class="ri-delete-bin-line"></i> Deletar</button>
+                        <div class="spacer"></div>
+                        <button type="button" class="btn-cancel" id="cancelEditBtn">Cancelar</button>
+                        <button type="submit" class="btn-submit"><i class="ri-save-line"></i> Salvar Alterações</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -780,7 +1543,7 @@
         const removeImageBtn = document.getElementById('removeImageBtn');
 
         function openPublishModal() {
-            publishModal.style.display = 'block';
+            publishModal.style.display = 'flex';
             publishForm.reset();
             imagePreviewContainer.style.display = 'none';
             productImageInput.value = '';
@@ -1114,7 +1877,7 @@
         let newImageSelected = false;
 
         function openManageProductsModal() {
-            manageProductsModal.style.display = 'block';
+            manageProductsModal.style.display = 'flex';
             productSearchInput.value = '';
             document.getElementById('searchResults').innerHTML = '';
             document.getElementById('currentProductInfo').classList.remove('show');
@@ -1206,60 +1969,47 @@
             const resultsContainer = document.getElementById('searchResults');
 
             if (products.length === 1) {
-                // Se houver apenas um produto, selecioná-lo automaticamente
                 selectProduct(products[0]);
                 resultsContainer.innerHTML = '';
             } else {
-                // Mostrar grid de produtos para seleção
-                resultsContainer.innerHTML = '<div class="products-grid" id="productsGrid"></div>';
+                resultsContainer.innerHTML = `<div style="font-size:0.78rem;color:var(--modal-muted);margin-bottom:8px;">${products.length} produto(s) encontrado(s) — clique para selecionar</div><div class="products-grid" id="productsGrid"></div>`;
                 const grid = document.getElementById('productsGrid');
 
                 products.forEach(product => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
+                    const available = product.DISPONIBILIDADE !== false;
                     card.innerHTML = `
                         <img src="${product['IMAGE-URL']}" alt="${product.PRODUTO}" class="product-card-image" onerror="this.src='https://via.placeholder.com/150?text=Sem+Imagem'">
                         <div class="product-card-info">
                             <div class="product-card-name">${product.PRODUTO}</div>
                             <div class="product-card-price">R$ ${parseFloat(product.PREÇO).toFixed(2)}</div>
+                            <span class="product-card-badge ${available ? 'badge-available' : 'badge-unavailable'}">${available ? 'Disponível' : 'Indisponível'}</span>
                         </div>
                     `;
-                    card.addEventListener('click', () => selectProduct(product));
+                    card.addEventListener('click', (e) => selectProduct(product, card));
                     grid.appendChild(card);
                 });
             }
         }
 
-        function selectProduct(product) {
+        function selectProduct(product, cardEl) {
             selectedProductData = product;
 
-            // Mostrar informações do produto selecionado
-            const currentProductInfo = document.getElementById('currentProductInfo');
-            currentProductInfo.innerHTML = `
-                <div>
-                    <img src="${product['IMAGE-URL']}" alt="${product.PRODUTO}" class="current-product-image" onerror="this.src='https://via.placeholder.com/150?text=Sem+Imagem'">
-                    <h3>${product.PRODUTO}</h3>
-                    <p><strong>ID:</strong> ${product.ID}</p>
-                    <p><strong>Preço:</strong> R$ ${parseFloat(product.PREÇO).toFixed(2)}</p>
-                    <p><strong>Desconto:</strong> ${product.DESCONTO}%</p>
-                    <p><strong>Disponível:</strong> ${product.DISPONIBILIDADE ? '✅ Sim' : '❌ Não'}</p>
-                </div>
-            `;
-            currentProductInfo.classList.add('show');
+            // Update selected product panel
+            const panel = document.getElementById('selectedProductPanel');
+            document.getElementById('selectedProductThumb').src = product['IMAGE-URL'] || '';
+            document.getElementById('selectedProductName').textContent = product.PRODUTO;
+            document.getElementById('selectedProductPrice').textContent = `R$ ${parseFloat(product.PREÇO).toFixed(2)} · ID: ${product.ID}`;
+            panel.classList.add('show');
 
-            // Mostrar botões de ação
-            document.getElementById('manageActions').style.display = 'flex';
+            // Mostrar footer com botões de ação
+            const manageActions = document.getElementById('manageActions');
+            manageActions.style.display = 'flex';
 
-            // Remover seleção anterior das cards
-            document.querySelectorAll('.product-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-
-            // Marcar card como selecionado
-            event?.target?.closest('.product-card')?.classList.add('selected');
-
-            // Limpar a zona de busca
-            document.getElementById('searchResults').innerHTML = '';
+            // Highlight selected card
+            document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+            if (cardEl) cardEl.classList.add('selected');
         }
 
         function openEditModal() {
@@ -1294,7 +2044,7 @@
             closeManageProductsModal();
 
             // Abrir modal de edição
-            editProductModal.style.display = 'block';
+            editProductModal.style.display = 'flex';
         }
 
         async function saveProductChanges() {
@@ -1540,7 +2290,7 @@
                 }
 
                 currentUser = session.user;
-                userEmailSpan.innerHTML = `<i class="ri-user-line"></i> ${currentUser.email}`;
+                userEmailSpan.textContent = currentUser.email;
                 loadAdminContent();
             } catch (error) {
                 redirectToLogin();
@@ -1548,20 +2298,42 @@
         }
 
         function loadAdminContent() {
+            const firstName = (currentUser.email || '').split('@')[0];
+
             mainContent.innerHTML = `
-                <button class="btn-publish-product" id="btnPublishProduct"> <i class="ri-upload-cloud-2-line"></i> Publicar Produto</button>
-                <button class="btn-publish-product" id="btnManageProducts" style="background-color: #ff9800; margin-left: 10px;"> <i class="ri-edit-line"></i> Gerenciar Produtos</button>
-                <div class="welcome-box">
-                    <h2>Bem-vindo,<br> ${currentUser.email}!🔥</h2>
-                    <p>Você está na área administrativa do sistema. Aqui você pode gerenciar produtos, pedidos e outras operações do painel.</p>
+                <div class="welcome-card">
+                    <div class="welcome-greeting">Bem-vindo de volta</div>
+                    <h2>${firstName} 👋</h2>
+                    <p>${currentUser.email}</p>
+                    <div class="welcome-card-icon"><i class="ri-store-2-line"></i></div>
+                </div>
+
+                <div class="action-grid">
+                    <button class="action-card" id="btnPublishProduct">
+                        <div class="action-card-icon blue"><i class="ri-upload-cloud-2-line"></i></div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Publicar Produto</div>
+                            <div class="action-card-desc">Adicione um novo produto à loja com imagem e preço</div>
+                        </div>
+                    </button>
+                    <button class="action-card" id="btnManageProducts">
+                        <div class="action-card-icon orange"><i class="ri-edit-line"></i></div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Gerenciar Produtos</div>
+                            <div class="action-card-desc">Edite, remova ou atualize produtos existentes</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="info-strip">
+                    <i class="ri-shield-check-line"></i>
+                    Sessão autenticada com segurança · Todas as alterações são salvas em tempo real no Supabase
                 </div>
             `;
 
-            // Adicionar evento ao botão de publicar produto
             document.getElementById('btnPublishProduct').addEventListener('click', openPublishModal);
             document.getElementById('btnManageProducts').addEventListener('click', openManageProductsModal);
 
-            // Carregar credenciais do ImageKit
             fetchImagekitCredentials();
         }
 
