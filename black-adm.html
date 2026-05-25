@@ -2196,6 +2196,7 @@
             document.getElementById('searchResults').innerHTML = '';
             document.getElementById('currentProductInfo').classList.remove('show');
             document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('selectedProductPanel').classList.remove('show');
             document.getElementById('manageActions').style.display = 'none';
             selectedProductData = null;
             productSearchInput.focus();
@@ -2206,6 +2207,7 @@
             productSearchInput.value = '';
             document.getElementById('searchResults').innerHTML = '';
             document.getElementById('currentProductInfo').classList.remove('show');
+            document.getElementById('selectedProductPanel').classList.remove('show');
             selectedProductData = null;
         }
 

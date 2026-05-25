@@ -1542,18 +1542,34 @@
                 return;
             }
 
+            // TTL para forçar revalidação periódica (1 hora)
+            const CACHE_IMAGE_TTL_MS = 1 * 60 * 60 * 1000;
+
             try {
                 // 1. Tentar buscar do cache
                 const cachedImage = await CacheManager.getImageFromCache(productId);
 
                 if (cachedImage && cachedImage.data) {
-                    console.log(`✅ Imagem carregada do cache para produto ${productId}`);
-                    imgElement.src = cachedImage.data;
-                    document.querySelector('.produto-imagem').classList.remove('carregando');
-                    return;
+                    const isSameUrl = (cachedImage.url === imageUrl);
+                    const ageMs = Date.now() - (cachedImage.timestamp || 0);
+                    const isFresh = ageMs < CACHE_IMAGE_TTL_MS;
+
+                    if (isSameUrl && isFresh) {
+                        console.log(`✅ Imagem carregada do cache para produto ${productId}`);
+                        imgElement.src = cachedImage.data;
+                        document.querySelector('.produto-imagem').classList.remove('carregando');
+                        return;
+                    }
+
+                    if (!isSameUrl) {
+                        console.log(`🔁 URL da imagem mudou para produto ${productId} — atualizando cache.`);
+                    } else if (!isFresh) {
+                        console.log(`⌛ Cache expirado para produto ${productId} (idade ${Math.round(ageMs / 1000)}s) — revalidando.`);
+                    }
+                    // Se chegamos aqui, vamos rebaixar para buscar nova versão da imagem
                 }
 
-                // 2. Se não estiver em cache, buscar da URL
+                // 2. Se não estiver em cache ou precisa revalidar, buscar da URL
                 if (!imageUrl) {
                     console.warn('⚠️ Nenhuma URL de imagem fornecida');
                     imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="Arial"%3EImagem não disponível%3C/text%3E%3C/svg%3E';
@@ -1575,7 +1591,7 @@
                 reader.onload = async (event) => {
                     const base64Data = event.target.result;
 
-                    // Salvar em cache
+                    // Salvar em cache (substitui entrada anterior)
                     await CacheManager.saveImageToCache(productId, imageUrl, base64Data);
 
                     imgElement.src = base64Data;
@@ -1679,16 +1695,16 @@
             function gerarDescricaoHtml(textoDescricao) {
                 const LIMITE_CARACTERES = 200;
                 const temDescricaoLonga = textoDescricao && textoDescricao.trim().length > LIMITE_CARACTERES;
-                
+
                 if (!textoDescricao || !textoDescricao.trim()) {
                     return '';
                 }
 
-                const textoTruncado = temDescricaoLonga 
+                const textoTruncado = temDescricaoLonga
                     ? textoDescricao.trim().substring(0, LIMITE_CARACTERES) + '...'
                     : textoDescricao.trim();
 
-                const botaoVerMais = temDescricaoLonga 
+                const botaoVerMais = temDescricaoLonga
                     ? `<span class="ver-mais-link" onclick="expandirDescricao(this)">Ver mais</span>`
                     : '';
 
@@ -1865,7 +1881,7 @@
         function expandirDescricao(linkElement) {
             const descricaoDiv = linkElement.closest('.produto-descricao');
             const textoDiv = descricaoDiv.querySelector('.produto-descricao-texto');
-            
+
             if (!textoDiv) return;
 
             const isExpanded = textoDiv.classList.contains('expandido');

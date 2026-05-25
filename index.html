@@ -2657,6 +2657,24 @@
             }
         }
 
+        // Inicializar cliques nos cards de produtos para abrir detalhes ao clicar em qualquer parte
+        function inicializarClicksDosProdutos() {
+            document.querySelectorAll('.produto-card').forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', (e) => {
+                    // Não redirecionar se clicar no botão (evita duplo clique)
+                    if (e.target.closest('.produto-botao')) {
+                        return;
+                    }
+
+                    const produtoId = card.dataset.id;
+                    if (produtoId) {
+                        adicionarAoCarrinho(produtoId);
+                    }
+                });
+            });
+        }
+
         // Helper: monta páginas respeitando a regra UX (merge se última página tiver < 10 itens)
         function computePaginas() {
             if (!produtosCarregados || produtosCarregados.length === 0) return [];
@@ -2687,6 +2705,11 @@
 
             // Renderizar produtos
             renderizarProdutos(produtosDaPagina, false);
+
+            // Inicializar cliques dos produtos
+            setTimeout(() => {
+                inicializarClicksDosProdutos();
+            }, 0);
 
             // Iniciar lazy loading
             setTimeout(() => {

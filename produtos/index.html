@@ -3069,6 +3069,24 @@
 
         // ===== GERADOR DE PRODUTOS (Simplificado e Otimizado) =====
 
+        // Inicializar cliques nos cards de produtos para abrir detalhes ao clicar em qualquer parte
+        function inicializarClicksDosProdutos() {
+            document.querySelectorAll('.produto-card').forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', (e) => {
+                    // Não redirecionar se clicar no botão (evita duplo clique)
+                    if (e.target.closest('.produto-botao')) {
+                        return;
+                    }
+
+                    const produtoId = card.dataset.id;
+                    if (produtoId) {
+                        adicionarAoCarrinho(produtoId);
+                    }
+                });
+            });
+        }
+
         // Formata preço para Real brasileiro
         function formatarPreco(preco) {
             return parseFloat(preco).toLocaleString('pt-BR', {
@@ -3197,6 +3215,11 @@
                 container.innerHTML = '';
             }
             renderizarProdutos(produtosDaPagina, false);
+
+            // Inicializar cliques dos produtos
+            setTimeout(() => {
+                inicializarClicksDosProdutos();
+            }, 0);
 
             // Iniciar lazy loading de imagens
             setTimeout(() => {
