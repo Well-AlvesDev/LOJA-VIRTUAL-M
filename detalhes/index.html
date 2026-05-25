@@ -552,7 +552,7 @@
     }
 
     .btn-pedido {
-        background-color: #25d366;
+        background-color: #eb3a75;
         color: white;
         border: none;
         padding: 15px 30px;
@@ -566,6 +566,12 @@
         gap: 10px;
         transition: all 0.3s ease;
         text-decoration: none;
+    }
+
+    .btn-pedido:hover {
+        background-color: #c0185a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(235,58,117,.35);
     }
 
     .btn-pedido i {
@@ -893,6 +899,13 @@
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="../config.js"></script>
+    <script src="./checkout-mp.js"></script>
+    <!-- =====================================================
+         CHECKOUT MERCADO PAGO
+         Defina as variáveis abaixo em config.js ou aqui:
+           window.MP_PUBLIC_KEY      = "TEST-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+           window.SUPABASE_EDGE_URL  = "https://SEU_PROJECT.supabase.co/functions/v1";
+    ===================================================== -->
     <script>
         // ===== LIMPAR TODOS OS TOKENS DO SUPABASE AO ENTRAR NA PÁGINA DE DETALHES =====
         // Remove credenciais administrativas e tokens Supabase para evitar conflitos
@@ -1655,6 +1668,7 @@
             const descricao = produto.DESCRIPTION || null;
 
             const linkWhatsApp = gerarLinkWhatsApp(nomeProduto, preco);
+            const precoNumerico = precoComDesconto; // valor numérico para o checkout MP
 
             let parcelamentoHtml = '';
 
@@ -1757,10 +1771,14 @@
                             ` : ''}
                             ${descricaoHtml}
                         </div>
-                        <a href="${linkWhatsApp}" target="_blank" rel="noopener noreferrer" class="btn-pedido">
-                            <i class="ri-whatsapp-line"></i>
+                        <button
+                            type="button"
+                            class="btn-pedido"
+                            onclick="window.MpCheckout.open(${JSON.stringify(nomeProduto)}, ${precoNumerico})"
+                        >
+                            <i class="ri-secure-payment-line"></i>
                             Fazer Pedido
-                        </a>
+                        </button>
                     </div>
                 </div>
             `;
