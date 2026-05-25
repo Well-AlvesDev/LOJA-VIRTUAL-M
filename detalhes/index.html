@@ -1906,13 +1906,14 @@
                             ${desconto > 0 ? `<div class="produto-preco-original"> ${precoOriginalFormatado}</div>` : ''}
                             <div class="produto-preco">${preco}</div>
                             <div class="meios-pagamento">
-                                <div class="meios-pagamento-icons">
-                                    <i class="ri-bank-card-line" style="color: #eb3a75; font-size: 16px;"></i>
-                                    <span style="color: #666; font-size: 14px;">Todos os cartões de crédito e débito</span>
-                                    <span style="color: #999;">| PIX </span>
-                                    <div class="meio-pagamento-icon" title="Pix" style="margin-left: 5px;">
-                                        <img src="../recursos/icones/pix@2x.png" alt="Pix">
+                                <div class="meios-pagamento-icons" style="flex-wrap: wrap; gap: 15px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div class="meio-pagamento-icon" title="Pix" style="margin: 0;">
+                                            <img src="../recursos/icones/pix@2x.png" alt="Pix" style="width: 24px;">
+                                        </div>
+                                        <span style="color: #666; font-size: 14px; font-weight: 500;"><strong>PIX com QR Code</strong></span>
                                     </div>
+                                    <span style="color: #999; width: 100%; border-top: 1px solid #e0e0e0; padding-top: 8px; font-size: 13px;">Também aceitamos cartões de crédito e débito</span>
                                 </div>
                             </div>
                             ${parcelamentoHtml ? `
@@ -2157,10 +2158,9 @@
                     },
                     customization: {
                         paymentMethods: {
+                            bankTransfer: 'all', // PIX com QR Code
                             creditCard: 'all',
                             debitCard: 'all',
-                            ticket: 'all',       // boleto
-                            bankTransfer: 'all', // PIX
                             maxInstallments: 12
                         },
                         visual: {
