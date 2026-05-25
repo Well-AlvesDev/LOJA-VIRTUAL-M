@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
     <link rel="icon" type="image/png" href="../recursos/identidade/logo.jpg">
+    <!-- SDK do Mercado Pago -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <style>
     * {
@@ -784,6 +786,135 @@
         transition: all 0.3s ease;
     }
 
+    /* ===== MODAL CHECKOUT MERCADO PAGO ===== */
+    #checkout-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 9000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    #checkout-overlay.active {
+        display: flex;
+    }
+
+    #checkout-modal {
+        background: #fff;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 520px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+        animation: modalEntrada 0.3s ease;
+        position: relative;
+    }
+
+    @keyframes modalEntrada {
+        from { opacity: 0; transform: translateY(30px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #checkout-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid #f0f0f0;
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1;
+        border-radius: 12px 12px 0 0;
+    }
+
+    #checkout-header h2 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    #btn-fechar-checkout {
+        background: none;
+        border: none;
+        font-size: 22px;
+        color: #999;
+        cursor: pointer;
+        line-height: 1;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: color 0.2s, background 0.2s;
+    }
+
+    #btn-fechar-checkout:hover {
+        color: #eb3a75;
+        background: #fff0f5;
+    }
+
+    #checkout-resumo {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 22px;
+        background: #fef6fa;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    #checkout-resumo-nome {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    #checkout-resumo-preco {
+        font-size: 18px;
+        font-weight: 600;
+        color: #eb3a75;
+        margin-top: 2px;
+    }
+
+    #checkout-bricks-container {
+        padding: 20px 22px 24px;
+        min-height: 200px;
+    }
+
+    #checkout-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 0;
+        gap: 14px;
+        color: #888;
+        font-size: 14px;
+    }
+
+    .checkout-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid #f0f0f0;
+        border-top-color: #eb3a75;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+    }
+
+    #checkout-erro {
+        display: none;
+        background: #fff0f0;
+        border: 1px solid #ffcdd2;
+        border-radius: 8px;
+        padding: 16px;
+        color: #b71c1c;
+        font-size: 14px;
+        margin: 0 22px 16px;
+        text-align: center;
+    }
+
     @media (max-width: 768px) {
         footer {
             padding: 50px 15px 0px;
@@ -884,6 +1015,33 @@
             <p>Carregando produto...</p>
         </div>
     </main>
+
+    <!-- MODAL CHECKOUT MERCADO PAGO -->
+    <div id="checkout-overlay">
+        <div id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-titulo">
+            <div id="checkout-header">
+                <h2 id="checkout-titulo">Finalizar Pedido</h2>
+                <button id="btn-fechar-checkout" title="Fechar" aria-label="Fechar checkout">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div id="checkout-resumo">
+                <div>
+                    <div id="checkout-resumo-nome">Carregando...</div>
+                    <div id="checkout-resumo-preco"></div>
+                </div>
+            </div>
+            <div id="checkout-erro"></div>
+            <div id="checkout-bricks-container">
+                <div id="checkout-loading">
+                    <div class="checkout-spinner"></div>
+                    <span>Preparando checkout seguro...</span>
+                </div>
+                <!-- O Brick do MP será renderizado aqui -->
+                <div id="paymentBrick_container"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- BOTÃO WHATSAPP -->
     <a href="https://wa.me/5511999999999" class="whatsapp-button" target="_blank" rel="noopener noreferrer"
@@ -1757,10 +1915,13 @@
                             ` : ''}
                             ${descricaoHtml}
                         </div>
-                        <a href="${linkWhatsApp}" target="_blank" rel="noopener noreferrer" class="btn-pedido">
-                            <i class="ri-whatsapp-line"></i>
+                        <button
+                            class="btn-pedido"
+                            onclick="abrirCheckout('${nomeProduto}', ${precoComDesconto}, '${productId}')"
+                        >
+                            <i class="ri-secure-payment-line"></i>
                             Fazer Pedido
-                        </a>
+                        </button>
                     </div>
                 </div>
             `;
@@ -1919,6 +2080,174 @@
                 exibirErro(`❌ Erro ao carregar o produto: ${err.message}`);
             }
         }
+
+        // ===== CHECKOUT MERCADO PAGO BRICKS =====
+
+        // ⚙️ CONFIGURAÇÃO — substitua pelos seus valores reais
+        const MP_PUBLIC_KEY = 'TEST-1d0b9e72-4658-4fc5-8833-441a72b286da'; // sua Public Key do MP
+        const SUPABASE_EDGE_URL = 'https://yoejlumglxbzxtzknsuy.supabase.co/functions/v1/criar-preferencia'; // URL da Edge Function
+
+        let mpBrickController = null;
+
+        /**
+         * Abre o modal e inicializa o Payment Brick do Mercado Pago.
+         * @param {string} nomeProduto
+         * @param {number} preco  — valor numérico já com desconto
+         * @param {string} produtoId
+         */
+        async function abrirCheckout(nomeProduto, preco, produtoId) {
+            // Exibir modal
+            const overlay = document.getElementById('checkout-overlay');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Preencher resumo
+            document.getElementById('checkout-resumo-nome').textContent = nomeProduto;
+            document.getElementById('checkout-resumo-preco').textContent =
+                preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            // Resetar estado anterior
+            document.getElementById('checkout-erro').style.display = 'none';
+            document.getElementById('checkout-loading').style.display = 'flex';
+            document.getElementById('paymentBrick_container').innerHTML = '';
+
+            // Destruir brick anterior se existir
+            if (mpBrickController) {
+                try { await mpBrickController.unmount(); } catch (_) {}
+                mpBrickController = null;
+            }
+
+            try {
+                // 1. Criar preferência via Edge Function do Supabase
+                const resp = await fetch(SUPABASE_EDGE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        titulo: nomeProduto,
+                        preco: preco,
+                        produtoId: produtoId
+                    })
+                });
+
+                if (!resp.ok) {
+                    const errBody = await resp.json().catch(() => ({}));
+                    throw new Error(errBody.error || `Erro ${resp.status} ao criar preferência`);
+                }
+
+                const { preferenceId } = await resp.json();
+
+                // 2. Inicializar SDK do Mercado Pago
+                const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+                const bricksBuilder = mp.bricks();
+
+                // 3. Ocultar loading e renderizar Brick
+                document.getElementById('checkout-loading').style.display = 'none';
+
+                const settings = {
+                    initialization: {
+                        amount: preco,
+                        preferenceId: preferenceId,
+                    },
+                    customization: {
+                        paymentMethods: {
+                            creditCard: 'all',
+                            debitCard: 'all',
+                            ticket: 'all',       // boleto
+                            bankTransfer: 'all', // PIX
+                            maxInstallments: 12
+                        },
+                        visual: {
+                            style: {
+                                theme: 'default',
+                                customVariables: {
+                                    baseColor: '#eb3a75',
+                                    baseColorSecondText: '#666',
+                                    buttonTextColor: '#ffffff',
+                                }
+                            }
+                        }
+                    },
+                    callbacks: {
+                        onReady: () => {
+                            console.log('✅ Payment Brick pronto');
+                        },
+                        onSubmit: async ({ selectedPaymentMethod, formData }) => {
+                            // Processar pagamento via Edge Function
+                            try {
+                                const pagtoResp = await fetch(
+                                    SUPABASE_EDGE_URL.replace('criar-preferencia', 'processar-pagamento'),
+                                    {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(formData)
+                                    }
+                                );
+                                const result = await pagtoResp.json();
+                                if (result.status === 'approved') {
+                                    fecharCheckout();
+                                    mostrarSucessoPagamento(nomeProduto);
+                                } else if (result.status === 'in_process' || result.status === 'pending') {
+                                    fecharCheckout();
+                                    mostrarPagamentoPendente();
+                                } else {
+                                    throw new Error(result.status_detail || 'Pagamento não aprovado');
+                                }
+                            } catch (err) {
+                                exibirErroBrick(err.message);
+                            }
+                        },
+                        onError: (err) => {
+                            console.error('❌ Erro no Brick:', err);
+                            exibirErroBrick('Erro ao carregar o formulário de pagamento. Tente novamente.');
+                        }
+                    }
+                };
+
+                mpBrickController = await bricksBuilder.create('payment', 'paymentBrick_container', settings);
+
+            } catch (err) {
+                console.error('❌ Erro no checkout:', err);
+                document.getElementById('checkout-loading').style.display = 'none';
+                exibirErroBrick(err.message || 'Não foi possível iniciar o checkout. Tente novamente.');
+            }
+        }
+
+        function fecharCheckout() {
+            document.getElementById('checkout-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+            if (mpBrickController) {
+                mpBrickController.unmount().catch(() => {});
+                mpBrickController = null;
+            }
+        }
+
+        function exibirErroBrick(msg) {
+            const el = document.getElementById('checkout-erro');
+            el.textContent = '⚠️ ' + msg;
+            el.style.display = 'block';
+        }
+
+        function mostrarSucessoPagamento(nomeProduto) {
+            // Você pode substituir por uma página/modal de sucesso customizado
+            alert(`✅ Pagamento aprovado! Obrigada pela compra de "${nomeProduto}". Em breve você receberá a confirmação.`);
+        }
+
+        function mostrarPagamentoPendente() {
+            alert('⏳ Seu pagamento está em análise. Você receberá a confirmação por e-mail em breve.');
+        }
+
+        // Fechar modal ao clicar no botão X
+        document.getElementById('btn-fechar-checkout').addEventListener('click', fecharCheckout);
+
+        // Fechar modal ao clicar fora do painel
+        document.getElementById('checkout-overlay').addEventListener('click', function(e) {
+            if (e.target === this) fecharCheckout();
+        });
+
+        // Fechar com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') fecharCheckout();
+        });
 
         // Carregar quando o DOM estiver pronto
         if (document.readyState === 'loading') {
