@@ -812,15 +812,17 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.55);
+        background: rgba(0, 0, 0, 0.55);
         z-index: 9000;
         align-items: center;
         justify-content: center;
         padding: 16px;
     }
+
     .checkout-overlay.aberto {
         display: flex;
     }
+
     .checkout-modal {
         background: #fff;
         border-radius: 14px;
@@ -828,13 +830,22 @@
         max-width: 480px;
         max-height: 92vh;
         overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
         animation: checkoutSlide 0.3s ease;
     }
+
     @keyframes checkoutSlide {
-        from { opacity:0; transform:translateY(24px); }
-        to   { opacity:1; transform:translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
+
     .checkout-header {
         display: flex;
         align-items: center;
@@ -842,6 +853,7 @@
         padding: 22px 24px 16px;
         border-bottom: 1px solid #f0f0f0;
     }
+
     .checkout-header h2 {
         font-size: 18px;
         font-weight: 600;
@@ -850,7 +862,11 @@
         align-items: center;
         gap: 10px;
     }
-    .checkout-header h2 i { color: #eb3a75; }
+
+    .checkout-header h2 i {
+        color: #eb3a75;
+    }
+
     .checkout-fechar {
         background: none;
         border: none;
@@ -861,15 +877,20 @@
         line-height: 1;
         transition: color 0.2s;
     }
-    .checkout-fechar:hover { color: #333; }
+
+    .checkout-fechar:hover {
+        color: #333;
+    }
+
     .checkout-resumo {
         padding: 16px 24px;
-        background: #fdf0f5;
-        border-bottom: 1px solid #f5d5e2;
+        background: #f0f5fd;
+        border-bottom: 1px solid #d5def5;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     .checkout-resumo-nome {
         font-size: 14px;
         color: #555;
@@ -878,12 +899,16 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     .checkout-resumo-preco {
         font-size: 20px;
-        font-weight: 700;
-        color: #eb3a75;
+        font-weight: 400;
+        color: #1f6316;
     }
-    .checkout-body { padding: 24px; }
+
+    .checkout-body {
+        padding: 24px;
+    }
 
     /* Tabs de método de pagamento */
     .mp-tabs {
@@ -891,6 +916,7 @@
         gap: 8px;
         margin-bottom: 24px;
     }
+
     .mp-tab {
         flex: 1;
         padding: 10px 6px;
@@ -907,7 +933,11 @@
         gap: 5px;
         transition: all 0.2s;
     }
-    .mp-tab i { font-size: 20px; }
+
+    .mp-tab i {
+        font-size: 20px;
+    }
+
     .mp-tab.ativo {
         border-color: #eb3a75;
         color: #eb3a75;
@@ -918,6 +948,7 @@
     .mp-form-group {
         margin-bottom: 16px;
     }
+
     .mp-form-group label {
         display: block;
         font-size: 13px;
@@ -925,6 +956,7 @@
         color: #444;
         margin-bottom: 6px;
     }
+
     .mp-form-group input,
     .mp-form-group select {
         width: 100%;
@@ -938,16 +970,19 @@
         background: #fafafa;
         font-family: Arial, sans-serif;
     }
+
     .mp-form-group input:focus,
     .mp-form-group select:focus {
         border-color: #eb3a75;
         background: #fff;
     }
+
     .mp-form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
     }
+
     .mp-form-row-3 {
         display: grid;
         grid-template-columns: 2fr 1fr 1fr;
@@ -959,24 +994,71 @@
         text-align: center;
         padding: 8px 0 16px;
     }
+
     .pix-instrucoes p {
         font-size: 14px;
         color: #555;
         margin-bottom: 16px;
         line-height: 1.5;
     }
+
     .pix-qr-container {
         display: none;
         text-align: center;
         margin: 16px 0;
     }
-    .pix-qr-container.visivel { display: block; }
+
+    .pix-qr-container.visivel {
+        display: block;
+    }
+
     .pix-qr-container img {
         width: 200px;
         height: 200px;
         border-radius: 8px;
         border: 2px solid #f0f0f0;
     }
+
+    .pix-codigo-container {
+        background: #ffffff;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 8px;
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .pix-codigo-container:hover {
+        border-color: #eb3a75;
+        background: #fdf0f5;
+    }
+
+    .pix-codigo-texto {
+        flex: 1;
+        font-size: 12px;
+        color: #151515;
+        font-family: sans-serif;
+        word-break: break-all;
+        line-height: 1.3;
+        font-weight: 500;
+    }
+
+    .pix-codigo-icone {
+        flex-shrink: 0;
+        font-size: 16px;
+        color: #eb3a75;
+        transition: all 0.3s ease;
+    }
+
+    .pix-codigo-container:hover .pix-codigo-icone {
+        transform: scale(1.1);
+    }
+
     .pix-copia-cola {
         background: #f5f5f5;
         border-radius: 8px;
@@ -989,28 +1071,17 @@
         max-height: 80px;
         overflow-y: auto;
     }
-    .pix-copiar-btn {
-        margin-top: 10px;
-        padding: 8px 20px;
-        background: #eb3a75;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        cursor: pointer;
-        font-weight: 600;
-    }
 
     /* Botão pagar */
     .btn-pagar {
         width: 100%;
         padding: 15px;
-        background: linear-gradient(135deg, #eb3a75, #c91e5a);
+        background: rgb(34, 100, 193);
         color: #fff;
         border: none;
         border-radius: 10px;
         font-size: 16px;
-        font-weight: 700;
+        font-weight: 400;
         cursor: pointer;
         margin-top: 8px;
         display: flex;
@@ -1020,16 +1091,25 @@
         transition: opacity 0.2s, transform 0.1s;
         font-family: Arial, sans-serif;
     }
-    .btn-pagar:hover { opacity: 0.92; }
-    .btn-pagar:active { transform: scale(0.98); }
+
+    .btn-pagar:hover {
+        opacity: 0.92;
+    }
+
+    .btn-pagar:active {
+        transform: scale(0.98);
+    }
+
     .btn-pagar:disabled {
         background: #ccc;
         cursor: not-allowed;
         opacity: 1;
     }
+
     .btn-pagar .spinner-btn {
-        width: 18px; height: 18px;
-        border: 2px solid rgba(255,255,255,0.4);
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
         border-top-color: #fff;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
@@ -1041,27 +1121,51 @@
         text-align: center;
         padding: 30px 20px;
     }
-    .mp-status.visivel { display: block; }
+
+    .mp-status.visivel {
+        display: block;
+    }
+
     .mp-status-icon {
         font-size: 60px;
         margin-bottom: 16px;
     }
+
     .mp-status h3 {
         font-size: 20px;
         font-weight: 700;
         margin-bottom: 8px;
     }
+
     .mp-status p {
         font-size: 14px;
         color: #666;
         line-height: 1.5;
     }
-    .mp-status.aprovado .mp-status-icon { color: #22c55e; }
-    .mp-status.aprovado h3 { color: #16a34a; }
-    .mp-status.pendente .mp-status-icon { color: #f59e0b; }
-    .mp-status.pendente h3 { color: #d97706; }
-    .mp-status.rejeitado .mp-status-icon { color: #ef4444; }
-    .mp-status.rejeitado h3 { color: #dc2626; }
+
+    .mp-status.aprovado .mp-status-icon {
+        color: #22c55e;
+    }
+
+    .mp-status.aprovado h3 {
+        color: #16a34a;
+    }
+
+    .mp-status.pendente .mp-status-icon {
+        color: #f59e0b;
+    }
+
+    .mp-status.pendente h3 {
+        color: #d97706;
+    }
+
+    .mp-status.rejeitado .mp-status-icon {
+        color: #ef4444;
+    }
+
+    .mp-status.rejeitado h3 {
+        color: #dc2626;
+    }
 
     .mp-polling-info {
         display: flex;
@@ -1072,15 +1176,27 @@
         font-size: 13px;
         color: #888;
     }
+
     .mp-polling-dot {
-        width: 8px; height: 8px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background: #eb3a75;
         animation: pollingPulse 1.2s ease-in-out infinite;
     }
+
     @keyframes pollingPulse {
-        0%,100% { opacity:1; transform:scale(1); }
-        50% { opacity:0.3; transform:scale(0.7); }
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.3;
+            transform: scale(0.7);
+        }
     }
 
     /* Segurança */
@@ -1093,7 +1209,10 @@
         color: #aaa;
         margin-top: 16px;
     }
-    .checkout-seguranca i { color: #22c55e; }
+
+    .checkout-seguranca i {
+        color: #22c55e;
+    }
 
     /* Erro inline */
     .mp-erro {
@@ -1106,13 +1225,35 @@
         margin-bottom: 14px;
         display: none;
     }
-    .mp-erro.visivel { display: block; }
+
+    .mp-erro.visivel {
+        display: block;
+    }
 
     @media (max-width: 480px) {
-        .checkout-modal { border-radius: 14px 14px 0 0; max-height: 96vh; }
-        .checkout-overlay { padding: 0; align-items: flex-end; }
-        .mp-form-row-3 { grid-template-columns: 1fr 1fr; }
-        .mp-form-row-3 .mp-form-group:first-child { grid-column: 1/-1; }
+        .checkout-modal {
+            border-radius: 14px 14px 0 0;
+            max-height: 96vh;
+        }
+
+        .checkout-overlay {
+            padding: 0;
+            align-items: flex-end;
+        }
+
+        .mp-form-row-3 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .mp-form-row-3 .mp-form-group:first-child {
+            grid-column: 1/-1;
+        }
+    }
+
+    #btn-gerar-pix i {
+        font-size: 24px;
+        font-weight: 400;
+
     }
 </style>
 
@@ -2247,7 +2388,10 @@
 
             <!-- Cabeçalho -->
             <div class="checkout-header">
-                <h2><i class="ri-secure-payment-line"></i> Finalizar Compra</h2>
+                <h2 style="font-weight: 400; font-size: 14px;">
+                    <img src="../recursos/icones/Mercado_Pago.svg" alt="" style="width: 150px;">
+                    Finalizando sua compra de forma segura com Mercado Pago.
+                </h2>
                 <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar">
                     <i class="ri-close-line"></i>
                 </button>
@@ -2268,15 +2412,16 @@
                 <!-- Tabs de método de pagamento -->
                 <div class="mp-tabs" id="mp-tabs">
                     <button class="mp-tab ativo" onclick="trocarAba('pix')" id="tab-pix">
-                        <i class="ri-qr-code-line"></i>
+                        <img src="../recursos/icones/Pix_(Brazil)_logo.svg" alt=""
+                            style="width: 70px; margin-right: 5px;">
                         PIX
                     </button>
                     <button class="mp-tab" onclick="trocarAba('credito')" id="tab-credito">
-                        <i class="ri-bank-card-line"></i>
+                        <img src="../recursos/icones/Basic_credit_card.svg.png" alt="" style="width: 30px;">
                         Crédito
                     </button>
                     <button class="mp-tab" onclick="trocarAba('debito')" id="tab-debito">
-                        <i class="ri-bank-card-2-line"></i>
+                        <img src="../recursos/icones/image.png" alt="" style="width: 30px;">
                         Débito
                     </button>
                 </div>
@@ -2290,7 +2435,8 @@
                         </div>
                         <div class="mp-form-group">
                             <label for="co-cpf">CPF *</label>
-                            <input type="text" id="co-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+                            <input type="text" id="co-cpf" placeholder="000.000.000-00" maxlength="14"
+                                oninput="mascaraCPF(this)">
                         </div>
                     </div>
                     <div class="mp-form-group">
@@ -2302,7 +2448,8 @@
                 <!-- ===== SEÇÃO PIX ===== -->
                 <div id="secao-pix">
                     <div class="pix-instrucoes">
-                        <p>Pague com PIX de forma rápida e segura.<br>O QR Code é válido por <strong>30 minutos</strong>.</p>
+                        <p>Pague com PIX de forma rápida e segura.<br>O QR Code é válido por <strong>30
+                                minutos</strong>.</p>
                     </div>
 
                     <!-- QR Code (aparece após gerar o PIX) -->
@@ -2324,12 +2471,14 @@
                 <div id="secao-credito" style="display:none;">
                     <div class="mp-form-group">
                         <label for="co-num-cartao">Número do cartão *</label>
-                        <input type="text" id="co-num-cartao" placeholder="0000 0000 0000 0000" maxlength="19" oninput="mascaraCartao(this)">
+                        <input type="text" id="co-num-cartao" placeholder="0000 0000 0000 0000" maxlength="19"
+                            oninput="mascaraCartao(this)">
                     </div>
                     <div class="mp-form-row">
                         <div class="mp-form-group">
                             <label for="co-validade">Validade *</label>
-                            <input type="text" id="co-validade" placeholder="MM/AA" maxlength="5" oninput="mascaraValidade(this)">
+                            <input type="text" id="co-validade" placeholder="MM/AA" maxlength="5"
+                                oninput="mascaraValidade(this)">
                         </div>
                         <div class="mp-form-group">
                             <label for="co-cvv">CVV *</label>
@@ -2338,7 +2487,8 @@
                     </div>
                     <div class="mp-form-group">
                         <label for="co-nome-cartao">Nome no cartão *</label>
-                        <input type="text" id="co-nome-cartao" placeholder="JOÃO DA SILVA" style="text-transform:uppercase">
+                        <input type="text" id="co-nome-cartao" placeholder="JOÃO DA SILVA"
+                            style="text-transform:uppercase">
                     </div>
                     <div class="mp-form-group">
                         <label for="co-parcelas">Parcelas *</label>
@@ -2359,12 +2509,14 @@
                 <div id="secao-debito" style="display:none;">
                     <div class="mp-form-group">
                         <label for="co-num-debito">Número do cartão *</label>
-                        <input type="text" id="co-num-debito" placeholder="0000 0000 0000 0000" maxlength="19" oninput="mascaraCartao(this)">
+                        <input type="text" id="co-num-debito" placeholder="0000 0000 0000 0000" maxlength="19"
+                            oninput="mascaraCartao(this)">
                     </div>
                     <div class="mp-form-row">
                         <div class="mp-form-group">
                             <label for="co-validade-debito">Validade *</label>
-                            <input type="text" id="co-validade-debito" placeholder="MM/AA" maxlength="5" oninput="mascaraValidade(this)">
+                            <input type="text" id="co-validade-debito" placeholder="MM/AA" maxlength="5"
+                                oninput="mascaraValidade(this)">
                         </div>
                         <div class="mp-form-group">
                             <label for="co-cvv-debito">CVV *</label>
@@ -2373,7 +2525,8 @@
                     </div>
                     <div class="mp-form-group">
                         <label for="co-nome-debito">Nome no cartão *</label>
-                        <input type="text" id="co-nome-debito" placeholder="JOÃO DA SILVA" style="text-transform:uppercase">
+                        <input type="text" id="co-nome-debito" placeholder="JOÃO DA SILVA"
+                            style="text-transform:uppercase">
                     </div>
                     <button class="btn-pagar" id="btn-pagar-debito" onclick="processarPagamentoCartao('debit_card')">
                         <i class="ri-lock-line"></i> Pagar com Débito
@@ -2402,510 +2555,540 @@
 
     <!-- ===== SCRIPT DE CHECKOUT MERCADO PAGO ===== -->
     <script>
-    // ================================================================
-    //  CONFIGURAÇÃO DO MERCADO PAGO
-    //  Substitua os valores abaixo pelas suas credenciais reais
-    // ================================================================
-    const MP_CONFIG = {
-        // Public Key do Mercado Pago — usada APENAS para tokenizar o cartão no browser (seguro)
-        publicKey: 'APP_USR-20eb1bea-5aff-4aeb-8fff-5fd6d97f3643',
+        // ================================================================
+        //  CONFIGURAÇÃO DO MERCADO PAGO
+        //  Substitua os valores abaixo pelas suas credenciais reais
+        // ================================================================
+        const MP_CONFIG = {
+            // Public Key do Mercado Pago — usada APENAS para tokenizar o cartão no browser (seguro)
+            publicKey: 'APP_USR-20eb1bea-5aff-4aeb-8fff-5fd6d97f3643',
 
-        // ✅ Access Token REMOVIDO do frontend — agora fica seguro na Edge Function do Supabase.
-        //    Substitua a URL abaixo pela URL da sua Edge Function após o deploy.
-        //    Formato: https://<SEU_PROJECT_REF>.supabase.co/functions/v1/mp-checkout
-        edgeFunctionUrl: 'https://hovfcntzthahwszjaxsw.supabase.co/functions/v1/mp-checkout',
+            // ✅ Access Token REMOVIDO do frontend — agora fica seguro na Edge Function do Supabase.
+            //    Substitua a URL abaixo pela URL da sua Edge Function após o deploy.
+            //    Formato: https://<SEU_PROJECT_REF>.supabase.co/functions/v1/mp-checkout
+            edgeFunctionUrl: 'https://hovfcntzthahwszjaxsw.supabase.co/functions/v1/mp-checkout',
 
-        // Intervalo de polling em ms (verifica status do pagamento a cada X ms)
-        pollingInterval: 3000,
+            // Intervalo de polling em ms (verifica status do pagamento a cada X ms)
+            pollingInterval: 3000,
 
-        // Máximo de tentativas de polling antes de parar
-        pollingMaxTentativas: 40,
-    };
+            // Máximo de tentativas de polling antes de parar
+            pollingMaxTentativas: 40,
+        };
 
-    // Helper: chama a Edge Function com uma action específica
-    async function mpEdge(action, dados) {
-        const resp = await fetch(MP_CONFIG.edgeFunctionUrl, {
-            method : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body   : JSON.stringify({ action, ...dados }),
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw { httpStatus: resp.status, ...data };
-        return data;
-    }
-
-    // ================================================================
-    //  ESTADO DO CHECKOUT
-    // ================================================================
-    let _co = {
-        abaAtiva: 'pix',
-        nomeProduto: '',
-        precoProduto: 0,
-        orderId: null,
-        paymentId: null,
-        pollingTimer: null,
-        tentativasPolling: 0,
-        pixCopiaCola: '',
-    };
-
-    // ================================================================
-    //  ABRIR / FECHAR MODAL
-    // ================================================================
-    function abrirCheckout(nomeProduto, precoProduto) {
-        _co.nomeProduto = nomeProduto;
-        _co.precoProduto = precoProduto;
-
-        document.getElementById('co-nome-produto').textContent = nomeProduto;
-        document.getElementById('co-preco-produto').textContent =
-            'R$ ' + precoProduto.toFixed(2).replace('.', ',');
-
-        // Resetar estado visual
-        resetarCheckout();
-
-        document.getElementById('checkout-overlay').classList.add('aberto');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function fecharCheckout() {
-        document.getElementById('checkout-overlay').classList.remove('aberto');
-        document.body.style.overflow = '';
-        pararPolling();
-    }
-
-    function fecharCheckoutOverlay(e) {
-        if (e.target === document.getElementById('checkout-overlay')) {
-            fecharCheckout();
+        // Helper: chama a Edge Function com uma action específica
+        async function mpEdge(action, dados) {
+            const resp = await fetch(MP_CONFIG.edgeFunctionUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, ...dados }),
+            });
+            const data = await resp.json();
+            if (!resp.ok) throw { httpStatus: resp.status, ...data };
+            return data;
         }
-    }
 
-    function resetarCheckout() {
-        _co.orderId = null;
-        _co.paymentId = null;
-        _co.tentativasPolling = 0;
-        _co.pixCopiaCola = '';
-        pararPolling();
+        // ================================================================
+        //  ESTADO DO CHECKOUT
+        // ================================================================
+        let _co = {
+            abaAtiva: 'pix',
+            nomeProduto: '',
+            precoProduto: 0,
+            orderId: null,
+            paymentId: null,
+            pollingTimer: null,
+            tentativasPolling: 0,
+            pixCopiaCola: '',
+        };
 
-        // Esconder tela de status
-        const status = document.getElementById('mp-status');
-        status.classList.remove('visivel', 'aprovado', 'pendente', 'rejeitado');
+        // ================================================================
+        //  ABRIR / FECHAR MODAL
+        // ================================================================
+        function abrirCheckout(nomeProduto, precoProduto) {
+            _co.nomeProduto = nomeProduto;
+            _co.precoProduto = precoProduto;
 
-        // Mostrar tabs e conteúdo
-        document.getElementById('mp-tabs').style.display = 'flex';
-        document.getElementById('secao-dados-comprador').style.display = 'block';
+            document.getElementById('co-nome-produto').textContent = nomeProduto;
+            document.getElementById('co-preco-produto').textContent =
+                'R$ ' + precoProduto.toFixed(2).replace('.', ',');
 
-        // Resetar abas e seções
-        trocarAba('pix');
+            // Resetar estado visual
+            resetarCheckout();
 
-        // Limpar campos
-        ['co-nome','co-cpf','co-email',
-         'co-num-cartao','co-validade','co-cvv','co-nome-cartao',
-         'co-num-debito','co-validade-debito','co-cvv-debito','co-nome-debito']
-        .forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-
-        // Resetar PIX QR
-        document.getElementById('pix-qr-container').classList.remove('visivel');
-        document.getElementById('btn-gerar-pix').style.display = 'flex';
-        document.getElementById('btn-gerar-pix').innerHTML =
-            '<i class="ri-qr-code-line"></i> Gerar QR Code PIX';
-        document.getElementById('btn-gerar-pix').disabled = false;
-
-        // Limpar erro
-        esconderErro();
-    }
-
-    // ================================================================
-    //  TABS
-    // ================================================================
-    function trocarAba(aba) {
-        _co.abaAtiva = aba;
-        ['pix','credito','debito'].forEach(a => {
-            document.getElementById('tab-' + a).classList.toggle('ativo', a === aba);
-            document.getElementById('secao-' + a).style.display = a === aba ? 'block' : 'none';
-        });
-        esconderErro();
-    }
-
-    // ================================================================
-    //  MÁSCARAS
-    // ================================================================
-    function mascaraCPF(input) {
-        let v = input.value.replace(/\D/g, '').substring(0, 11);
-        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        input.value = v;
-    }
-
-    function mascaraCartao(input) {
-        let v = input.value.replace(/\D/g, '').substring(0, 16);
-        v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
-        input.value = v.trim();
-    }
-
-    function mascaraValidade(input) {
-        let v = input.value.replace(/\D/g, '').substring(0, 4);
-        if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
-        input.value = v;
-    }
-
-    // ================================================================
-    //  VALIDAÇÃO
-    // ================================================================
-    function validarDadosComuns() {
-        const nome  = document.getElementById('co-nome').value.trim();
-        const cpf   = document.getElementById('co-cpf').value.replace(/\D/g,'');
-        const email = document.getElementById('co-email').value.trim();
-
-        if (!nome || nome.split(' ').length < 2)
-            return mostrarErro('Informe seu nome completo (nome e sobrenome).');
-        if (cpf.length !== 11)
-            return mostrarErro('CPF inválido. Digite os 11 dígitos.');
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-            return mostrarErro('E-mail inválido.');
-        return true;
-    }
-
-    function validarCartao(sufixo) {
-        sufixo = sufixo || '';
-        const num    = document.getElementById('co-num' + sufixo).value.replace(/\s/g,'');
-        const valid  = document.getElementById('co-validade' + sufixo).value;
-        const cvv    = document.getElementById('co-cvv' + sufixo).value;
-        const ncart  = document.getElementById('co-nome' + sufixo).value.trim();
-
-        if (num.length < 13 || num.length > 19)
-            return mostrarErro('Número do cartão inválido.');
-        if (!/^\d{2}\/\d{2}$/.test(valid))
-            return mostrarErro('Validade inválida. Use MM/AA.');
-        if (cvv.length < 3)
-            return mostrarErro('CVV inválido.');
-        if (!ncart || ncart.split(' ').length < 2)
-            return mostrarErro('Informe o nome completo como está no cartão.');
-        return true;
-    }
-
-    // ================================================================
-    //  UTILITÁRIOS
-    // ================================================================
-    function mostrarErro(msg) {
-        const el = document.getElementById('mp-erro');
-        el.textContent = msg;
-        el.classList.add('visivel');
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        return false;
-    }
-
-    function esconderErro() {
-        document.getElementById('mp-erro').classList.remove('visivel');
-    }
-
-    function setBotaoCarregando(btnId, carregando) {
-        const btn = document.getElementById(btnId);
-        if (!btn) return;
-        btn.disabled = carregando;
-        if (carregando) {
-            btn.innerHTML = '<div class="spinner-btn"></div> Processando...';
+            document.getElementById('checkout-overlay').classList.add('aberto');
+            document.body.style.overflow = 'hidden';
         }
-    }
 
-    function copiarPixCopiaCola() {
-        if (!_co.pixCopiaCola) return;
-        navigator.clipboard.writeText(_co.pixCopiaCola).then(() => {
-            const btn = document.querySelector('.pix-copiar-btn');
-            btn.innerHTML = '<i class="ri-check-line"></i> Copiado!';
-            setTimeout(() => {
-                btn.innerHTML = '<i class="ri-file-copy-line"></i> Copiar código PIX';
-            }, 2000);
-        }).catch(() => {
-            // Fallback para iOS Safari
-            const ta = document.createElement('textarea');
-            ta.value = _co.pixCopiaCola;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-        });
-    }
-
-    // ================================================================
-    //  TELA DE STATUS
-    // ================================================================
-    function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
-        document.getElementById('mp-tabs').style.display = 'none';
-        document.getElementById('secao-dados-comprador').style.display = 'none';
-        ['pix','credito','debito'].forEach(a => {
-            document.getElementById('secao-' + a).style.display = 'none';
-        });
-
-        const el = document.getElementById('mp-status');
-        el.className = 'mp-status visivel ' + tipo;
-        document.getElementById('mp-status-icon').textContent = icone;
-        document.getElementById('mp-status-titulo').textContent = titulo;
-        document.getElementById('mp-status-descricao').textContent = descricao;
-
-        const polling = document.getElementById('mp-polling-info');
-        polling.style.display = mostrarPolling ? 'flex' : 'none';
-    }
-
-    // ================================================================
-    //  POLLING DE STATUS
-    // ================================================================
-    function iniciarPolling(paymentId) {
-        pararPolling();
-        _co.tentativasPolling = 0;
-        _co.pollingTimer = setInterval(() => verificarStatusPagamento(paymentId), MP_CONFIG.pollingInterval);
-    }
-
-    function pararPolling() {
-        if (_co.pollingTimer) {
-            clearInterval(_co.pollingTimer);
-            _co.pollingTimer = null;
-        }
-    }
-
-    async function verificarStatusPagamento(paymentId) {
-        _co.tentativasPolling++;
-
-        if (_co.tentativasPolling > MP_CONFIG.pollingMaxTentativas) {
+        function fecharCheckout() {
+            document.getElementById('checkout-overlay').classList.remove('aberto');
+            document.body.style.overflow = '';
             pararPolling();
-            mostrarStatusTela('pendente', '⏰', 'Tempo expirado',
-                'Não conseguimos confirmar seu pagamento automaticamente. Se o pagamento foi realizado, entre em contato conosco.', false);
-            return;
         }
 
-        try {
-            const data = await mpEdge('status_pagamento', { payment_id: paymentId });
-            const status = data.status;
-
-            if (status === 'approved') {
-                pararPolling();
-                mostrarStatusTela('aprovado', '✅', 'Pagamento aprovado!',
-                    'Seu pagamento foi confirmado com sucesso. Em breve você receberá mais informações.', false);
-
-            } else if (status === 'rejected' || status === 'cancelled') {
-                pararPolling();
-                mostrarStatusTela('rejeitado', '❌', 'Pagamento recusado',
-                    'O pagamento não foi aprovado. Verifique os dados do cartão ou tente outra forma de pagamento.', false);
+        function fecharCheckoutOverlay(e) {
+            if (e.target === document.getElementById('checkout-overlay')) {
+                fecharCheckout();
             }
-            // se pending/in_process: não faz nada, aguarda próximo tick do polling
-        } catch (err) {
-            console.warn('Erro ao verificar status (tentativa ' + _co.tentativasPolling + '):', err);
-            // Não para o polling em erro de rede — tenta novamente no próximo tick
         }
-    }
 
-    // ================================================================
-    //  PAGAMENTO PIX
-    // ================================================================
-    async function processarPagamentoPIX() {
-        esconderErro();
-        if (validarDadosComuns() !== true) return;
+        function resetarCheckout() {
+            _co.orderId = null;
+            _co.paymentId = null;
+            _co.tentativasPolling = 0;
+            _co.pixCopiaCola = '';
+            pararPolling();
 
-        setBotaoCarregando('btn-gerar-pix', true);
+            // Esconder tela de status
+            const status = document.getElementById('mp-status');
+            status.classList.remove('visivel', 'aprovado', 'pendente', 'rejeitado');
 
-        const cpf   = document.getElementById('co-cpf').value.replace(/\D/g,'');
-        const nome  = document.getElementById('co-nome').value.trim();
-        const email = document.getElementById('co-email').value.trim();
+            // Mostrar tabs e conteúdo
+            document.getElementById('mp-tabs').style.display = 'flex';
+            document.getElementById('secao-dados-comprador').style.display = 'block';
 
-        try {
-            const data = await mpEdge('criar_pix', {
-                transaction_amount: _co.precoProduto,
-                description       : _co.nomeProduto,
-                email,
-                first_name: nome.split(' ')[0],
-                last_name : nome.split(' ').slice(1).join(' '),
-                cpf,
+            // Resetar abas e seções
+            trocarAba('pix');
+
+            // Limpar campos
+            ['co-nome', 'co-cpf', 'co-email',
+                'co-num-cartao', 'co-validade', 'co-cvv', 'co-nome-cartao',
+                'co-num-debito', 'co-validade-debito', 'co-cvv-debito', 'co-nome-debito']
+                .forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+
+            // Resetar PIX QR
+            document.getElementById('pix-qr-container').classList.remove('visivel');
+            document.getElementById('btn-gerar-pix').style.display = 'flex';
+            document.getElementById('btn-gerar-pix').innerHTML =
+                '<i class="ri-qr-code-line"></i> Gerar QR Code PIX';
+            document.getElementById('btn-gerar-pix').disabled = false;
+
+            // Limpar erro
+            esconderErro();
+        }
+
+        // ================================================================
+        //  TABS
+        // ================================================================
+        function trocarAba(aba) {
+            _co.abaAtiva = aba;
+            ['pix', 'credito', 'debito'].forEach(a => {
+                document.getElementById('tab-' + a).classList.toggle('ativo', a === aba);
+                document.getElementById('secao-' + a).style.display = a === aba ? 'block' : 'none';
+            });
+            esconderErro();
+        }
+
+        // ================================================================
+        //  MÁSCARAS
+        // ================================================================
+        function mascaraCPF(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 11);
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            input.value = v;
+        }
+
+        function mascaraCartao(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 16);
+            v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+            input.value = v.trim();
+        }
+
+        function mascaraValidade(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 4);
+            if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
+            input.value = v;
+        }
+
+        // ================================================================
+        //  VALIDAÇÃO
+        // ================================================================
+        function validarDadosComuns() {
+            const nome = document.getElementById('co-nome').value.trim();
+            const cpf = document.getElementById('co-cpf').value.replace(/\D/g, '');
+            const email = document.getElementById('co-email').value.trim();
+
+            if (!nome || nome.split(' ').length < 2)
+                return mostrarErro('Informe seu nome completo (nome e sobrenome).');
+            if (cpf.length !== 11)
+                return mostrarErro('CPF inválido. Digite os 11 dígitos.');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+                return mostrarErro('E-mail inválido.');
+            return true;
+        }
+
+        function validarCartao(sufixo) {
+            sufixo = sufixo || '';
+            const num = document.getElementById('co-num' + sufixo).value.replace(/\s/g, '');
+            const valid = document.getElementById('co-validade' + sufixo).value;
+            const cvv = document.getElementById('co-cvv' + sufixo).value;
+            const ncart = document.getElementById('co-nome' + sufixo).value.trim();
+
+            if (num.length < 13 || num.length > 19)
+                return mostrarErro('Número do cartão inválido.');
+            if (!/^\d{2}\/\d{2}$/.test(valid))
+                return mostrarErro('Validade inválida. Use MM/AA.');
+            if (cvv.length < 3)
+                return mostrarErro('CVV inválido.');
+            if (!ncart || ncart.split(' ').length < 2)
+                return mostrarErro('Informe o nome completo como está no cartão.');
+            return true;
+        }
+
+        // ================================================================
+        //  UTILITÁRIOS
+        // ================================================================
+        function mostrarErro(msg) {
+            const el = document.getElementById('mp-erro');
+            el.textContent = msg;
+            el.classList.add('visivel');
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            return false;
+        }
+
+        function esconderErro() {
+            document.getElementById('mp-erro').classList.remove('visivel');
+        }
+
+        function setBotaoCarregando(btnId, carregando) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.disabled = carregando;
+            if (carregando) {
+                btn.innerHTML = '<div class="spinner-btn"></div> Processando...';
+            }
+        }
+
+        function copiarPixCopiaCola() {
+            if (!_co.pixCopiaCola) return;
+            navigator.clipboard.writeText(_co.pixCopiaCola).then(() => {
+                const container = document.querySelector('.pix-codigo-container');
+                if (container) {
+                    const icone = container.querySelector('.pix-codigo-icone');
+                    const textoOriginal = icone.className;
+                    icone.className = 'ri-check-line pix-codigo-icone';
+                    container.style.borderColor = '#22c55e';
+                    container.style.background = '#f0fdf4';
+                    setTimeout(() => {
+                        icone.className = textoOriginal;
+                        container.style.borderColor = '#e0e0e0';
+                        container.style.background = '#ffffff';
+                    }, 2000);
+                }
+            }).catch(() => {
+                // Fallback para iOS Safari
+                const ta = document.createElement('textarea');
+                ta.value = _co.pixCopiaCola;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            });
+        }
+
+        // ================================================================
+        //  TELA DE STATUS
+        // ================================================================
+        function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
+            document.getElementById('mp-tabs').style.display = 'none';
+            document.getElementById('secao-dados-comprador').style.display = 'none';
+            ['pix', 'credito', 'debito'].forEach(a => {
+                document.getElementById('secao-' + a).style.display = 'none';
             });
 
-            _co.paymentId = data.id;
+            const el = document.getElementById('mp-status');
+            el.className = 'mp-status visivel ' + tipo;
+            document.getElementById('mp-status-icon').textContent = icone;
+            document.getElementById('mp-status-titulo').textContent = titulo;
+            document.getElementById('mp-status-descricao').textContent = descricao;
 
-            const qrBase64 = data.qr_code_base64;
-            const qrText   = data.qr_code;
+            const polling = document.getElementById('mp-polling-info');
+            polling.style.display = mostrarPolling ? 'flex' : 'none';
+        }
 
-            if (qrBase64) {
-                document.getElementById('pix-qr-img').src = 'data:image/png;base64,' + qrBase64;
+        // ================================================================
+        //  POLLING DE STATUS
+        // ================================================================
+        function iniciarPolling(paymentId) {
+            pararPolling();
+            _co.tentativasPolling = 0;
+            _co.pollingTimer = setInterval(() => verificarStatusPagamento(paymentId), MP_CONFIG.pollingInterval);
+        }
+
+        function pararPolling() {
+            if (_co.pollingTimer) {
+                clearInterval(_co.pollingTimer);
+                _co.pollingTimer = null;
             }
-            if (qrText) {
-                _co.pixCopiaCola = qrText;
-                document.getElementById('pix-copia-cola-texto').textContent = qrText;
+        }
+
+        async function verificarStatusPagamento(paymentId) {
+            _co.tentativasPolling++;
+
+            if (_co.tentativasPolling > MP_CONFIG.pollingMaxTentativas) {
+                pararPolling();
+                mostrarStatusTela('pendente', '⏰', 'Tempo expirado',
+                    'Não conseguimos confirmar seu pagamento automaticamente. Se o pagamento foi realizado, entre em contato conosco.', false);
+                return;
             }
 
-            document.getElementById('pix-qr-container').classList.add('visivel');
-            document.getElementById('btn-gerar-pix').style.display = 'none';
+            try {
+                const data = await mpEdge('status_pagamento', { payment_id: paymentId });
+                const status = data.status;
 
-            // Exibir tela de aguardando PIX + QR Code inline
-            mostrarStatusTela('pendente', '📱', 'Aguardando pagamento PIX',
-                'Escaneie o QR Code com o app do seu banco ou use o código Copia e Cola. O pagamento expira em 30 minutos.',
-                true);
+                if (status === 'approved') {
+                    pararPolling();
+                    mostrarStatusTela('aprovado', '✅', 'Pagamento aprovado!',
+                        'Seu pagamento foi confirmado com sucesso. Em breve você receberá mais informações.', false);
 
-            document.getElementById('mp-status').insertAdjacentHTML('beforeend', `
-                <div style="margin-top:16px;">
-                    <img src="${qrBase64 ? 'data:image/png;base64,' + qrBase64 : ''}"
-                         style="width:160px;height:160px;border-radius:8px;border:2px solid #f0f0f0;">
-                    <div style="margin-top:10px;">
-                        <button class="pix-copiar-btn" onclick="copiarPixCopiaCola()" style="margin:0 auto;">
-                            <i class="ri-file-copy-line"></i> Copiar código PIX
-                        </button>
+                } else if (status === 'rejected' || status === 'cancelled') {
+                    pararPolling();
+                    mostrarStatusTela('rejeitado', '❌', 'Pagamento recusado',
+                        'O pagamento não foi aprovado. Verifique os dados do cartão ou tente outra forma de pagamento.', false);
+                }
+                // se pending/in_process: não faz nada, aguarda próximo tick do polling
+            } catch (err) {
+                console.warn('Erro ao verificar status (tentativa ' + _co.tentativasPolling + '):', err);
+                // Não para o polling em erro de rede — tenta novamente no próximo tick
+            }
+        }
+
+        // ================================================================
+        //  PAGAMENTO PIX
+        // ================================================================
+        async function processarPagamentoPIX() {
+            esconderErro();
+            if (validarDadosComuns() !== true) return;
+
+            setBotaoCarregando('btn-gerar-pix', true);
+
+            const cpf = document.getElementById('co-cpf').value.replace(/\D/g, '');
+            const nome = document.getElementById('co-nome').value.trim();
+            const email = document.getElementById('co-email').value.trim();
+
+            try {
+                const data = await mpEdge('criar_pix', {
+                    transaction_amount: _co.precoProduto,
+                    description: _co.nomeProduto,
+                    email,
+                    first_name: nome.split(' ')[0],
+                    last_name: nome.split(' ').slice(1).join(' '),
+                    cpf,
+                });
+
+                _co.paymentId = data.id;
+
+                const qrBase64 = data.qr_code_base64;
+                const qrText = data.qr_code;
+
+                if (qrBase64) {
+                    document.getElementById('pix-qr-img').src = 'data:image/png;base64,' + qrBase64;
+                }
+                if (qrText) {
+                    _co.pixCopiaCola = qrText;
+                    document.getElementById('pix-copia-cola-texto').textContent = qrText;
+                }
+
+                document.getElementById('pix-qr-container').classList.add('visivel');
+                document.getElementById('btn-gerar-pix').style.display = 'none';
+
+                // Exibir tela de aguardando PIX + QR Code inline
+                mostrarStatusTela('pendente', '', 'Aguardando pagamento PIX',
+                    'Escaneie o QR Code com o app do seu banco ou use o código Copia e Cola. O pagamento expira em 30 minutos.',
+                    true);
+
+                // Limpar elementos dinamicamente adicionados anteriormente
+                const mpStatus = document.getElementById('mp-status');
+                const elementsToKeep = new Set([
+                    'mp-status-icon',
+                    'mp-status-titulo',
+                    'mp-status-descricao',
+                    'mp-polling-info'
+                ]);
+
+                Array.from(mpStatus.children).forEach(child => {
+                    if (!elementsToKeep.has(child.id)) {
+                        child.remove();
+                    }
+                });
+
+                // Adicionar imagem do PIX acima do texto
+                mpStatus.insertAdjacentHTML('afterbegin', `
+                <img src="../recursos/icones/pix@2x.png" alt="PIX" style="width:80px;margin-bottom:1px; margin-top: -30px;">
+            `);
+
+                mpStatus.insertAdjacentHTML('beforeend', `
+                <div style="margin-top:20px; text-align: center;">
+                    <div style="margin-bottom: 20px;">
+                        <img src="${qrBase64 ? 'data:image/png;base64,' + qrBase64 : ''}"
+                             style="width:160px;height:160px;border-radius:8px;border:2px solid #f0f0f0;">
+                    </div>
+                    <p style="font-size: 12px; color: #999; margin-bottom: 12px; margin-top: 0;">Código de pagamento</p>
+                    <div class="pix-codigo-container" onclick="copiarPixCopiaCola()">
+                        <span class="pix-codigo-texto">${_co.pixCopiaCola.substring(0, 26)}...</span>
+                        <i class="ri-file-copy-line pix-codigo-icone"></i>
                     </div>
                 </div>
             `);
 
-            iniciarPolling(data.id);
-
-        } catch (err) {
-            console.error('Erro PIX:', err);
-            setBotaoCarregando('btn-gerar-pix', false);
-            document.getElementById('btn-gerar-pix').innerHTML =
-                '<i class="ri-qr-code-line"></i> Gerar QR Code PIX';
-            mostrarErro(err.error || 'Erro ao gerar PIX. Verifique sua conexão e tente novamente.');
-        }
-    }
-
-    // ================================================================
-    //  PAGAMENTO CARTÃO (CRÉDITO / DÉBITO)
-    // ================================================================
-    async function processarPagamentoCartao(metodoPagamento) {
-        esconderErro();
-        if (validarDadosComuns() !== true) return;
-
-        const isDebito = metodoPagamento === 'debit_card';
-        const sufixo   = isDebito ? '-debito' : '-cartao';
-        const btnId    = isDebito ? 'btn-pagar-debito' : 'btn-pagar-credito';
-
-        if (validarCartao(sufixo) !== true) return;
-
-        setBotaoCarregando(btnId, true);
-
-        const nome  = document.getElementById('co-nome').value.trim();
-        const cpf   = document.getElementById('co-cpf').value.replace(/\D/g,'');
-        const email = document.getElementById('co-email').value.trim();
-        const numCartao  = document.getElementById('co-num' + sufixo).value.replace(/\s/g,'');
-        const validade   = document.getElementById('co-validade' + sufixo).value;
-        const cvv        = document.getElementById('co-cvv' + sufixo).value;
-        const nomeCartao = document.getElementById('co-nome' + sufixo).value.trim().toUpperCase();
-        const parcelas   = isDebito ? 1 : parseInt(document.getElementById('co-parcelas').value);
-
-        const [mesStr, anoStr] = validade.split('/');
-        const mesCartao  = parseInt(mesStr);
-        const anoCartao  = 2000 + parseInt(anoStr);
-
-        const resetBotao = () => {
-            setBotaoCarregando(btnId, false);
-            document.getElementById(btnId).innerHTML = isDebito
-                ? '<i class="ri-lock-line"></i> Pagar com Débito'
-                : '<i class="ri-lock-line"></i> Pagar com Crédito';
-        };
-
-        try {
-            // PASSO 1 — Tokenizar o cartão com o SDK do MP (roda no browser, é seguro)
-            //           O token gerado não expõe os dados do cartão, apenas substitui por um ID único.
-            let cardToken;
-            try {
-                const mp = new MercadoPago(MP_CONFIG.publicKey, { locale: 'pt-BR' });
-                cardToken = await mp.createCardToken({
-                    cardNumber           : numCartao,
-                    cardholderName       : nomeCartao,
-                    cardExpirationMonth  : String(mesCartao).padStart(2,'0'),
-                    cardExpirationYear   : String(anoCartao),
-                    securityCode         : cvv,
-                    identificationType   : 'CPF',
-                    identificationNumber : cpf,
-                });
-            } catch (tokenErr) {
-                console.error('Erro ao tokenizar cartão:', tokenErr);
-                resetBotao();
-                return mostrarErro(tokenErr.message || 'Dados do cartão inválidos. Verifique e tente novamente.');
-            }
-
-            // PASSO 2 — Enviar token + dados para a Edge Function (que faz a chamada segura ao MP)
-            const data = await mpEdge('criar_pagamento_cartao', {
-                transaction_amount: _co.precoProduto,
-                description       : _co.nomeProduto,
-                token             : cardToken.id,
-                installments      : parcelas,
-                payment_method_id : obterPaymentMethodId(numCartao, isDebito),
-                email,
-                first_name: nome.split(' ')[0],
-                last_name : nome.split(' ').slice(1).join(' '),
-                cpf,
-            });
-
-            _co.paymentId = data.id;
-
-            const status = data.status;
-            if (status === 'approved') {
-                mostrarStatusTela('aprovado', '✅', 'Pagamento aprovado!',
-                    'Seu pagamento foi confirmado com sucesso. Obrigado pela compra!', false);
-
-            } else if (status === 'in_process' || status === 'pending' || status === 'authorized') {
-                mostrarStatusTela('pendente', '⏳', 'Pagamento em análise',
-                    'Seu pagamento está sendo processado. Você receberá uma confirmação em breve.', true);
                 iniciarPolling(data.id);
 
-            } else {
-                mostrarStatusTela('rejeitado', '❌', 'Pagamento recusado',
-                    traduzirStatusDetail(data.status_detail) || 'O pagamento não foi aprovado. Verifique os dados e tente novamente.', false);
+            } catch (err) {
+                console.error('Erro PIX:', err);
+                setBotaoCarregando('btn-gerar-pix', false);
+                document.getElementById('btn-gerar-pix').innerHTML =
+                    '<i class="ri-qr-code-line"></i> Gerar QR Code PIX';
+                mostrarErro(err.error || 'Erro ao gerar PIX. Verifique sua conexão e tente novamente.');
             }
-
-        } catch (err) {
-            console.error('Erro cartão:', err);
-            resetBotao();
-            mostrarErro(
-                err.error || traduzirErroMP(err.detail) ||
-                'Erro ao processar pagamento. Verifique sua conexão e tente novamente.'
-            );
         }
-    }
 
-    // ================================================================
-    //  DETECTAR BANDEIRA DO CARTÃO (simplificado)
-    // ================================================================
-    function obterPaymentMethodId(numCartao, isDebito) {
-        const n = numCartao.replace(/\s/g,'');
-        if (/^4/.test(n))       return isDebito ? 'visa_debit' : 'visa';
-        if (/^5[1-5]/.test(n))  return isDebito ? 'debmaster' : 'master';
-        if (/^3[47]/.test(n))   return 'amex';
-        if (/^(36|38|30)/.test(n)) return 'diners';
-        if (/^(6011|65|64[4-9]|622)/.test(n)) return 'discover';
-        if (/^(50|63[6-9]|60680)/.test(n)) return 'elo';
-        if (/^(384|636368|438935|504175|451416|636297)/.test(n)) return 'elo';
-        if (/^(4011|4312|4389|4514|4576|50)/.test(n)) return 'elo';
-        // Fallback
-        return isDebito ? 'debvisa' : 'visa';
-    }
+        // ================================================================
+        //  PAGAMENTO CARTÃO (CRÉDITO / DÉBITO)
+        // ================================================================
+        async function processarPagamentoCartao(metodoPagamento) {
+            esconderErro();
+            if (validarDadosComuns() !== true) return;
 
-    // ================================================================
-    //  TRADUTORES DE ERRO
-    // ================================================================
-    function traduzirErroMP(msg) {
-        const erros = {
-            'invalid_number'        : 'Número do cartão inválido.',
-            'invalid_security_code' : 'CVV inválido.',
-            'invalid_expiration_date': 'Data de validade inválida.',
-            'invalid_cardholder_name': 'Nome no cartão inválido.',
-            'rejected_by_bank'      : 'Pagamento recusado pelo banco. Tente outro cartão.',
-            'insufficient_amount'   : 'Saldo insuficiente no cartão.',
-            'rejected_blacklist'    : 'Cartão bloqueado. Entre em contato com seu banco.',
-            'cc_rejected_call_for_authorize': 'Ligue para seu banco para autorizar a transação.',
-        };
-        return erros[msg] || msg;
-    }
+            const isDebito = metodoPagamento === 'debit_card';
+            const sufixo = isDebito ? '-debito' : '-cartao';
+            const btnId = isDebito ? 'btn-pagar-debito' : 'btn-pagar-credito';
 
-    function traduzirStatusDetail(detail) {
-        const detalhes = {
-            'cc_rejected_insufficient_amount' : 'Saldo insuficiente no cartão.',
-            'cc_rejected_bad_filled_card_number' : 'Número do cartão inválido.',
-            'cc_rejected_bad_filled_security_code': 'CVV inválido.',
-            'cc_rejected_bad_filled_date'     : 'Data de validade inválida.',
-            'cc_rejected_call_for_authorize'  : 'Ligue para seu banco para autorizar.',
-            'cc_rejected_card_disabled'       : 'Cartão desativado. Contate seu banco.',
-            'cc_rejected_duplicated_payment'  : 'Pagamento duplicado detectado.',
-            'cc_rejected_high_risk'           : 'Pagamento recusado por suspeita de fraude.',
-        };
-        return detalhes[detail] || null;
-    }
+            if (validarCartao(sufixo) !== true) return;
+
+            setBotaoCarregando(btnId, true);
+
+            const nome = document.getElementById('co-nome').value.trim();
+            const cpf = document.getElementById('co-cpf').value.replace(/\D/g, '');
+            const email = document.getElementById('co-email').value.trim();
+            const numCartao = document.getElementById('co-num' + sufixo).value.replace(/\s/g, '');
+            const validade = document.getElementById('co-validade' + sufixo).value;
+            const cvv = document.getElementById('co-cvv' + sufixo).value;
+            const nomeCartao = document.getElementById('co-nome' + sufixo).value.trim().toUpperCase();
+            const parcelas = isDebito ? 1 : parseInt(document.getElementById('co-parcelas').value);
+
+            const [mesStr, anoStr] = validade.split('/');
+            const mesCartao = parseInt(mesStr);
+            const anoCartao = 2000 + parseInt(anoStr);
+
+            const resetBotao = () => {
+                setBotaoCarregando(btnId, false);
+                document.getElementById(btnId).innerHTML = isDebito
+                    ? '<i class="ri-lock-line"></i> Pagar com Débito'
+                    : '<i class="ri-lock-line"></i> Pagar com Crédito';
+            };
+
+            try {
+                // PASSO 1 — Tokenizar o cartão com o SDK do MP (roda no browser, é seguro)
+                //           O token gerado não expõe os dados do cartão, apenas substitui por um ID único.
+                let cardToken;
+                try {
+                    const mp = new MercadoPago(MP_CONFIG.publicKey, { locale: 'pt-BR' });
+                    cardToken = await mp.createCardToken({
+                        cardNumber: numCartao,
+                        cardholderName: nomeCartao,
+                        cardExpirationMonth: String(mesCartao).padStart(2, '0'),
+                        cardExpirationYear: String(anoCartao),
+                        securityCode: cvv,
+                        identificationType: 'CPF',
+                        identificationNumber: cpf,
+                    });
+                } catch (tokenErr) {
+                    console.error('Erro ao tokenizar cartão:', tokenErr);
+                    resetBotao();
+                    return mostrarErro(tokenErr.message || 'Dados do cartão inválidos. Verifique e tente novamente.');
+                }
+
+                // PASSO 2 — Enviar token + dados para a Edge Function (que faz a chamada segura ao MP)
+                const data = await mpEdge('criar_pagamento_cartao', {
+                    transaction_amount: _co.precoProduto,
+                    description: _co.nomeProduto,
+                    token: cardToken.id,
+                    installments: parcelas,
+                    payment_method_id: obterPaymentMethodId(numCartao, isDebito),
+                    email,
+                    first_name: nome.split(' ')[0],
+                    last_name: nome.split(' ').slice(1).join(' '),
+                    cpf,
+                });
+
+                _co.paymentId = data.id;
+
+                const status = data.status;
+                if (status === 'approved') {
+                    mostrarStatusTela('aprovado', '✅', 'Pagamento aprovado!',
+                        'Seu pagamento foi confirmado com sucesso. Obrigado pela compra!', false);
+
+                } else if (status === 'in_process' || status === 'pending' || status === 'authorized') {
+                    mostrarStatusTela('pendente', '⏳', 'Pagamento em análise',
+                        'Seu pagamento está sendo processado. Você receberá uma confirmação em breve.', true);
+                    iniciarPolling(data.id);
+
+                } else {
+                    mostrarStatusTela('rejeitado', '❌', 'Pagamento recusado',
+                        traduzirStatusDetail(data.status_detail) || 'O pagamento não foi aprovado. Verifique os dados e tente novamente.', false);
+                }
+
+            } catch (err) {
+                console.error('Erro cartão:', err);
+                resetBotao();
+                mostrarErro(
+                    err.error || traduzirErroMP(err.detail) ||
+                    'Erro ao processar pagamento. Verifique sua conexão e tente novamente.'
+                );
+            }
+        }
+
+        // ================================================================
+        //  DETECTAR BANDEIRA DO CARTÃO (simplificado)
+        // ================================================================
+        function obterPaymentMethodId(numCartao, isDebito) {
+            const n = numCartao.replace(/\s/g, '');
+            if (/^4/.test(n)) return isDebito ? 'visa_debit' : 'visa';
+            if (/^5[1-5]/.test(n)) return isDebito ? 'debmaster' : 'master';
+            if (/^3[47]/.test(n)) return 'amex';
+            if (/^(36|38|30)/.test(n)) return 'diners';
+            if (/^(6011|65|64[4-9]|622)/.test(n)) return 'discover';
+            if (/^(50|63[6-9]|60680)/.test(n)) return 'elo';
+            if (/^(384|636368|438935|504175|451416|636297)/.test(n)) return 'elo';
+            if (/^(4011|4312|4389|4514|4576|50)/.test(n)) return 'elo';
+            // Fallback
+            return isDebito ? 'debvisa' : 'visa';
+        }
+
+        // ================================================================
+        //  TRADUTORES DE ERRO
+        // ================================================================
+        function traduzirErroMP(msg) {
+            const erros = {
+                'invalid_number': 'Número do cartão inválido.',
+                'invalid_security_code': 'CVV inválido.',
+                'invalid_expiration_date': 'Data de validade inválida.',
+                'invalid_cardholder_name': 'Nome no cartão inválido.',
+                'rejected_by_bank': 'Pagamento recusado pelo banco. Tente outro cartão.',
+                'insufficient_amount': 'Saldo insuficiente no cartão.',
+                'rejected_blacklist': 'Cartão bloqueado. Entre em contato com seu banco.',
+                'cc_rejected_call_for_authorize': 'Ligue para seu banco para autorizar a transação.',
+            };
+            return erros[msg] || msg;
+        }
+
+        function traduzirStatusDetail(detail) {
+            const detalhes = {
+                'cc_rejected_insufficient_amount': 'Saldo insuficiente no cartão.',
+                'cc_rejected_bad_filled_card_number': 'Número do cartão inválido.',
+                'cc_rejected_bad_filled_security_code': 'CVV inválido.',
+                'cc_rejected_bad_filled_date': 'Data de validade inválida.',
+                'cc_rejected_call_for_authorize': 'Ligue para seu banco para autorizar.',
+                'cc_rejected_card_disabled': 'Cartão desativado. Contate seu banco.',
+                'cc_rejected_duplicated_payment': 'Pagamento duplicado detectado.',
+                'cc_rejected_high_risk': 'Pagamento recusado por suspeita de fraude.',
+            };
+            return detalhes[detail] || null;
+        }
     </script>
 
     <!-- SDK Mercado Pago (carregado ao final para não bloquear a renderização) -->
