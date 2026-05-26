@@ -851,7 +851,7 @@
         align-items: center;
         justify-content: space-between;
         padding: 22px 24px 16px;
-        border-bottom: 1px solid #f0f0f0;
+      
     }
 
     .checkout-header h2 {
@@ -2389,14 +2389,15 @@
             <!-- Cabeçalho -->
             <div class="checkout-header">
                 <h2 style="font-weight: 400; font-size: 14px;">
-                    <img src="../recursos/icones/Mercado_Pago.svg" alt="" style="width: 150px;">
-                    Finalizando sua compra de forma segura com Mercado Pago.
+                    <img src="../recursos/icones/Mercado_Pago.svg" alt="" style="width: 150px;  height: 50px;
+  border-right: 1px solid #00000052"><img src="../recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="" style="width: 110px; margin-left: 20px;">
                 </h2>
+
                 <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar">
                     <i class="ri-close-line"></i>
                 </button>
             </div>
-
+<p style="margin-left: 25px; font-size: 12px; margin-bottom: 10px;">Finalize sua compra com segurança  e rapidez <br> atráves do Mercado Pago.</p>
             <!-- Resumo do produto -->
             <div class="checkout-resumo">
                 <span class="checkout-resumo-nome" id="co-nome-produto">—</span>
@@ -2831,7 +2832,7 @@
 
             if (_co.tentativasPolling > MP_CONFIG.pollingMaxTentativas) {
                 pararPolling();
-                mostrarStatusTela('pendente', '⏰', 'Tempo expirado',
+                mostrarStatusTela('pendente', '', 'Tempo expirado',
                     'Não conseguimos confirmar seu pagamento automaticamente. Se o pagamento foi realizado, entre em contato conosco.', false);
                 return;
             }
@@ -2842,12 +2843,12 @@
 
                 if (status === 'approved') {
                     pararPolling();
-                    mostrarStatusTela('aprovado', '✅', 'Pagamento aprovado!',
+                    mostrarStatusTela('aprovado', '', 'Pagamento aprovado!',
                         'Seu pagamento foi confirmado com sucesso. Em breve você receberá mais informações.', false);
 
                 } else if (status === 'rejected' || status === 'cancelled') {
                     pararPolling();
-                    mostrarStatusTela('rejeitado', '❌', 'Pagamento recusado',
+                    mostrarStatusTela('rejeitado', '', 'Pagamento recusado',
                         'O pagamento não foi aprovado. Verifique os dados do cartão ou tente outra forma de pagamento.', false);
                 }
                 // se pending/in_process: não faz nada, aguarda próximo tick do polling
@@ -2918,7 +2919,7 @@
 
                 // Adicionar imagem do PIX acima do texto
                 mpStatus.insertAdjacentHTML('afterbegin', `
-                <img src="../recursos/icones/pix@2x.png" alt="PIX" style="width:80px;margin-bottom:1px; margin-top: -30px;">
+                <img src="../recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="PIX" style="width:140px;margin-bottom:1px; margin-top: -30px;">
             `);
 
                 mpStatus.insertAdjacentHTML('beforeend', `
