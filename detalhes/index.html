@@ -2729,11 +2729,8 @@
 
             document.getElementById('checkout-overlay').classList.add('aberto');
                 document.body.style.overflow = 'hidden';
-                // foco no primeiro campo do modal para acessibilidade
-                setTimeout(() => {
-                    const first = document.querySelector('#checkout-overlay .mp-form-group input, #checkout-overlay .mp-form-group select, #checkout-overlay .btn-pagar');
-                    if (first) first.focus();
-                }, 120);
+                // Não aplicar foco automático em nenhum input ao abrir o modal
+                // (preserva acessibilidade sem selecionar o campo para digitação)
         }
 
         function fecharCheckout() {
