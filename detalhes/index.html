@@ -807,16 +807,18 @@
         }
     }
 
-    /* ===== CHECKOUT MODAL ===== */
+    /* ===== CHECKOUT MODAL (reestilizado para seguir padrão black-adm) ===== */
     .checkout-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.55);
+        background: rgba(15, 20, 35, 0.55);
         z-index: 9000;
         align-items: center;
         justify-content: center;
-        padding: 16px;
+        padding: 20px;
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
     }
 
     .checkout-overlay.aberto {
@@ -824,96 +826,81 @@
     }
 
     .checkout-modal {
-        background: #fff;
-        border-radius: 14px;
+        background: var(--white, #ffffff);
+        border-radius: 12px;
         width: 100%;
-        max-width: 480px;
-        max-height: 92vh;
+        max-width: 560px;
+        max-height: 94vh;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-        animation: checkoutSlide 0.3s ease;
+        box-shadow: 0 10px 30px rgba(12, 18, 30, 0.35);
+        animation: checkoutSlide 0.28s cubic-bezier(.2,.9,.3,1);
+        overflow: hidden;
     }
 
     @keyframes checkoutSlide {
-        from {
-            opacity: 0;
-            transform: translateY(24px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
     .checkout-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 22px 24px 16px;
-        background: #fff;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 18px 20px;
+        background: var(--white, #fff);
+        border-bottom: 1px solid var(--border, #edf2f7);
         flex-shrink: 0;
     }
 
-    .checkout-header h2 {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1a1a1a;
+    .checkout-brand {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 14px;
     }
 
-    .checkout-header h2 i {
-        color: #eb3a75;
-    }
+    .checkout-brand .mp-logo { height: 40px; display:block; }
+    .checkout-brand .store-logo { height: 34px; opacity: 0.95; }
 
     .checkout-fechar {
-        background: none;
-        border: none;
-        font-size: 22px;
+        background: var(--surface, #f7f8fa);
+        border: 1px solid var(--modal-border, #e8eaed);
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
         cursor: pointer;
-        color: #888;
-        padding: 4px;
-        line-height: 1;
-        transition: color 0.2s;
+        color: var(--muted, #6b7280);
+        transition: all 0.14s ease;
     }
 
-    .checkout-fechar:hover {
-        color: #333;
-    }
+    .checkout-fechar:hover { background: #fff0f0; color: var(--danger, #e53935); border-color: #fca5a5; }
 
     .checkout-resumo {
-        padding: 16px 24px;
-        background: #f0f5fd;
-        border-bottom: 1px solid #d5def5;
+        padding: 14px 20px;
+        background: var(--modal-accent-light, #eef2ff);
+        border-bottom: 1px solid var(--modal-border, #e8eaed);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 12px;
         flex-shrink: 0;
     }
 
-    .checkout-resumo-nome {
-        font-size: 14px;
-        color: #555;
-        max-width: 70%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    .checkout-resumo-nome { font-size: 15px; color: var(--text, #1a1d23); font-weight: 600; max-width: 72%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .checkout-resumo-preco { font-size: 18px; font-weight: 700; color: var(--success, #16a34a); }
 
-    .checkout-resumo-preco {
-        font-size: 20px;
-        font-weight: 400;
-        color: #1f6316;
-    }
+    .checkout-body { padding: 18px 20px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-    .checkout-body {
-        padding: 24px;
-        flex: 1;
-        overflow-y: auto;
+    /* mobile: sheet style */
+    @media (max-width: 640px) {
+        .checkout-overlay { align-items: flex-end; padding: 0; }
+        .checkout-modal { width: 100%; max-width: 100%; border-radius: 12px 12px 0 0; max-height: 92vh; }
+        .checkout-header { padding: 12px 14px; }
+        .checkout-resumo { padding: 12px 14px; }
+        .checkout-body { padding: 14px; }
     }
 
     /* Tabs de método de pagamento */
@@ -2492,18 +2479,17 @@
     <div class="checkout-overlay" id="checkout-overlay" onclick="fecharCheckoutOverlay(event)">
         <div class="checkout-modal" id="checkout-modal">
 
-            <!-- Cabeçalho -->
-            <div class="checkout-header">
-                <h2 style="font-weight: 400; font-size: 14px;">
-                    <img src="../recursos/icones/Mercado_Pago.svg" alt="" style="width: 150px;  height: 50px;
-  border-right: 1px solid #00000052"><img src="../recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp"
-                        alt="" style="width: 110px; margin-left: 20px;">
-                </h2>
+                    <!-- Cabeçalho -->
+                    <div class="checkout-header">
+                        <div class="checkout-brand">
+                            <img src="../recursos/icones/Mercado_Pago.svg" alt="Mercado Pago" class="mp-logo">
+                            <img src="../recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="Loja" class="store-logo">
+                        </div>
 
-                <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar">
-                    <i class="ri-close-line"></i>
-                </button>
-            </div>
+                        <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar" aria-label="Fechar checkout">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
             <p style="margin-left: 25px; font-size: 12px; margin-bottom: 10px;">Finalize sua compra com segurança e
                 rapidez <br> atráves do Mercado Pago.</p>
             <!-- Resumo do produto -->
@@ -2741,7 +2727,12 @@
             resetarCheckout();
 
             document.getElementById('checkout-overlay').classList.add('aberto');
-            document.body.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+                // foco no primeiro campo do modal para acessibilidade
+                setTimeout(() => {
+                    const first = document.querySelector('#checkout-overlay .mp-form-group input, #checkout-overlay .mp-form-group select, #checkout-overlay .btn-pagar');
+                    if (first) first.focus();
+                }, 120);
         }
 
         function fecharCheckout() {
@@ -2749,6 +2740,13 @@
             document.body.style.overflow = '';
             pararPolling();
         }
+
+        // fechar com tecla ESC quando modal estiver aberto
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('checkout-overlay').classList.contains('aberto')) {
+                fecharCheckout();
+            }
+        });
 
         function fecharCheckoutOverlay(e) {
             if (e.target === document.getElementById('checkout-overlay')) {
