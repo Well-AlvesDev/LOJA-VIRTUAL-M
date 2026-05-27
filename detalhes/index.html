@@ -897,7 +897,8 @@
     /* mobile: sheet style */
     @media (max-width: 640px) {
         .checkout-overlay { align-items: flex-end; padding: 0; }
-        .checkout-modal { width: 100%; max-width: 100%; border-radius: 12px 12px 0 0; max-height: 92vh; }
+        /* Fix: use a fixed sheet height so content changes don't push the sheet up */
+        .checkout-modal { width: 100%; max-width: 100%; border-radius: 12px 12px 0 0; max-height: 92vh; height: 92vh; }
         .checkout-header { padding: 12px 14px; }
         .checkout-resumo { padding: 12px 14px; }
         .checkout-body { padding: 14px; }
@@ -2802,6 +2803,17 @@
                 document.getElementById('secao-' + a).style.display = a === aba ? 'block' : 'none';
             });
             esconderErro();
+            // Evitar salto em mobile: remover foco do botão e garantir scroll interno
+            if (window.innerWidth <= 640) {
+                setTimeout(() => {
+                    try {
+                        const active = document.activeElement;
+                        if (active && (active.tagName === 'BUTTON' || active.tagName === 'A')) active.blur();
+                    } catch (e) { }
+                    const body = document.querySelector('#checkout-modal .checkout-body');
+                    if (body) body.scrollTop = 0;
+                }, 40);
+            }
         }
 
         // ================================================================
