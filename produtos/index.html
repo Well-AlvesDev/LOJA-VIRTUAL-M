@@ -1143,6 +1143,17 @@
             <div id="produtosContainer" class="produtos-container">
                 <!-- Cards serão gerados aqui pelo JavaScript -->
             </div>
+            <div id="nenhunmaPromocao" hidden style="text-align: center; padding: 60px 40px; color: #999;">
+                <i class="ri-emotion-sad-line"
+                    style="font-size: 64px; color: #eb3a75; margin-bottom: 20px; display: block;"></i>
+                <h2 style="font-size: 24px; color: #333; margin-bottom: 10px;">Nenhuma promoção disponível no momento
+                </h2>
+                <p style="font-size: 14px; color: #999; margin-bottom: 30px;">Volte em breve para conferir nossas
+                    melhores ofertas!</p>
+                <a href="../produtos/index.html"
+                    style="display: inline-block; padding: 12px 28px; background-color: #eb3a75; color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">Ver
+                    todos os produtos</a>
+            </div>
             <div id="produtosErro" hidden style="text-align: center; padding: 40px; color: #999;">
                 Não foi possível carregar os produtos. Tente novamente.
             </div>
@@ -3212,6 +3223,11 @@
             if (container) {
                 container.innerHTML = '';
             }
+
+            // Ocultar mensagens de erro
+            document.getElementById('nenhunmaPromocao').hidden = true;
+            document.getElementById('produtosErro').hidden = true;
+
             renderizarProdutos(produtosDaPagina, false);
 
             // Inicializar cliques dos produtos
@@ -3585,6 +3601,15 @@
 
                 // Usar o termo de pesquisa já extraído da URL (termoBuscaAtual)
                 let produtos = await buscarProdutosNoSupabase(termoBuscaAtual);
+
+                // Verificar se está em modo promoção e se não há produtos
+                if (modoPromocao && (!produtos || produtos.length === 0)) {
+                    logManager.warn('⚠️ Nenhuma promoção disponível no momento');
+                    esconderSkeletonLoader();
+                    document.getElementById('nenhunmaPromocao').hidden = false;
+                    document.getElementById('produtosContainer').innerHTML = '';
+                    return false;
+                }
 
                 if (!produtos || produtos.length === 0) {
                     logManager.warn('⚠️ Nenhum produto encontrado para o termo pesquisado');
