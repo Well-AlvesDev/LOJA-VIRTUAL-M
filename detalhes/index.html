@@ -398,25 +398,25 @@
     .produto-nome {
         font-size: 28px;
         font-weight: 400;
-        color: #333;
+        color: #545454;
         margin-bottom: 10px;
         text-transform: capitalize;
     }
 
     .produto-uuid {
         font-size: 12px;
-        color: #999;
+        color: #3186be;
         font-weight: 400;
         letter-spacing: 1px;
         margin-bottom: 15px;
-        font-family: 'Courier New', monospace;
+        font-family: sans-serif;
         text-transform: uppercase;
     }
 
     .produto-preco {
         font-size: 32px;
         font-weight: 400;
-        color: #eb3a75;
+        color: #4d4d4d;
         margin-bottom: 10px;
     }
 
@@ -643,7 +643,7 @@
     }
 
     .breadcrumb .breadcrumb-current {
-        color: #333;
+        color: #1d68be;
         font-weight: 500;
     }
 
@@ -935,9 +935,9 @@
     }
 
     .mp-tab.ativo {
-        border-color: #eb3a75;
-        color: #eb3a75;
-        background: #fdf0f5;
+        border-color: #fffdfe;
+        color: #3a8deb;
+        background: #f0f6fd;
     }
 
     /* Formulário dados pessoais */
@@ -2287,9 +2287,9 @@
                             <div class="produto-preco">${preco}</div>
                             <div class="meios-pagamento">
                                 <div class="meios-pagamento-icons">
-                                    <i class="ri-bank-card-line" style="color: #eb3a75; font-size: 16px;"></i>
-                                    <span style="color: #666; font-size: 14px;">Todos os cartões de crédito e débito</span>
-                                    <span style="color: #999;">| PIX </span>
+                                    <i class="ri-bank-card-line" style="color: black; font-size: 16px;"></i>
+                                    <span style="color: #666; font-size: 14px;">*Aceitamos cartões apenas na loja física</span>
+                                    <span style="color: green;">| Em nossa loja virtual aceitamos PIX</span>
                                     <div class="meio-pagamento-icon" title="Pix" style="margin-left: 5px;">
                                         <img src="../recursos/icones/pix@2x.png" alt="Pix">
                                     </div>
@@ -2512,15 +2512,7 @@
                     <button class="mp-tab ativo" onclick="trocarAba('pix')" id="tab-pix">
                         <img src="../recursos/icones/Pix_(Brazil)_logo.svg" alt=""
                             style="width: 70px; margin-right: 5px;">
-                        PIX
-                    </button>
-                    <button class="mp-tab" onclick="trocarAba('credito')" id="tab-credito">
-                        <img src="../recursos/icones/Basic_credit_card.svg.png" alt="" style="width: 30px;">
-                        Crédito
-                    </button>
-                    <button class="mp-tab" onclick="trocarAba('debito')" id="tab-debito">
-                        <img src="../recursos/icones/image.png" alt="" style="width: 30px;">
-                        Débito
+                        RECOMENDADO
                     </button>
                 </div>
 
@@ -2555,9 +2547,7 @@
 
                 <!-- ===== SEÇÃO PIX ===== -->
                 <div id="secao-pix">
-                    <div class="pix-instrucoes">
-
-                    </div>
+                
 
                     <!-- QR Code (aparece após gerar o PIX) -->
                     <div class="pix-qr-container" id="pix-qr-container">
@@ -2572,72 +2562,11 @@
                     <button class="btn-pagar" id="btn-gerar-pix" onclick="processarPagamentoPIX()">
                         <i class="ri-qr-code-line"></i> Gerar QR Code PIX
                     </button>
-                </div>
-
-                <!-- ===== SEÇÃO CARTÃO DE CRÉDITO ===== -->
-                <div id="secao-credito" style="display:none;">
-                    <div class="mp-form-group">
-                        <label for="co-num-cartao">Número do cartão *</label>
-                        <input type="text" id="co-num-cartao" placeholder="0000 0000 0000 0000" maxlength="19"
-                            oninput="mascaraCartao(this)">
+                        <div class="pix-instrucoes">
+                        <p style="font-size: 11px; font-weight: 400; color: #333; margin-top: 4px; max-width: 400px; text-align: center; display: inline-block;">
+                            Em nossa loja online, no momento, aceitamos apenas pagamentos via PIX. Cartões de crédito e débito são aceitos apenas na loja física.
+                        </p>
                     </div>
-                    <div class="mp-form-row">
-                        <div class="mp-form-group">
-                            <label for="co-validade">Validade *</label>
-                            <input type="text" id="co-validade" placeholder="MM/AA" maxlength="5"
-                                oninput="mascaraValidade(this)">
-                        </div>
-                        <div class="mp-form-group">
-                            <label for="co-cvv">CVV *</label>
-                            <input type="text" id="co-cvv" placeholder="123" maxlength="4">
-                        </div>
-                    </div>
-                    <div class="mp-form-group">
-                        <label for="co-nome-cartao">Nome no cartão *</label>
-                        <input type="text" id="co-nome-cartao" placeholder="JOÃO DA SILVA"
-                            style="text-transform:uppercase">
-                    </div>
-                    <div class="mp-form-group">
-                        <label for="co-parcelas">Parcelas *</label>
-                        <select id="co-parcelas">
-                            <option value="1">1x sem juros</option>
-                            <option value="2">2x sem juros</option>
-                            <option value="3">3x sem juros</option>
-                            <option value="6">6x sem juros</option>
-                            <option value="12">12x</option>
-                        </select>
-                    </div>
-                    <button class="btn-pagar" id="btn-pagar-credito" onclick="processarPagamentoCartao('credit_card')">
-                        <i class="ri-lock-line"></i> Pagar com Crédito
-                    </button>
-                </div>
-
-                <!-- ===== SEÇÃO CARTÃO DE DÉBITO ===== -->
-                <div id="secao-debito" style="display:none;">
-                    <div class="mp-form-group">
-                        <label for="co-num-debito">Número do cartão *</label>
-                        <input type="text" id="co-num-debito" placeholder="0000 0000 0000 0000" maxlength="19"
-                            oninput="mascaraCartao(this)">
-                    </div>
-                    <div class="mp-form-row">
-                        <div class="mp-form-group">
-                            <label for="co-validade-debito">Validade *</label>
-                            <input type="text" id="co-validade-debito" placeholder="MM/AA" maxlength="5"
-                                oninput="mascaraValidade(this)">
-                        </div>
-                        <div class="mp-form-group">
-                            <label for="co-cvv-debito">CVV *</label>
-                            <input type="text" id="co-cvv-debito" placeholder="123" maxlength="4">
-                        </div>
-                    </div>
-                    <div class="mp-form-group">
-                        <label for="co-nome-debito">Nome no cartão *</label>
-                        <input type="text" id="co-nome-debito" placeholder="JOÃO DA SILVA"
-                            style="text-transform:uppercase">
-                    </div>
-                    <button class="btn-pagar" id="btn-pagar-debito" onclick="processarPagamentoCartao('debit_card')">
-                        <i class="ri-lock-line"></i> Pagar com Débito
-                    </button>
                 </div>
 
                 <!-- ===== TELA DE STATUS ===== -->
@@ -2766,8 +2695,10 @@
             status.classList.remove('visivel', 'aprovado', 'pendente', 'rejeitado');
 
             // Mostrar tabs e conteúdo
-            document.getElementById('mp-tabs').style.display = 'flex';
-            document.getElementById('secao-dados-comprador').style.display = 'block';
+            const mpTabs = document.getElementById('mp-tabs');
+            if (mpTabs) mpTabs.style.display = 'flex';
+            const secaoDados = document.getElementById('secao-dados-comprador');
+            if (secaoDados) secaoDados.style.display = 'block';
 
             // Resetar abas e seções
             trocarAba('pix');
@@ -2798,8 +2729,10 @@
         function trocarAba(aba) {
             _co.abaAtiva = aba;
             ['pix', 'credito', 'debito'].forEach(a => {
-                document.getElementById('tab-' + a).classList.toggle('ativo', a === aba);
-                document.getElementById('secao-' + a).style.display = a === aba ? 'block' : 'none';
+                const tab = document.getElementById('tab-' + a);
+                if (tab) tab.classList.toggle('ativo', a === aba);
+                const section = document.getElementById('secao-' + a);
+                if (section) section.style.display = a === aba ? 'block' : 'none';
             });
             esconderErro();
             // Evitar salto em mobile: remover foco do botão e garantir scroll interno
@@ -2946,10 +2879,13 @@
         //  TELA DE STATUS
         // ================================================================
         function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
-            document.getElementById('mp-tabs').style.display = 'none';
-            document.getElementById('secao-dados-comprador').style.display = 'none';
+            const mpTabs = document.getElementById('mp-tabs');
+            if (mpTabs) mpTabs.style.display = 'none';
+            const secaoDados = document.getElementById('secao-dados-comprador');
+            if (secaoDados) secaoDados.style.display = 'none';
             ['pix', 'credito', 'debito'].forEach(a => {
-                document.getElementById('secao-' + a).style.display = 'none';
+                const section = document.getElementById('secao-' + a);
+                if (section) section.style.display = 'none';
             });
 
             const el = document.getElementById('mp-status');

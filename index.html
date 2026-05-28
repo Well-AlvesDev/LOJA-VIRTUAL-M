@@ -2599,14 +2599,12 @@
                 let textoParcelamento = '';
                 if (parcelamento) {
                     if (parcelamento['sem-juros-ate'] > 0) {
-                        const valorParcela = (parseFloat(precoFinal) / parcelamento['sem-juros-ate']).toFixed(2);
                         textoParcelamento = `<div class="produto-parcelamento">
-                            <span class="parcelas-count">${parcelamento['sem-juros-ate']} x</span> de R$ ${formatarPreco(valorParcela)} <span class="parcelas-info"><br class="quebra-pequena">sem juros</span>
+                            Em até <span class="parcelas-count">${parcelamento['sem-juros-ate']}x</span> <span class="parcelas-info">sem juros</span>
                         </div>`;
                     } else if (parcelamento['parcelado-em-ate'] > 0) {
-                        const valorParcela = (parseFloat(precoFinal) / parcelamento['parcelado-em-ate']).toFixed(2);
                         textoParcelamento = `<div class="produto-parcelamento">
-                            em até <span class="parcelas-count">${parcelamento['parcelado-em-ate']} x</span> de R$ ${formatarPreco(valorParcela)}<br class="quebra-pequena">
+                            Em até <span class="parcelas-count">${parcelamento['parcelado-em-ate']}x</span> <span class="parcelas-info">no cartão de crédito</span>
                         </div>`;
                     }
                 }
