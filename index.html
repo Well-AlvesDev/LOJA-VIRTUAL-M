@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <link rel="stylesheet" href="./recursos/css/Barra-de-pesquisa.css">
     <link rel="stylesheet" href="./recursos/css/estilos-para-card-de-produtos.css">
+    <link rel="stylesheet" href="./recursos/css/cart.css">
     <link rel="icon" type="image/png" href="./recursos/identidade/logo.jpg">
     <style>
         * {
@@ -416,49 +417,6 @@
             50%,
             100% {
                 opacity: 0;
-            }
-        }
-
-        /* Botão WhatsApp Fixo */
-        .whatsapp-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: #25d366;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-            z-index: 20;
-            text-decoration: none;
-            color: #fff;
-        }
-
-        .whatsapp-button:hover {
-            background-color: #20ba5f;
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .whatsapp-button i {
-            font-size: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .whatsapp-button {
-                bottom: 15px;
-                right: 15px;
-                width: 45px;
-                height: 45px;
-            }
-
-            .whatsapp-button i {
-                font-size: 19px;
             }
         }
 
@@ -3426,34 +3384,6 @@
         }
 
         // Controlar visibilidade do botão WhatsApp baseado no footer
-        function controlarBotaoWhatsApp() {
-            const whatsappBtn = document.querySelector('.whatsapp-button');
-            const footer = document.querySelector('footer');
-
-            if (!whatsappBtn || !footer) return;
-
-            // Usar IntersectionObserver para detectar quando o footer está próximo
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Footer está visível ou próximo, ocultar botão
-                        whatsappBtn.style.opacity = '0';
-                        whatsappBtn.style.pointerEvents = 'none';
-                        whatsappBtn.style.transition = 'opacity 0.3s ease';
-                    } else {
-                        // Footer não está visível, mostrar botão
-                        whatsappBtn.style.opacity = '1';
-                        whatsappBtn.style.pointerEvents = 'auto';
-                        whatsappBtn.style.transition = 'opacity 0.3s ease';
-                    }
-                });
-            }, {
-                rootMargin: '-160px' // Começar a ocultar -160px antes do footer ficar visível
-            });
-
-            observer.observe(footer);
-        }
-
         // Carregar produtos ao iniciar
         document.addEventListener('DOMContentLoaded', () => {
             iniciarLazyLoading();
@@ -3471,7 +3401,6 @@
                     iniciarLazyLoading();
                     gerarCategorias(); // Gerar categorias após carregar produtos
                     gerarFooter(); // Gerar footer após carregar produtos
-                    controlarBotaoWhatsApp(); // Iniciar controle do botão WhatsApp
                 }, 50);
             });
 
@@ -3612,9 +3541,21 @@
     </div>
 
     <!-- Botão WhatsApp Fixo -->
-    <a href="https://wa.me/5585988881234" target="_blank" class="whatsapp-button" title="Fale conosco no WhatsApp">
-        <i class="ri-whatsapp-line"></i>
-    </a>
+    <!-- CONTAINER DE AÇÕES FLUTUANTES (CARRINHO + WHATSAPP) -->
+    <div class="floating-actions">
+        <button class="floating-btn cart-button cart-icon-trigger" title="Abrir carrinho">
+            <i class="ri-shopping-cart-line"></i>
+            <div id="cart-badge"></div>
+        </button>
+        <a href="https://wa.me/5585988881234" class="floating-btn whatsapp-button" target="_blank"
+            rel="noopener noreferrer" title="Fale conosco no WhatsApp">
+            <i class="ri-whatsapp-line"></i>
+        </a>
+    </div>
+
+    <!-- Sistema de Carrinho -->
+    <script src="./config.js"></script>
+    <script src="./recursos/js/cart.js"></script>
 </body>
 
 </html>

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
+    <link rel="stylesheet" href="../recursos/css/cart.css">
     <link rel="icon" type="image/png" href="../recursos/identidade/logo.jpg">
 </head>
 <style>
@@ -296,14 +297,21 @@
         }
     }
 
-    /* Botão WhatsApp Fixo */
-    .whatsapp-button {
+    /* Container de Ações Flutuantes */
+    .floating-actions {
         position: fixed;
         bottom: 20px;
         right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        z-index: 20;
+    }
+
+    /* Botão Flutuante Genérico */
+    .floating-btn {
         width: 60px;
         height: 60px;
-        background-color: #25d366;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -311,30 +319,52 @@
         cursor: pointer;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         transition: all 0.3s ease;
-        z-index: 20;
+        border: none;
         text-decoration: none;
         color: #fff;
+        position: relative;
     }
 
-    .whatsapp-button:hover {
-        background-color: #20ba5f;
+    .floating-btn:hover {
         transform: scale(1.1);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
 
-    .whatsapp-button i {
+    .floating-btn i {
         font-size: 30px;
     }
 
+    /* Botão Carrinho */
+    .cart-button {
+        background-color: #eb3a75;
+    }
+
+    .cart-button:hover {
+        background-color: #d42d63;
+    }
+
+    /* Botão WhatsApp */
+    .whatsapp-button {
+        background-color: #25d366;
+    }
+
+    .whatsapp-button:hover {
+        background-color: #20ba5f;
+    }
+
     @media (max-width: 768px) {
-        .whatsapp-button {
+        .floating-actions {
             bottom: 15px;
             right: 15px;
+            gap: 12px;
+        }
+
+        .floating-btn {
             width: 45px;
             height: 45px;
         }
 
-        .whatsapp-button i {
+        .floating-btn i {
             font-size: 19px;
         }
     }
@@ -574,6 +604,38 @@
         font-size: 20px;
     }
 
+    .btn-adicionar-carrinho {
+        background-color: #f0f0f0;
+        color: #333;
+        border: 2px solid #eb3a75;
+        padding: 13px 30px;
+        font-size: 15px;
+        font-weight: 500;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-adicionar-carrinho:hover {
+        background-color: #eb3a75;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(235, 58, 117, 0.3);
+    }
+
+    .btn-adicionar-carrinho:active {
+        transform: translateY(0);
+    }
+
+    .btn-adicionar-carrinho i {
+        font-size: 18px;
+    }
+
     .loading-container {
         display: flex;
         flex-direction: column;
@@ -692,6 +754,11 @@
         .btn-pedido {
             padding: 12px 20px;
             font-size: 14px;
+        }
+
+        .btn-adicionar-carrinho {
+            padding: 11px 20px;
+            font-size: 13px;
         }
 
         .breadcrumb {
@@ -836,13 +903,20 @@
         display: flex;
         flex-direction: column;
         box-shadow: 0 10px 30px rgba(12, 18, 30, 0.35);
-        animation: checkoutSlide 0.28s cubic-bezier(.2,.9,.3,1);
+        animation: checkoutSlide 0.28s cubic-bezier(.2, .9, .3, 1);
         overflow: hidden;
     }
 
     @keyframes checkoutSlide {
-        from { opacity: 0; transform: translateY(18px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(18px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .checkout-header {
@@ -851,7 +925,7 @@
         justify-content: space-between;
         padding: 18px 20px;
         background: var(--white, #fff);
-      
+
         flex-shrink: 0;
     }
 
@@ -861,8 +935,15 @@
         gap: 14px;
     }
 
-    .checkout-brand .mp-logo { height: 40px; display:block; }
-    .checkout-brand .store-logo { height: 34px; opacity: 0.95; }
+    .checkout-brand .mp-logo {
+        height: 40px;
+        display: block;
+    }
+
+    .checkout-brand .store-logo {
+        height: 34px;
+        opacity: 0.95;
+    }
 
     .checkout-fechar {
         background: var(--surface, #f7f8fa);
@@ -878,7 +959,11 @@
         transition: all 0.14s ease;
     }
 
-    .checkout-fechar:hover { background: #fff0f0; color: var(--danger, #e53935); border-color: #fca5a5; }
+    .checkout-fechar:hover {
+        background: #fff0f0;
+        color: var(--danger, #e53935);
+        border-color: #fca5a5;
+    }
 
     .checkout-resumo {
         padding: 14px 20px;
@@ -891,19 +976,56 @@
         flex-shrink: 0;
     }
 
-    .checkout-resumo-nome { font-size: 15px; color: var(--text, #1a1d23); font-weight: 600; max-width: 72%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .checkout-resumo-preco { font-size: 18px; font-weight: 700; color: var(--success, #16a34a); }
+    .checkout-resumo-nome {
+        font-size: 15px;
+        color: var(--text, #1a1d23);
+        font-weight: 600;
+        max-width: 72%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-    .checkout-body { padding: 18px 20px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .checkout-resumo-preco {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--success, #16a34a);
+    }
+
+    .checkout-body {
+        padding: 18px 20px;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 
     /* mobile: sheet style */
     @media (max-width: 640px) {
-        .checkout-overlay { align-items: flex-end; padding: 0; }
+        .checkout-overlay {
+            align-items: flex-end;
+            padding: 0;
+        }
+
         /* Fix: use a fixed sheet height so content changes don't push the sheet up */
-        .checkout-modal { width: 100%; max-width: 100%; border-radius: 12px 12px 0 0; max-height: 92vh; height: 92vh; }
-        .checkout-header { padding: 12px 14px; }
-        .checkout-resumo { padding: 12px 14px; }
-        .checkout-body { padding: 14px; }
+        .checkout-modal {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 12px 12px 0 0;
+            max-height: 92vh;
+            height: 92vh;
+        }
+
+        .checkout-header {
+            padding: 12px 14px;
+        }
+
+        .checkout-resumo {
+            padding: 12px 14px;
+        }
+
+        .checkout-body {
+            padding: 14px;
+        }
     }
 
     /* Tabs de método de pagamento */
@@ -1430,14 +1552,21 @@
         </div>
     </main>
 
-    <!-- BOTÃO WHATSAPP -->
-    <a href="https://wa.me/5511999999999" class="whatsapp-button" target="_blank" rel="noopener noreferrer"
-        title="Fale conosco no WhatsApp">
-        <i class="ri-whatsapp-line"></i>
-    </a>
+    <!-- CONTAINER DE AÇÕES FLUTUANTES (CARRINHO + WHATSAPP) -->
+    <div class="floating-actions">
+        <button class="floating-btn cart-button cart-icon-trigger" title="Abrir carrinho">
+            <i class="ri-shopping-cart-line"></i>
+            <div id="cart-badge"></div>
+        </button>
+        <a href="https://wa.me/5511999999999" class="floating-btn whatsapp-button" target="_blank"
+            rel="noopener noreferrer" title="Fale conosco no WhatsApp">
+            <i class="ri-whatsapp-line"></i>
+        </a>
+    </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="../config.js"></script>
+    <script src="../recursos/js/cart.js"></script>
     <script>
         // ===== LIMPAR TODOS OS TOKENS DO SUPABASE AO ENTRAR NA PÁGINA DE DETALHES =====
         // Remove credenciais administrativas e tokens Supabase para evitar conflitos
@@ -2302,10 +2431,16 @@
                             ` : ''}
                             ${descricaoHtml}
                         </div>
-                        <button class="btn-pedido" onclick="abrirCheckout('${nomeProduto}', ${precoComDesconto}, ${produto.ID})">
-                            <i class="ri-shopping-bag-4-fill"></i>
-                            Comprar agora
-                        </button>
+                        <div style="display: flex; gap: 10px; flex-direction: column;">
+                            <button class="btn-pedido" onclick="abrirCheckout('${nomeProduto}', ${precoComDesconto}, ${produto.ID})">
+                                <i class="ri-shopping-bag-4-fill"></i>
+                                Comprar agora
+                            </button>
+                            <button class="btn-adicionar-carrinho" onclick="CartSystem.adicionarProdutoComDesabilitar(this, ${produto.ID}, '${nomeProduto}', ${precoComDesconto}, '${extrairUrlImagem(produto)}')">
+                                <i class="ri-add-line"></i>
+                                Adicionar ao carrinho
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2482,17 +2617,18 @@
     <div class="checkout-overlay" id="checkout-overlay" onclick="fecharCheckoutOverlay(event)">
         <div class="checkout-modal" id="checkout-modal">
 
-                    <!-- Cabeçalho -->
-                    <div class="checkout-header">
-                        <div class="checkout-brand">
-                            <img src="../recursos/icones/Mercado_Pago.svg" alt="Mercado Pago" class="mp-logo">
-                            <img src="../recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="Loja" class="store-logo">
-                        </div>
+            <!-- Cabeçalho -->
+            <div class="checkout-header">
+                <div class="checkout-brand">
+                    <img src="../recursos/icones/Mercado_Pago.svg" alt="Mercado Pago" class="mp-logo">
+                    <img src="../recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="Loja"
+                        class="store-logo">
+                </div>
 
-                        <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar" aria-label="Fechar checkout">
-                            <i class="ri-close-line"></i>
-                        </button>
-                    </div>
+                <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar" aria-label="Fechar checkout">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
             <p style="margin-left: 25px; font-size: 12px; margin-bottom: 10px;">Finalize sua compra com segurança e
                 rapidez <br> atráves do Mercado Pago.</p>
             <!-- Resumo do produto -->
@@ -2547,7 +2683,7 @@
 
                 <!-- ===== SEÇÃO PIX ===== -->
                 <div id="secao-pix">
-                
+
 
                     <!-- QR Code (aparece após gerar o PIX) -->
                     <div class="pix-qr-container" id="pix-qr-container">
@@ -2562,9 +2698,11 @@
                     <button class="btn-pagar" id="btn-gerar-pix" onclick="processarPagamentoPIX()">
                         <i class="ri-qr-code-line"></i> Gerar QR Code PIX
                     </button>
-                        <div class="pix-instrucoes">
-                        <p style="font-size: 11px; font-weight: 400; color: #333; margin-top: 4px; max-width: 400px; text-align: center; display: inline-block;">
-                            Em nossa loja online, no momento, aceitamos apenas pagamentos via PIX. Cartões de crédito e débito são aceitos apenas na loja física.
+                    <div class="pix-instrucoes">
+                        <p
+                            style="font-size: 11px; font-weight: 400; color: #333; margin-top: 4px; max-width: 400px; text-align: center; display: inline-block;">
+                            Em nossa loja online, no momento, aceitamos apenas pagamentos via PIX. Cartões de crédito e
+                            débito são aceitos apenas na loja física.
                         </p>
                     </div>
                 </div>
@@ -2605,10 +2743,12 @@
             edgeFunctionUrl: 'https://hovfcntzthahwszjaxsw.supabase.co/functions/v1/mp-checkout',
 
             // Intervalo de polling em ms (verifica status do pagamento a cada X ms)
-            pollingInterval: 3000,
+            // Aumentado para 5 segundos para reduzir requisições desnecessárias
+            pollingInterval: 5000,
 
             // Máximo de tentativas de polling antes de parar
-            pollingMaxTentativas: 40,
+            // 600 tentativas × 5 segundos = 3000 segundos = 50 minutos (cobre os 30 min do PIX com margem)
+            pollingMaxTentativas: 600,
         };
 
         // Helper: chama a Edge Function com uma action específica
@@ -2659,9 +2799,9 @@
             resetarCheckout();
 
             document.getElementById('checkout-overlay').classList.add('aberto');
-                document.body.style.overflow = 'hidden';
-                // Não aplicar foco automático em nenhum input ao abrir o modal
-                // (preserva acessibilidade sem selecionar o campo para digitação)
+            document.body.style.overflow = 'hidden';
+            // Não aplicar foco automático em nenhum input ao abrir o modal
+            // (preserva acessibilidade sem selecionar o campo para digitação)
         }
 
         function fecharCheckout() {
