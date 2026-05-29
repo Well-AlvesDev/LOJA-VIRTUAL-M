@@ -397,6 +397,82 @@
     font-size: 15px;
 }
 
+/* Modal de confirmação */
+.cart-confirmation-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 8500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.cart-confirmation-overlay.aberto {
+    display: flex;
+}
+
+.cart-confirmation-modal {
+    width: min(420px, 100%);
+    background: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    max-width: 420px;
+}
+
+.cart-confirmation-content {
+    margin-bottom: 20px;
+}
+
+.cart-confirmation-content h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: #111;
+}
+
+.cart-confirmation-content p {
+    margin: 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+.cart-confirmation-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.cart-confirmation-btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.cart-confirmation-cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.cart-confirmation-cancel:hover {
+    background: #e5e7eb;
+}
+
+.cart-confirmation-confirm {
+    background: #dc2626;
+    color: #fff;
+}
+
+.cart-confirmation-confirm:hover {
+    background: #b91c1c;
+}
+
 /* Notificação de Adição */
 .cart-notificacao {
     position: fixed;

@@ -28,6 +28,7 @@ const CartSystem = (() => {
         // Renderizar modal HTML (estrutura vazia, conteúdo será preenchido dinamicamente)
         if (!document.getElementById('cart-overlay')) {
             criarModalHTML();
+            criarModalConfirmacaoHTML();
         }
 
         // Anexar listeners ao botão de carrinho se existir
@@ -140,11 +141,80 @@ const CartSystem = (() => {
     }
 
     function limparCarrinhoComConfirmacao() {
-        if (confirm('Tem certeza que deseja remover todos os itens do carrinho?')) {
-            limparCarrinho();
-            renderizarCarrinho();
-            mostrarNotificacaoLimpeza();
-        }
+        mostrarModalConfirmacao(
+            'Tem certeza que deseja remover todos os itens do carrinho?',
+            () => {
+                limparCarrinho();
+                renderizarCarrinho();
+                mostrarNotificacaoLimpeza();
+            }
+        );
+    }
+
+    function criarModalConfirmacaoHTML() {
+        const modal = document.createElement('div');
+        modal.id = 'cart-confirmation-overlay';
+        modal.className = 'cart-confirmation-overlay';
+        modal.innerHTML = `
+            <div class="cart-confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="cart-confirmation-title">
+                <div class="cart-confirmation-content">
+                    <h3 id="cart-confirmation-title">Confirmar ação</h3>
+                    <p id="cart-confirmation-message">Tem certeza?</p>
+                </div>
+                <div class="cart-confirmation-actions">
+                    <button type="button" class="cart-confirmation-btn cart-confirmation-cancel">Cancelar</button>
+                    <button type="button" class="cart-confirmation-btn cart-confirmation-confirm">Sim, limpar tudo</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                esconderModalConfirmacao();
+            }
+        });
+
+        modal.querySelector('.cart-confirmation-cancel').addEventListener('click', esconderModalConfirmacao);
+        modal.querySelector('.cart-confirmation-confirm').addEventListener('click', () => {
+            const confirmar = modal.dataset.confirmAction;
+            if (confirmar && window[confirmar] instanceof Function) {
+                window[confirmar]();
+            }
+            esconderModalConfirmacao();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('aberto')) {
+                esconderModalConfirmacao();
+            }
+        });
+    }
+
+    function mostrarModalConfirmacao(mensagem, callbackConfirmar) {
+        const modal = document.getElementById('cart-confirmation-overlay');
+        if (!modal) return;
+
+        const messageElement = modal.querySelector('#cart-confirmation-message');
+        messageElement.textContent = mensagem;
+        modal.classList.add('aberto');
+        modal.dataset.confirmAction = 'cartConfirmationCallback';
+
+        window.cartConfirmationCallback = function() {
+            if (callbackConfirmar instanceof Function) {
+                callbackConfirmar();
+            }
+            delete window.cartConfirmationCallback;
+        };
+    }
+
+    function esconderModalConfirmacao() {
+        const modal = document.getElementById('cart-confirmation-overlay');
+        if (!modal) return;
+        modal.classList.remove('aberto');
+        delete window.cartConfirmationCallback;
+        delete modal.dataset.confirmAction;
     }
 
     // ===== CÁLCULOS =====
@@ -410,14 +480,13 @@ const CartSystem = (() => {
     function irParaCheckout() {
         if (carrinhoData.length === 0) return;
 
-        // Serializar carrinho para passar via URL ou sessionStorage
+        // Serializar carrinho para passar via sessionStorage
         sessionStorage.setItem('cart-checkout', JSON.stringify(carrinhoData));
         fecharCarrinho();
 
-        // Se houver primeiro produto, abrir checkout com ele
-        const primeiroProduto = carrinhoData[0];
+        // Passar todos os produtos para o checkout
         if (typeof abrirCheckout === 'function') {
-            abrirCheckout(primeiroProduto.nome, primeiroProduto.preco, primeiroProduto.id);
+            abrirCheckout(carrinhoData);
         }
     }
 
