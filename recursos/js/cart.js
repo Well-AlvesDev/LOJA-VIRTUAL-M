@@ -8,6 +8,8 @@ const CartSystem = (() => {
     // ===== CONFIGURAÇÃO =====
     const STORAGE_KEY = 'dona-flor-cart';
     const CLICK_THROTTLE_MS = 1000; // Intervalo mínimo entre cliques (ms)
+    const MAX_QUANTIDADE_POR_PRODUTO = 9; // Máximo de unidades do mesmo produto
+    const MAX_PRODUTOS_DIFERENTES = 10; // Máximo de produtos diferentes no carrinho
     let supabaseClient = null;
     let carrinhoData = null;
     const ultimoCliquePorProduto = new Map(); // Rastrear últimos cliques
@@ -85,9 +87,21 @@ const CartSystem = (() => {
         const indexExistente = carrinhoData.findIndex(item => item.id === produtoId);
 
         if (indexExistente >= 0) {
+            // Verificar se atingiu o máximo
+            if (carrinhoData[indexExistente].quantidade >= MAX_QUANTIDADE_POR_PRODUTO) {
+                console.warn(`⚠️ Quantidade máxima (${MAX_QUANTIDADE_POR_PRODUTO}) atingida para "${nomeProduto}"`);
+                mostrarNotificacaoErro(`Máximo de ${MAX_QUANTIDADE_POR_PRODUTO} unidades por produto`);
+                return false;
+            }
             // Aumentar quantidade
             carrinhoData[indexExistente].quantidade += 1;
         } else {
+            // Verificar se já atingiu o máximo de produtos diferentes
+            if (carrinhoData.length >= MAX_PRODUTOS_DIFERENTES) {
+                console.warn(`⚠️ Máximo de ${MAX_PRODUTOS_DIFERENTES} produtos diferentes atingido`);
+                mostrarNotificacaoErro(`Máximo de ${MAX_PRODUTOS_DIFERENTES} produtos diferentes no carrinho`);
+                return false;
+            }
             // Adicionar novo produto
             carrinhoData.push({
                 id: produtoId,
@@ -121,11 +135,22 @@ const CartSystem = (() => {
         const produto = carrinhoData.find(item => item.id === produtoId);
         if (!produto) return false;
 
-        if (novaQuantidade <= 0) {
+        const quantidadeInt = parseInt(novaQuantidade);
+
+        // Validar quantidade
+        if (quantidadeInt > MAX_QUANTIDADE_POR_PRODUTO) {
+            console.warn(`⚠️ Quantidade excede o máximo de ${MAX_QUANTIDADE_POR_PRODUTO}`);
+            mostrarNotificacaoErro(`Máximo de ${MAX_QUANTIDADE_POR_PRODUTO} unidades por produto`);
+            produto.quantidade = MAX_QUANTIDADE_POR_PRODUTO;
+            salvarNoLocalStorage(carrinhoData);
+            return false;
+        }
+
+        if (quantidadeInt <= 0) {
             return removerProduto(produtoId);
         }
 
-        produto.quantidade = parseInt(novaQuantidade);
+        produto.quantidade = quantidadeInt;
         salvarNoLocalStorage(carrinhoData);
         return true;
     }
@@ -334,9 +359,9 @@ const CartSystem = (() => {
                             <button class="cart-btn-menos" onclick="CartSystem.atualizarQuantidadeUI(${item.id}, ${item.quantidade - 1})">
                                 <i class="ri-subtract-line"></i>
                             </button>
-                            <input type="number" class="cart-quantidade" value="${item.quantidade}" min="1" 
+                            <input type="number" class="cart-quantidade" value="${item.quantidade}" min="1" max="${MAX_QUANTIDADE_POR_PRODUTO}"
                                    onchange="CartSystem.atualizarQuantidadeUI(${item.id}, this.value)">
-                            <button class="cart-btn-mais" onclick="CartSystem.atualizarQuantidadeUI(${item.id}, ${item.quantidade + 1})">
+                            <button class="cart-btn-mais" onclick="CartSystem.atualizarQuantidadeUI(${item.id}, ${item.quantidade + 1})" ${item.quantidade >= MAX_QUANTIDADE_POR_PRODUTO ? 'disabled' : ''}>
                                 <i class="ri-add-line"></i>
                             </button>
                         </div>
