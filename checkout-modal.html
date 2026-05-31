@@ -1,0 +1,119 @@
+<!--
+  checkout-modal.html — Trecho HTML do modal de checkout
+  Cole este bloco em cada página, ANTES do </body>
+  Requer: checkout.css, checkout.js e o SDK do Mercado Pago
+-->
+
+<!-- ===== MODAL DE CHECKOUT MERCADO PAGO ===== -->
+    <div class="checkout-overlay" id="checkout-overlay" onclick="fecharCheckoutOverlay(event)">
+        <div class="checkout-modal" id="checkout-modal">
+
+            <!-- Cabeçalho -->
+            <div class="checkout-header">
+                <div class="checkout-brand">
+                    <img src="./recursos/icones/Mercado_Pago.svg" alt="Mercado Pago" class="mp-logo">
+                    <img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="Loja"
+                        class="store-logo">
+                </div>
+
+                <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar" aria-label="Fechar checkout">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <p style="margin-left: 25px; font-size: 12px; margin-bottom: 10px;">Finalize sua compra com segurança e
+                rapidez <br> atráves do Mercado Pago.</p>
+            <!-- Resumo do produto -->
+            <div class="checkout-resumo">
+                <span class="checkout-resumo-nome" id="co-nome-produto">—</span>
+                <span class="checkout-resumo-preco" id="co-preco-produto">R$ 0,00</span>
+            </div>
+
+            <!-- Corpo do checkout -->
+            <div class="checkout-body">
+
+                <!-- Mensagem de erro -->
+                <div class="mp-erro" id="mp-erro"></div>
+
+                <!-- Tabs de método de pagamento -->
+                <div class="mp-tabs" id="mp-tabs">
+                    <button class="mp-tab ativo" onclick="trocarAba('pix')" id="tab-pix">
+                        <img src="./recursos/icones/Pix_(Brazil)_logo.svg" alt=""
+                            style="width: 70px; margin-right: 5px;">
+                        RECOMENDADO
+                    </button>
+                </div>
+
+                <!-- ===== DADOS DO COMPRADOR (comuns a todos) ===== -->
+                <div id="secao-dados-comprador">
+                    <div class="mp-form-row">
+                        <div class="mp-form-group">
+                            <label for="co-nome">Nome completo *</label>
+                            <input type="text" id="co-nome" placeholder="João da Silva" autocomplete="name">
+                        </div>
+                        <div class="mp-form-group">
+                            <label for="co-cpf">CPF *</label>
+                            <input type="text" id="co-cpf" placeholder="000.000.000-00" maxlength="14"
+                                oninput="mascaraCPF(this)">
+                        </div>
+                    </div>
+                    <div class="mp-form-group">
+                        <label for="co-email">E-mail *</label>
+                        <input type="email" id="co-email" placeholder="joao@email.com" autocomplete="email">
+                    </div>
+                    <div class="mp-form-group">
+                        <label for="co-telefone">Telefone / WhatsApp *</label>
+                        <input type="tel" id="co-telefone" placeholder="(00) 00000-0000" maxlength="15"
+                            oninput="mascaraTelefone(this)" autocomplete="tel">
+                    </div>
+                    <div class="mp-form-group">
+                        <label for="co-endereco">Endereço de entrega *</label>
+                        <input type="text" id="co-endereco" placeholder="Rua, número, bairro, cidade – UF"
+                            autocomplete="street-address">
+                    </div>
+                </div>
+
+                <!-- ===== SEÇÃO PIX ===== -->
+                <div id="secao-pix">
+
+
+                    <!-- QR Code (aparece após gerar o PIX) -->
+                    <div class="pix-qr-container" id="pix-qr-container">
+                        <img id="pix-qr-img" src="" alt="QR Code PIX">
+                        <div class="pix-copia-cola" id="pix-copia-cola-texto"></div>
+                        <button class="pix-copiar-btn" onclick="copiarPixCopiaCola()">
+                            <i class="ri-file-copy-line"></i> Copiar código PIX
+                        </button>
+                    </div>
+
+                    <!-- Botão gerar PIX -->
+                    <button class="btn-pagar" id="btn-gerar-pix" onclick="processarPagamentoPIX()">
+                        <i class="ri-qr-code-line"></i> Gerar QR Code PIX
+                    </button>
+                    <div class="pix-instrucoes">
+                        <p
+                            style="font-size: 11px; font-weight: 400; color: #333; margin-top: 4px; max-width: 400px; text-align: center; display: inline-block;">
+                            Em nossa loja online, no momento, aceitamos apenas pagamentos via PIX. Cartões de crédito e
+                            débito são aceitos apenas na loja física.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ===== TELA DE STATUS ===== -->
+                <div class="mp-status" id="mp-status">
+                    <div class="mp-status-icon" id="mp-status-icon">⏳</div>
+                    <h3 id="mp-status-titulo">Processando...</h3>
+                    <p id="mp-status-descricao">Aguarde enquanto confirmamos seu pagamento.</p>
+                    <div class="mp-polling-info" id="mp-polling-info">
+                        <div class="mp-polling-dot"></div>
+                        <span>Verificando pagamento...</span>
+                    </div>
+                </div>
+
+                <!-- Segurança -->
+                <div class="checkout-seguranca">
+                    <i class="ri-shield-check-fill"></i>
+                    Pagamento 100% seguro via Mercado Pago
+                </div>
+            </div>
+        </div>
+    </div>
