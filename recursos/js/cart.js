@@ -226,7 +226,7 @@ const CartSystem = (() => {
         modal.classList.add('aberto');
         modal.dataset.confirmAction = 'cartConfirmationCallback';
 
-        window.cartConfirmationCallback = function() {
+        window.cartConfirmationCallback = function () {
             if (callbackConfirmar instanceof Function) {
                 callbackConfirmar();
             }
@@ -306,6 +306,14 @@ const CartSystem = (() => {
         // Event listener para clicar em um produto e ir para detalhes
         const cartBody = modal.querySelector('#cart-body');
         cartBody.addEventListener('click', (e) => {
+            // Não redirecionar se o clique foi em botões de controle
+            if (e.target.closest('.cart-btn-remover') ||
+                e.target.closest('.cart-btn-menos') ||
+                e.target.closest('.cart-btn-mais') ||
+                e.target.closest('.cart-quantidade')) {
+                return;
+            }
+
             const cartItem = e.target.closest('.cart-item');
             if (cartItem) {
                 const produtoId = cartItem.dataset.productId;
@@ -560,7 +568,7 @@ const CartSystem = (() => {
         botao.disabled = true;
         botao.style.opacity = '0.6';
         botao.style.cursor = 'not-allowed';
-        
+
         const textoOriginal = botao.innerHTML;
         botao.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Adicionando...';
 
