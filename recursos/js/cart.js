@@ -259,7 +259,7 @@ const CartSystem = (() => {
         modal.innerHTML = `
             <div class="cart-modal" id="cart-modal">
                 <div class="cart-header">
-                    <h2>Meu Carrinho</h2>
+                    <h2 id="cart-title">Meu Carrinho</h2>
                     <button class="cart-close" onclick="CartSystem.fecharCarrinho()" aria-label="Fechar carrinho">
                         <i class="ri-close-line"></i>
                     </button>
@@ -303,6 +303,18 @@ const CartSystem = (() => {
 
         document.body.appendChild(modal);
 
+        // Event listener para clicar em um produto e ir para detalhes
+        const cartBody = modal.querySelector('#cart-body');
+        cartBody.addEventListener('click', (e) => {
+            const cartItem = e.target.closest('.cart-item');
+            if (cartItem) {
+                const produtoId = cartItem.dataset.productId;
+                if (produtoId) {
+                    window.location.href = `../detalhes/index.html?id=${produtoId}`;
+                }
+            }
+        });
+
         // Event listener para fechar ao clicar no overlay
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -321,6 +333,13 @@ const CartSystem = (() => {
     function renderizarCarrinho() {
         const cartBody = document.getElementById('cart-body');
         const cartFooter = document.getElementById('cart-footer');
+        const quantidadeTotal = calcularQuantidadeTotal();
+
+        // Atualizar título com quantidade total
+        const titleElement = document.getElementById('cart-title');
+        if (titleElement) {
+            titleElement.textContent = `Meu Carrinho (${quantidadeTotal})`;
+        }
 
         if (!cartBody) return;
 
