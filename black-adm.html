@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <script src="config.js"></script>
     <style>
@@ -405,10 +406,13 @@
         }
 
         @keyframes badgePulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
             }
+
             50% {
                 transform: scale(1.1);
                 box-shadow: 0 4px 12px rgba(234, 88, 12, 0.5);
@@ -417,6 +421,56 @@
 
         .orders-notification-badge.hidden {
             display: none;
+        }
+
+        /* Filtro de pedidos abaixo do cabeçalho do modal */
+        .orders-filter-bar {
+            padding: 10px 24px;
+            border-bottom: 1px solid var(--modal-border);
+            background: var(--modal-surface);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .orders-filter-bar label {
+            color: var(--modal-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .orders-filter-bar #filterDropdown {
+            display: inline-block;
+            flex: 1;
+            min-width: 150px;
+            max-width: 300px;
+        }
+
+        @media (max-width: 640px) {
+            .orders-filter-bar {
+                padding: 12px 16px;
+                gap: 10px;
+            }
+
+            .orders-filter-bar label {
+                font-size: 0.85rem;
+            }
+
+            .orders-filter-bar #filterDropdown {
+                min-width: 140px;
+                max-width: 100%;
+            }
+        }
+
+        .orders-filter {
+            padding: 6px 10px;
+            border: 1px solid var(--modal-border);
+            background: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--modal-text);
         }
 
         /* ── INFO STRIP ── */
@@ -950,7 +1004,7 @@
         }
 
         .toggle-switch input:checked+.toggle-track {
-            background: #20de20;
+            background: var(--success);
         }
 
         .toggle-switch input:checked+.toggle-track::after {
@@ -1812,6 +1866,178 @@
             padding-top: 12px;
             border-top: 1px solid var(--modal-border);
         }
+
+        /* ===== CUSTOM DROPDOWN WITH VUE ===== */
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+            width: auto;
+            font-family: 'DM Sans', Arial, sans-serif;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1.5px solid var(--modal-border);
+            background: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--modal-text);
+            font-weight: 500;
+            transition: all var(--transition);
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .dropdown-trigger:hover {
+            border-color: var(--modal-accent);
+            background: var(--modal-input-bg);
+        }
+
+        .dropdown-trigger.active {
+            border-color: var(--modal-accent);
+            background: var(--modal-accent-light);
+            color: var(--modal-accent);
+        }
+
+        .dropdown-icon {
+            font-size: 14px;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .dropdown-trigger.active .dropdown-icon {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: white;
+            border: 1.5px solid var(--modal-border);
+            border-radius: var(--radius-sm);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            min-width: 100%;
+            animation: dropdownSlideDown 0.15s ease;
+        }
+
+        @keyframes dropdownSlideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--modal-text);
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--modal-border);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--modal-surface);
+            color: var(--modal-accent);
+        }
+
+        .dropdown-item.selected {
+            background: var(--modal-accent-light);
+            color: var(--modal-accent);
+            font-weight: 600;
+        }
+
+        .dropdown-item.selected::before {
+            content: '✓';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            margin-right: 4px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* Tablet responsividade para dropdown */
+        @media (max-width: 768px) and (min-width: 641px) {
+            .dropdown-trigger {
+                padding: 8px 12px;
+                font-size: 0.88rem;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: calc(100% + 6px);
+                left: 0;
+                width: auto;
+                min-width: 200px;
+                max-height: 300px;
+                overflow-y: auto;
+                z-index: 2000;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+                border-radius: var(--radius-md);
+                animation: dropdownSlideDown 0.15s ease;
+            }
+
+            .dropdown-item {
+                padding: 11px 15px;
+                font-size: 0.92rem;
+            }
+        }
+
+        /* Mobile responsividade para dropdown */
+        @media (max-width: 640px) {
+            .dropdown-trigger {
+                padding: 9px 12px;
+                font-size: 0.85rem;
+            }
+
+            .custom-dropdown {
+                width: 100%;
+                max-width: 100%;
+                position: relative;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: calc(100% + 6px);
+                left: 0;
+                right: auto;
+                width: auto;
+                min-width: 180px;
+                max-width: calc(100vw - 20px);
+                max-height: 250px;
+                overflow-y: auto;
+                z-index: 2000;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+                border-radius: var(--radius-md);
+                animation: dropdownSlideDown 0.15s ease;
+            }
+
+            .dropdown-item {
+                padding: 11px 14px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 
@@ -2115,6 +2341,12 @@
                     </div>
                 </div>
                 <button class="close-btn" id="closeOrdersModal" title="Fechar">&times;</button>
+            </div>
+
+            <!-- Filtro de pedidos abaixo do cabeçalho -->
+            <div class="orders-filter-bar" id="ordersFilterBar">
+                <label>Mostrar:</label>
+                <div id="filterDropdown" style="display: inline-block;"></div>
             </div>
 
             <div class="modal-body">
@@ -2989,12 +3221,15 @@
             document.getElementById('btnViewOrders').addEventListener('click', openOrdersModal);
 
             fetchImagekitCredentials();
-            
+
             // Verificar pedidos pendentes ao carregar a página
             checkAndUpdatePendingOrders();
-            
-            // Verificar pedidos pendentes ao carregar a página
-            checkAndUpdatePendingOrders();
+
+            // Vincular mudança do filtro para recarregar pedidos quando selecionado
+            const ordersFilterEl = document.getElementById('ordersFilter');
+            if (ordersFilterEl) {
+                ordersFilterEl.addEventListener('change', fetchOrders);
+            }
         }
 
         // ---------- Visualizador de Pedidos ----------
@@ -3069,7 +3304,7 @@
         async function updateOrderViewStatus(orderId, newViewStatus) {
             try {
                 console.log('Atualizando pedido:', orderId, 'view:', newViewStatus);
-                
+
                 const { data, error } = await supabase
                     .from('pedidos_cps56')
                     .update({ view: newViewStatus })
@@ -3081,7 +3316,7 @@
                     alert(`Erro ao atualizar pedido: ${error.message}`);
                     return false;
                 }
-                
+
                 console.log('Pedido atualizado com sucesso:', data);
                 return true;
             } catch (err) {
@@ -3097,14 +3332,14 @@
         function updateOrdersNotificationBadge() {
             const badge = document.getElementById('ordersNotificationBadge');
             if (!badge) return;
-            
+
             // Buscar todos os pedidos do localStorage ou fazer fetch
             const ordersList = document.getElementById('ordersList');
             if (!ordersList) return;
-            
+
             // Contar pedidos pendentes (cards sem a classe 'viewed')
             const pendingOrders = document.querySelectorAll('.order-card:not(.viewed)').length;
-            
+
             if (pendingOrders > 0) {
                 badge.textContent = pendingOrders;
                 badge.classList.remove('hidden');
@@ -3117,10 +3352,10 @@
             try {
                 const { data, error } = await supabase.from('pedidos_cps56').select('view');
                 if (error) throw error;
-                
+
                 const orders = data || [];
                 const pendingCount = orders.filter(o => o.view === false).length;
-                
+
                 const badge = document.getElementById('ordersNotificationBadge');
                 if (badge) {
                     if (pendingCount > 0) {
@@ -3139,10 +3374,10 @@
             try {
                 const { data, error } = await supabase.from('pedidos_cps56').select('view');
                 if (error) throw error;
-                
+
                 const orders = data || [];
                 const pendingCount = orders.filter(o => o.view === false).length;
-                
+
                 const badge = document.getElementById('ordersNotificationBadge');
                 if (badge) {
                     if (pendingCount > 0) {
@@ -3157,7 +3392,7 @@
             }
         }
 
-        async function fetchOrders() {
+        async function fetchOrders(filterType) {
             const ordersList = document.getElementById('ordersList');
             const ordersCountText = document.getElementById('ordersCountText');
             if (ordersList) ordersList.innerHTML = '<div style="text-align:center;padding:20px;"><span class="loading-spinner"></span> Carregando pedidos...</div>';
@@ -3169,12 +3404,12 @@
                     return;
                 }
                 const orders = data || [];
-                
+
                 // Calcular totais
                 const totalOrders = orders.length;
                 const completedOrders = orders.filter(o => o.view === true).length;
                 const pendingOrders = orders.filter(o => o.view === false).length;
-                
+
                 if (ordersCountText) {
                     ordersCountText.innerHTML = `${totalOrders} pedido(s) · <span style="color: #16a34a; font-weight: 600;">${completedOrders} concluído(s)</span> · <span style="color: #e53935; font-weight: 600;">${pendingOrders} pendente(s)</span>`;
                 }
@@ -3189,8 +3424,25 @@
                         notificationBadge.classList.add('hidden');
                     }
                 }
-                
+
+                // Determinar filtro atual (usar parâmetro ou padrão 'pending')
+                const filter = filterType || 'pending';
+
                 if (!orders || orders.length === 0) {
+                    const empty = document.getElementById('ordersEmpty');
+                    if (empty) empty.style.display = 'block';
+                    if (ordersList) ordersList.innerHTML = '';
+                    return;
+                }
+
+                // Filtrar pedidos de acordo com o filtro selecionado
+                let displayOrders = orders.filter(o => {
+                    if (filter === 'pending') return !o.view;
+                    if (filter === 'completed') return o.view === true;
+                    return true;
+                });
+
+                if (!displayOrders || displayOrders.length === 0) {
                     const empty = document.getElementById('ordersEmpty');
                     if (empty) empty.style.display = 'block';
                     if (ordersList) ordersList.innerHTML = '';
@@ -3200,20 +3452,11 @@
                     if (empty) empty.style.display = 'none';
                 }
 
-                // Ordenar pedidos: pendentes primeiro, depois concluídos, ambos ordenados por created_at (mais recentes primeiro)
-                orders.sort((a, b) => {
-                    // Primeiro, pedidos pendentes (view = false) vêm antes dos concluídos (view = true)
-                    if (a.view !== b.view) {
-                        return (a.view ? 1 : 0) - (b.view ? 1 : 0);
-                    }
-                    // Se têm o mesmo status, ordena por created_at (mais recentes primeiro)
-                    const dateA = new Date(a.created_at || 0);
-                    const dateB = new Date(b.created_at || 0);
-                    return dateB - dateA;
-                });
+                // Ordenar por created_at (mais recentes primeiro)
+                displayOrders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
                 if (ordersList) ordersList.innerHTML = '';
-                orders.forEach(order => {
+                displayOrders.forEach(order => {
                     const produtos = parseProducts(order.produto_nome_e_id || order.produto_nome || '');
                     const pedidoTotal = formatCurrency(order.produto_valor || order.total || '');
                     const clienteNome = order.cliente_nome || '';
@@ -3296,7 +3539,7 @@
                             </div>
                         </div>
                     `;
-                    
+
                     // Event listener para expandir/recolher
                     const header = card.querySelector('.order-header');
                     header.addEventListener('click', () => {
@@ -3309,7 +3552,7 @@
                         // Atualiza a referência do pedido expandido
                         expandedOrderCard = card.classList.contains('expanded') ? card : null;
                     });
-                    
+
                     if (ordersList) ordersList.appendChild(card);
                 });
 
@@ -3329,6 +3572,8 @@
                                 const labelText = card.querySelector('.order-status-text');
                                 if (labelText) labelText.textContent = newStatus ? 'Concluído' : 'Pendente';
                             }
+                            // Recarregar a lista para respeitar o filtro atual
+                            fetchOrders();
                         } else {
                             toggle.checked = !newStatus;
                         }
@@ -3345,6 +3590,9 @@
         function openOrdersModal() {
             const ordersModal = document.getElementById('ordersModal');
             if (ordersModal) ordersModal.style.display = 'flex';
+            // Definir filtro padrão para pedidos pendentes ao abrir
+            const ordersFilterEl = document.getElementById('ordersFilter');
+            if (ordersFilterEl) ordersFilterEl.value = 'pending';
             fetchOrders();
         }
 
@@ -3411,6 +3659,101 @@
                 // Erro silencioso ao remover imagem (não afeta o fluxo principal)
             }
         }
+
+        // ===== VUE CUSTOM DROPDOWN COMPONENT =====
+        const { createApp } = Vue;
+
+        const OrderFilterDropdown = {
+            template: `
+                <div class="custom-dropdown">
+                    <button 
+                        class="dropdown-trigger" 
+                        :class="{ active: isOpen }"
+                        @click="toggleDropdown"
+                        type="button"
+                    >
+                        <span>{{ selectedLabel }}</span>
+                        <i class="ri-arrow-down-s-line dropdown-icon"></i>
+                    </button>
+                    <div class="dropdown-menu" v-if="isOpen" @click.stop>
+                        <div 
+                            v-for="option in options" 
+                            :key="option.value"
+                            class="dropdown-item"
+                            :class="{ selected: selectedValue === option.value }"
+                            @click="selectOption(option)"
+                        >
+                            {{ option.label }}
+                        </div>
+                    </div>
+                </div>
+            `,
+            data() {
+                return {
+                    isOpen: false,
+                    selectedValue: 'pending',
+                    selectedLabel: 'Pedidos pendentes',
+                    options: [
+                        { label: 'Pedidos pendentes', value: 'pending' },
+                        { label: 'Pedidos concluídos', value: 'completed' }
+                    ]
+                };
+            },
+            methods: {
+                toggleDropdown() {
+                    this.isOpen = !this.isOpen;
+                },
+                selectOption(option) {
+                    this.selectedValue = option.value;
+                    this.selectedLabel = option.label;
+                    this.isOpen = false;
+
+                    // Disparar evento customizado para integrar com código existente
+                    const event = new CustomEvent('filterChange', {
+                        detail: { filter: option.value }
+                    });
+                    document.getElementById('ordersFilterBar').dispatchEvent(event);
+
+                    // Se a função fetchOrders existe, chamar com novo filtro
+                    if (typeof fetchOrders === 'function') {
+                        fetchOrders(option.value);
+                    }
+                }
+            },
+            mounted() {
+                // Fechar dropdown ao clicar fora em todos os tamanhos
+                const clickOutsideHandler = (event) => {
+                    const dropdown = this.$el;
+                    if (dropdown && !dropdown.contains(event.target)) {
+                        this.isOpen = false;
+                    }
+                };
+
+                document.addEventListener('click', clickOutsideHandler);
+
+                this.$watch(() => this.$el, () => {
+                    this.$nextTick(() => {
+                        document.addEventListener('click', clickOutsideHandler);
+                    });
+                });
+            }
+        };
+
+        // Montar componente Vue quando o modal de pedidos for aberto
+        let filterDropdownApp = null;
+        const originalOpenOrdersModal = window.openOrdersModal || function () { };
+
+        window.openOrdersModal = function () {
+            originalOpenOrdersModal.apply(this, arguments);
+
+            // Montar componente Vue se ainda não estiver montado
+            setTimeout(() => {
+                const filterContainer = document.getElementById('filterDropdown');
+                if (filterContainer && !filterDropdownApp) {
+                    filterDropdownApp = createApp(OrderFilterDropdown).mount(filterContainer);
+                }
+            }, 100);
+        };
 
     </script>
 </body>
