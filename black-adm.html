@@ -384,6 +384,41 @@
             line-height: 1.45;
         }
 
+        /* Badge de notificação para pedidos pendentes */
+        .orders-notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ea580c;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 2px solid var(--white);
+            box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
+            animation: badgePulse 2s ease infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 4px 12px rgba(234, 88, 12, 0.5);
+            }
+        }
+
+        .orders-notification-badge.hidden {
+            display: none;
+        }
+
         /* ── INFO STRIP ── */
         .info-strip {
             display: flex;
@@ -915,7 +950,7 @@
         }
 
         .toggle-switch input:checked+.toggle-track {
-            background: var(--modal-accent);
+            background: #20de20;
         }
 
         .toggle-switch input:checked+.toggle-track::after {
@@ -1542,6 +1577,241 @@
                 flex-shrink: 0;
             }
         }
+
+        /* ===== COLLAPSIBLE ORDERS ===== */
+        .order-card {
+            border: 1.5px solid var(--modal-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+            overflow: hidden;
+            background: var(--modal-bg);
+            transition: all 0.2s ease;
+        }
+
+        .order-card.viewed {
+            opacity: 0.7;
+            background-color: #f0f0f0;
+        }
+
+        .order-card.completed {
+            border-color: #16a34a;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s ease;
+            background: var(--modal-bg);
+        }
+
+        .order-header:hover {
+            background: var(--modal-surface);
+        }
+
+        .order-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .order-toggle-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--modal-accent);
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .order-card.expanded .order-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .order-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .order-id-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--modal-text);
+            white-space: nowrap;
+        }
+
+        .order-client-name {
+            font-size: 0.85rem;
+            color: var(--modal-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .order-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .order-price {
+            font-weight: 600;
+            color: var(--modal-accent);
+            font-size: 0.9rem;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .order-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            border-top: 1px solid var(--modal-border);
+        }
+
+        .order-card.expanded .order-content {
+            max-height: 1000px;
+        }
+
+        .order-content-inner {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .order-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .order-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--modal-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .order-products {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .order-product-item {
+            font-size: 0.9rem;
+            color: var(--modal-text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .order-product-name {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .order-product-meta {
+            font-size: 0.75rem;
+            color: var(--modal-muted);
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .order-info-row {
+            font-size: 0.87rem;
+            color: var(--modal-text);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .order-info-item {
+            display: flex;
+            gap: 4px;
+        }
+
+        .order-info-label {
+            font-weight: 500;
+            color: var(--modal-muted);
+        }
+
+        .order-info-value {
+            word-break: break-word;
+        }
+
+        @media (max-width: 640px) {
+            .order-header {
+                padding: 12px 12px;
+                gap: 8px;
+            }
+
+            .order-summary {
+                gap: 8px;
+            }
+
+            .order-price {
+                font-size: 0.85rem;
+                min-width: 70px;
+            }
+
+            .order-content-inner {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .order-info-row {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Toggle vertical para status dos pedidos */
+        .order-status-toggle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .order-status-text {
+            font-size: 0.73rem;
+            font-weight: 500;
+            color: var(--modal-text);
+            text-align: center;
+            white-space: nowrap;
+            height: 16px;
+            line-height: 16px;
+        }
+
+        /* Data e hora do pedido */
+        .order-datetime {
+            font-size: 0.75rem;
+            color: var(--modal-muted);
+            text-align: right;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--modal-border);
+        }
     </style>
 </head>
 
@@ -1830,6 +2100,37 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Visualizador de Pedidos -->
+    <div id="ordersModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i class="ri-file-list-3-line"></i></div>
+                    <div>
+                        <h2>Pedidos</h2>
+                        <p class="modal-subtitle" id="ordersCountText">Carregando pedidos...</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeOrdersModal" title="Fechar">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="ordersList"></div>
+                <div id="ordersEmpty" class="no-results" style="display:none;">
+                    <div class="no-results-icon">📭</div>
+                    Nenhum pedido encontrado.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="form-actions">
+                    <div class="spacer"></div>
+                    <button type="button" class="btn-cancel" id="btnCloseOrdersFooter">Fechar</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2667,6 +2968,14 @@
                             <div class="action-card-desc">Edite, remova ou atualize produtos existentes</div>
                         </div>
                     </button>
+                    <button class="action-card" id="btnViewOrders" style="position: relative;">
+                        <div class="orders-notification-badge hidden" id="ordersNotificationBadge">0</div>
+                        <div class="action-card-icon blue"><i class="ri-file-list-3-line"></i></div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Visualizar Pedidos</div>
+                            <div class="action-card-desc">Veja a lista de pedidos e detalhes dos clientes</div>
+                        </div>
+                    </button>
                 </div>
 
                 <div class="info-strip">
@@ -2677,9 +2986,389 @@
 
             document.getElementById('btnPublishProduct').addEventListener('click', openPublishModal);
             document.getElementById('btnManageProducts').addEventListener('click', openManageProductsModal);
+            document.getElementById('btnViewOrders').addEventListener('click', openOrdersModal);
 
             fetchImagekitCredentials();
+            
+            // Verificar pedidos pendentes ao carregar a página
+            checkAndUpdatePendingOrders();
+            
+            // Verificar pedidos pendentes ao carregar a página
+            checkAndUpdatePendingOrders();
         }
+
+        // ---------- Visualizador de Pedidos ----------
+        function formatOrderDateTime(createdAt) {
+            if (!createdAt) return '';
+            try {
+                const date = new Date(createdAt);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${day}/${month}/${year} às ${hours}:${minutes}`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function formatCPF(cpf) {
+            if (!cpf) return '';
+            const digits = String(cpf).replace(/\D/g, '');
+            if (digits.length !== 11) return cpf;
+            return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+
+        function formatPhone(phone) {
+            if (!phone) return '';
+            const digits = String(phone).replace(/\D/g, '');
+            if (digits.length === 11) {
+                const ddd = digits.slice(0, 2);
+                const part1 = digits.slice(2, 7);
+                const part2 = digits.slice(7);
+                return `(${ddd}) ${part1}-${part2}`;
+            } else if (digits.length === 10) {
+                const ddd = digits.slice(0, 2);
+                const part1 = digits.slice(2, 6);
+                const part2 = digits.slice(6);
+                return `(${ddd}) ${part1}-${part2}`;
+            }
+            return phone;
+        }
+
+        function parseProducts(produto_nome_e_id) {
+            if (!produto_nome_e_id) return [];
+            const items = String(produto_nome_e_id).split(',').map(s => s.trim()).filter(Boolean);
+            return items.map(item => {
+                const idx = item.lastIndexOf('(');
+                let name = item;
+                let prodId = '';
+                let qty = '';
+                if (idx !== -1) {
+                    name = item.slice(0, idx).trim();
+                    const inside = item.slice(idx + 1, item.lastIndexOf(')'));
+                    if (inside) {
+                        const parts = inside.split('/').map(p => p.trim());
+                        prodId = parts[0] || '';
+                        qty = parts[1] || '';
+                    }
+                }
+                return { name, prodId, qty, raw: item };
+            });
+        }
+
+        function formatCurrency(value) {
+            if (value === null || value === undefined) return '';
+            const cleaned = String(value).replace(/\s/g, '').replace(/\./g, '').replace(',', '.').replace(/[^\d\.-]/g, '');
+            const num = parseFloat(cleaned);
+            if (isNaN(num)) return value;
+            return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        async function updateOrderViewStatus(orderId, newViewStatus) {
+            try {
+                console.log('Atualizando pedido:', orderId, 'view:', newViewStatus);
+                
+                const { data, error } = await supabase
+                    .from('pedidos_cps56')
+                    .update({ view: newViewStatus })
+                    .eq('id', orderId)
+                    .select();
+
+                if (error) {
+                    console.error('Erro Supabase:', error);
+                    alert(`Erro ao atualizar pedido: ${error.message}`);
+                    return false;
+                }
+                
+                console.log('Pedido atualizado com sucesso:', data);
+                return true;
+            } catch (err) {
+                console.error('Erro inesperado:', err);
+                alert(`Erro inesperado: ${err.message}`);
+                return false;
+            }
+        }
+
+        // Variável global para rastrear o pedido expandido atualmente
+        let expandedOrderCard = null;
+
+        function updateOrdersNotificationBadge() {
+            const badge = document.getElementById('ordersNotificationBadge');
+            if (!badge) return;
+            
+            // Buscar todos os pedidos do localStorage ou fazer fetch
+            const ordersList = document.getElementById('ordersList');
+            if (!ordersList) return;
+            
+            // Contar pedidos pendentes (cards sem a classe 'viewed')
+            const pendingOrders = document.querySelectorAll('.order-card:not(.viewed)').length;
+            
+            if (pendingOrders > 0) {
+                badge.textContent = pendingOrders;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        async function checkAndUpdatePendingOrders() {
+            try {
+                const { data, error } = await supabase.from('pedidos_cps56').select('view');
+                if (error) throw error;
+                
+                const orders = data || [];
+                const pendingCount = orders.filter(o => o.view === false).length;
+                
+                const badge = document.getElementById('ordersNotificationBadge');
+                if (badge) {
+                    if (pendingCount > 0) {
+                        badge.textContent = pendingCount;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar pedidos pendentes:', error);
+            }
+        }
+
+        async function checkAndUpdatePendingOrders() {
+            try {
+                const { data, error } = await supabase.from('pedidos_cps56').select('view');
+                if (error) throw error;
+                
+                const orders = data || [];
+                const pendingCount = orders.filter(o => o.view === false).length;
+                
+                const badge = document.getElementById('ordersNotificationBadge');
+                if (badge) {
+                    if (pendingCount > 0) {
+                        badge.textContent = pendingCount;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar pedidos pendentes:', error);
+            }
+        }
+
+        async function fetchOrders() {
+            const ordersList = document.getElementById('ordersList');
+            const ordersCountText = document.getElementById('ordersCountText');
+            if (ordersList) ordersList.innerHTML = '<div style="text-align:center;padding:20px;"><span class="loading-spinner"></span> Carregando pedidos...</div>';
+            try {
+                const { data, error } = await supabase.from('pedidos_cps56').select('*');
+                if (error) {
+                    if (ordersList) ordersList.innerHTML = `<div class="no-results">Erro ao carregar pedidos: ${error.message}</div>`;
+                    if (ordersCountText) ordersCountText.textContent = 'Erro';
+                    return;
+                }
+                const orders = data || [];
+                
+                // Calcular totais
+                const totalOrders = orders.length;
+                const completedOrders = orders.filter(o => o.view === true).length;
+                const pendingOrders = orders.filter(o => o.view === false).length;
+                
+                if (ordersCountText) {
+                    ordersCountText.innerHTML = `${totalOrders} pedido(s) · <span style="color: #16a34a; font-weight: 600;">${completedOrders} concluído(s)</span> · <span style="color: #e53935; font-weight: 600;">${pendingOrders} pendente(s)</span>`;
+                }
+
+                // Atualizar badge de notificação com pedidos pendentes
+                const notificationBadge = document.getElementById('ordersNotificationBadge');
+                if (notificationBadge) {
+                    if (pendingOrders > 0) {
+                        notificationBadge.textContent = pendingOrders;
+                        notificationBadge.classList.remove('hidden');
+                    } else {
+                        notificationBadge.classList.add('hidden');
+                    }
+                }
+                
+                if (!orders || orders.length === 0) {
+                    const empty = document.getElementById('ordersEmpty');
+                    if (empty) empty.style.display = 'block';
+                    if (ordersList) ordersList.innerHTML = '';
+                    return;
+                } else {
+                    const empty = document.getElementById('ordersEmpty');
+                    if (empty) empty.style.display = 'none';
+                }
+
+                // Ordenar pedidos: pendentes primeiro, depois concluídos, ambos ordenados por created_at (mais recentes primeiro)
+                orders.sort((a, b) => {
+                    // Primeiro, pedidos pendentes (view = false) vêm antes dos concluídos (view = true)
+                    if (a.view !== b.view) {
+                        return (a.view ? 1 : 0) - (b.view ? 1 : 0);
+                    }
+                    // Se têm o mesmo status, ordena por created_at (mais recentes primeiro)
+                    const dateA = new Date(a.created_at || 0);
+                    const dateB = new Date(b.created_at || 0);
+                    return dateB - dateA;
+                });
+
+                if (ordersList) ordersList.innerHTML = '';
+                orders.forEach(order => {
+                    const produtos = parseProducts(order.produto_nome_e_id || order.produto_nome || '');
+                    const pedidoTotal = formatCurrency(order.produto_valor || order.total || '');
+                    const clienteNome = order.cliente_nome || '';
+                    const clienteTel = formatPhone(order.cliente_telefone || '');
+                    const clienteCpf = formatCPF(order.cliente_cpf || '');
+                    const clienteEmail = order.cliente_email || '';
+                    const clienteEndereco = order.cliente_endereco || '';
+                    const isViewed = order.view || false;
+
+                    const prodHtml = produtos.map(p => `
+                        <div class="order-product-item">
+                            <div class="order-product-name">
+                                <strong>${escapeHtml(p.name)}</strong>
+                                <span class="order-product-meta">ID:${escapeHtml(p.prodId)} · Qtd:${escapeHtml(p.qty)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    const card = document.createElement('div');
+                    card.className = `order-card ${isViewed ? 'viewed completed' : ''}`;
+                    const truncatedId = String(order.id).substring(0, 4) + '...';
+                    card.innerHTML = `
+                        <div class="order-header">
+                            <div class="order-header-left">
+                                <div class="order-toggle-icon">▼</div>
+                                <div class="order-summary">
+                                    <div class="order-id-badge">#${escapeHtml(truncatedId)}</div>
+                                    <div class="order-client-name">${escapeHtml(clienteNome)}</div>
+                                </div>
+                            </div>
+                            <div class="order-header-right">
+                                <div class="order-price">${pedidoTotal}</div>
+                                <label class="order-status-toggle" style="margin:0;cursor:pointer;" onclick="event.stopPropagation();">
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" class="order-view-toggle" data-order-id="${escapeHtml(order.id)}" ${isViewed ? 'checked' : ''}>
+                                        <div class="toggle-track"></div>
+                                    </div>
+                                    <span class="order-status-text">${isViewed ? 'Concluído' : 'Pendente'}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="order-content">
+                            <div class="order-content-inner">
+                                <div class="order-section">
+                                    <div class="order-section-title">Produtos</div>
+                                    <div class="order-products">${prodHtml}</div>
+                                </div>
+                                <div class="order-section">
+                                    <div class="order-section-title">Informações do Cliente</div>
+                                    <div class="order-info-row">
+                                        <div class="order-info-item">
+                                            <span class="order-info-label">Nome:</span>
+                                            <span class="order-info-value">${escapeHtml(clienteNome)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <div class="order-info-item">
+                                            <span class="order-info-label">Telefone:</span>
+                                            <span class="order-info-value">${escapeHtml(clienteTel)}</span>
+                                        </div>
+                                        <div class="order-info-item">
+                                            <span class="order-info-label">Email:</span>
+                                            <span class="order-info-value">${escapeHtml(clienteEmail)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <div class="order-info-item">
+                                            <span class="order-info-label">CPF:</span>
+                                            <span class="order-info-value">${escapeHtml(clienteCpf)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <div class="order-info-item">
+                                            <span class="order-info-label">Endereço:</span>
+                                            <span class="order-info-value">${escapeHtml(clienteEndereco)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="order-datetime">${formatOrderDateTime(order.created_at)}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Event listener para expandir/recolher
+                    const header = card.querySelector('.order-header');
+                    header.addEventListener('click', () => {
+                        // Se há um pedido expandido diferente do atual, fecha primeiro
+                        if (expandedOrderCard && expandedOrderCard !== card) {
+                            expandedOrderCard.classList.remove('expanded');
+                        }
+                        // Alterna o estado do pedido clicado
+                        card.classList.toggle('expanded');
+                        // Atualiza a referência do pedido expandido
+                        expandedOrderCard = card.classList.contains('expanded') ? card : null;
+                    });
+                    
+                    if (ordersList) ordersList.appendChild(card);
+                });
+
+                // Adicionar event listeners aos toggles
+                document.querySelectorAll('.order-view-toggle').forEach(toggle => {
+                    toggle.addEventListener('change', async (e) => {
+                        const orderId = toggle.getAttribute('data-order-id');
+                        const newStatus = toggle.checked;
+                        const card = toggle.closest('.order-card');
+
+                        toggle.disabled = true;
+                        const success = await updateOrderViewStatus(orderId, newStatus);
+
+                        if (success) {
+                            if (card) {
+                                card.classList.toggle('viewed', newStatus);
+                                const labelText = card.querySelector('.order-status-text');
+                                if (labelText) labelText.textContent = newStatus ? 'Concluído' : 'Pendente';
+                            }
+                        } else {
+                            toggle.checked = !newStatus;
+                        }
+
+                        toggle.disabled = false;
+                    });
+                });
+            } catch (err) {
+                const ordersListEl = document.getElementById('ordersList');
+                if (ordersListEl) ordersListEl.innerHTML = `<div class="no-results">Erro inesperado: ${err.message}</div>`;
+            }
+        }
+
+        function openOrdersModal() {
+            const ordersModal = document.getElementById('ordersModal');
+            if (ordersModal) ordersModal.style.display = 'flex';
+            fetchOrders();
+        }
+
+        function closeOrdersModal() {
+            const ordersModal = document.getElementById('ordersModal');
+            if (ordersModal) ordersModal.style.display = 'none';
+            const list = document.getElementById('ordersList');
+            if (list) list.innerHTML = '';
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.id === 'closeOrdersModal') closeOrdersModal();
+            if (e.target && e.target.id === 'btnCloseOrdersFooter') closeOrdersModal();
+        });
+
+        window.addEventListener('click', (event) => {
+            const ordersModal = document.getElementById('ordersModal');
+            if (event.target === ordersModal) closeOrdersModal();
+        });
 
         function redirectToLogin() {
             window.location.href = 'login.html';
@@ -2722,6 +3411,7 @@
                 // Erro silencioso ao remover imagem (não afeta o fluxo principal)
             }
         }
+
     </script>
 </body>
 
