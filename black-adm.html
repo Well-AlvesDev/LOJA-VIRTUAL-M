@@ -3328,6 +3328,8 @@
 
         // Variável global para rastrear o pedido expandido atualmente
         let expandedOrderCard = null;
+        // Variável global para rastrear o filtro atual de pedidos
+        let currentOrderFilter = 'pending';
 
         function updateOrdersNotificationBadge() {
             const badge = document.getElementById('ordersNotificationBadge');
@@ -3411,7 +3413,7 @@
                 const pendingOrders = orders.filter(o => o.view === false).length;
 
                 if (ordersCountText) {
-                    ordersCountText.innerHTML = `${totalOrders} pedido(s) · <span style="color: #16a34a; font-weight: 600;">${completedOrders} concluído(s)</span> · <span style="color: #e53935; font-weight: 600;">${pendingOrders} pendente(s)</span>`;
+                    ordersCountText.innerHTML = `${totalOrders} ped. · <span style="color: #16a34a; font-weight: 600;">${completedOrders} concl.</span> · <span style="color: #e53935; font-weight: 600;">${pendingOrders} pend.</span>`;
                 }
 
                 // Atualizar badge de notificação com pedidos pendentes
@@ -3425,8 +3427,12 @@
                     }
                 }
 
-                // Determinar filtro atual (usar parâmetro ou padrão 'pending')
-                const filter = filterType || 'pending';
+                // Determinar filtro atual (usar parâmetro ou manter o global)
+                const filter = filterType !== undefined ? filterType : currentOrderFilter;
+                // Atualizar a variável global de filtro
+                if (filterType !== undefined) {
+                    currentOrderFilter = filterType;
+                }
 
                 if (!orders || orders.length === 0) {
                     const empty = document.getElementById('ordersEmpty');
@@ -3573,7 +3579,7 @@
                                 if (labelText) labelText.textContent = newStatus ? 'Concluído' : 'Pendente';
                             }
                             // Recarregar a lista para respeitar o filtro atual
-                            fetchOrders();
+                            fetchOrders(currentOrderFilter);
                         } else {
                             toggle.checked = !newStatus;
                         }
@@ -3591,9 +3597,24 @@
             const ordersModal = document.getElementById('ordersModal');
             if (ordersModal) ordersModal.style.display = 'flex';
             // Definir filtro padrão para pedidos pendentes ao abrir
+            currentOrderFilter = 'pending';
             const ordersFilterEl = document.getElementById('ordersFilter');
             if (ordersFilterEl) ordersFilterEl.value = 'pending';
-            fetchOrders();
+            fetchOrders('pending');
+        }
+
+        function changeOrderFilter(filterValue) {
+            // Atualizar a variável global do filtro
+            currentOrderFilter = filterValue;
+
+            // Se o componente Vue do dropdown existir, atualizar seu estado
+            if (filterDropdownApp && filterDropdownApp.$data) {
+                filterDropdownApp.$data.selectedValue = filterValue;
+                filterDropdownApp.$data.selectedLabel = filterValue === 'pending' ? 'Pedidos pendentes' : 'Pedidos concluídos';
+            }
+
+            // Recarregar os pedidos com o novo filtro
+            fetchOrders(filterValue);
         }
 
         function closeOrdersModal() {
@@ -3707,6 +3728,9 @@
                     this.selectedValue = option.value;
                     this.selectedLabel = option.label;
                     this.isOpen = false;
+
+                    // Atualizar a variável global de filtro
+                    currentOrderFilter = option.value;
 
                     // Disparar evento customizado para integrar com código existente
                     const event = new CustomEvent('filterChange', {
