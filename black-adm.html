@@ -7,6 +7,7 @@
     <title>Painel Administrativo</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="recursos/js/reauth-success-modal.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <script src="config.js"></script>
     <style>
@@ -2038,6 +2039,134 @@
                 font-size: 0.9rem;
             }
         }
+
+        /* ===== PAGINATION BAR ===== */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 24px;
+            border-top: 1px solid var(--modal-border);
+            background: var(--modal-surface);
+            flex-shrink: 0;
+        }
+
+        .pagination-btn {
+            padding: 8px 14px;
+            border: 1.5px solid var(--modal-border);
+            background: var(--modal-bg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.87rem;
+            font-weight: 500;
+            font-family: 'DM Sans', Arial, sans-serif;
+            color: var(--modal-text);
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--modal-accent);
+            background: var(--modal-accent-light);
+            color: var(--modal-accent);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+            color: var(--modal-text);
+            font-weight: 500;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .pagination-bar {
+                padding: 12px 16px;
+                gap: 8px;
+            }
+
+            .pagination-btn {
+                padding: 6px 10px;
+                font-size: 0.78rem;
+            }
+
+            .pagination-info {
+                font-size: 0.78rem;
+            }
+        }
+
+        /* ===== REAUTH MODAL CUSTOM STYLES ===== */
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid var(--modal-border);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', Arial, sans-serif;
+            font-size: 0.9rem;
+            color: var(--modal-text);
+            background: var(--modal-input-bg);
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+            outline: none;
+        }
+
+        .form-group input[type="email"]:focus,
+        .form-group input[type="password"]:focus {
+            border-color: var(--modal-accent);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(29, 99, 211, 0.1);
+        }
+
+        #reauthForm > .modal-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        #reauthForm .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* ===== REAUTH SUCCESS MESSAGE DETAILED ===== */
+        #reauthSuccessMessage.show {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+            display: flex;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border: 1px solid #a7f3d0;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        #reauthSuccessMessage code {
+            background: white;
+            color: var(--modal-text);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        #reauthSuccessMessage strong {
+            color: var(--modal-text);
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -2357,12 +2486,73 @@
                 </div>
             </div>
 
+            <div class="pagination-bar" id="ordersPaginationBar">
+                <button type="button" class="pagination-btn" id="btnPrevPage" title="Página anterior">
+                    <i class="ri-arrow-left-s-line"></i> Anterior
+                </button>
+                <div class="pagination-info" id="paginationInfo">1 de 1</div>
+                <button type="button" class="pagination-btn" id="btnNextPage" title="Próxima página">
+                    Próximo <i class="ri-arrow-right-s-line"></i>
+                </button>
+            </div>
+
             <div class="modal-footer">
                 <div class="form-actions">
                     <div class="spacer"></div>
                     <button type="button" class="btn-cancel" id="btnCloseOrdersFooter">Fechar</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Reautenticação para Alterar Status de Pedido -->
+    <div id="reauthModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i class="ri-lock-line"></i></div>
+                    <div>
+                        <h2>Confirmar Identidade</h2>
+                        <p class="modal-subtitle">Digite suas credenciais para alterar o status do pedido</p>
+                    </div>
+                </div>
+                <button type="button" class="close-btn" id="closeReauthModal"><i class="ri-close-line"></i></button>
+            </div>
+
+            <form id="reauthForm">
+                <div class="modal-body">
+                    <div class="success-message" id="reauthSuccessMessage">
+                        <i class="ri-check-line"></i>
+                        <span>Identidade confirmada com sucesso!</span>
+                    </div>
+
+                    <div class="error-message" id="reauthErrorMessage" style="display: none; color: var(--modal-danger); font-size: 0.87rem; margin-bottom: 12px; align-items: center; gap: 6px;">
+                        <i class="ri-error-warning-line"></i>
+                        <span id="reauthErrorText"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reauthEmail">Email</label>
+                        <input type="email" id="reauthEmail" placeholder="seu@email.com" required>
+                        <div class="error-message"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reauthPassword">Senha</label>
+                        <input type="password" id="reauthPassword" placeholder="••••••••" required>
+                        <div class="error-message"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancelReauthBtn">Cancelar</button>
+                        <button type="submit" class="btn-submit" id="submitReauthBtn">
+                            <span>Confirmar</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -3326,10 +3516,203 @@
             }
         }
 
+        // ===== SISTEMA DE REAUTENTICAÇÃO =====
+        let pendingOrderStatusUpdate = null;
+        const reauthModal = document.getElementById('reauthModal');
+        const reauthForm = document.getElementById('reauthForm');
+        const reauthEmailInput = document.getElementById('reauthEmail');
+        const reauthPasswordInput = document.getElementById('reauthPassword');
+        const submitReauthBtn = document.getElementById('submitReauthBtn');
+        const cancelReauthBtn = document.getElementById('cancelReauthBtn');
+        const closeReauthModalBtn = document.getElementById('closeReauthModal');
+        const reauthErrorMessage = document.getElementById('reauthErrorMessage');
+        const reauthErrorText = document.getElementById('reauthErrorText');
+        const reauthSuccessMessage = document.getElementById('reauthSuccessMessage');
+        // Bloqueio para evitar que o modal seja fechado acidentalmente
+        let reauthLocked = false;
+
+        function openReauthModal(orderId, newStatus) {
+            pendingOrderStatusUpdate = { orderId, newStatus };
+            reauthModal.style.display = 'flex';
+            reauthForm.reset();
+            reauthErrorMessage.style.display = 'none';
+            reauthSuccessMessage.classList.remove('show');
+            reauthEmailInput.value = currentUser?.email || '';
+            reauthPasswordInput.value = '';
+            reauthPasswordInput.focus();
+        }
+
+        function closeReauthModal(force = false) {
+            // Se estiver bloqueado (mostrando sucesso ou processando), só fecha se for forçado
+            if (reauthLocked && !force) return;
+
+            reauthLocked = false;
+            reauthModal.style.display = 'none';
+            reauthForm.reset();
+            reauthForm.style.display = 'block';
+            reauthErrorMessage.style.display = 'none';
+            reauthSuccessMessage.classList.remove('show');
+            reauthSuccessMessage.innerHTML = '<i class="ri-check-line"></i><span>Identidade confirmada com sucesso!</span>';
+            pendingOrderStatusUpdate = null;
+            submitReauthBtn.disabled = false;
+            submitReauthBtn.textContent = 'Confirmar';
+        }
+
+        async function reauthenticateUser(email, password) {
+            try {
+                // Validar credenciais sem criar uma nova sessão
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                    options: {
+                        shouldCreateSession: false
+                    }
+                });
+
+                if (error) {
+                    console.error('Erro na reautenticação:', error);
+                    throw new Error(error.message || 'Falha ao validar credenciais');
+                }
+
+                if (!data.user) {
+                    throw new Error('Falha na autenticação');
+                }
+
+                // Verificar se o email coincide com o usuário logado
+                if (data.user.email !== currentUser.email) {
+                    throw new Error('As credenciais fornecidas não correspondem ao usuário logado');
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Erro reauthenticateUser:', error);
+                throw error;
+            }
+        }
+
+        // Event listeners para reautenticação
+        closeReauthModalBtn.addEventListener('click', () => closeReauthModal(true));
+        cancelReauthBtn.addEventListener('click', () => closeReauthModal(true));
+
+        reauthForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!pendingOrderStatusUpdate) {
+                closeReauthModal(true);
+                return;
+            }
+
+            const email = reauthEmailInput.value.trim();
+            const password = reauthPasswordInput.value;
+
+            if (!email || !password) {
+                reauthErrorMessage.style.display = 'flex';
+                reauthErrorText.textContent = 'Por favor, preencha todos os campos';
+                return;
+            }
+
+            submitReauthBtn.disabled = true;
+            const originalText = submitReauthBtn.textContent;
+            submitReauthBtn.innerHTML = '<span class="loading-spinner"></span> Confirmando...';
+            // Bloquear fechamento acidental enquanto o processo está em andamento
+            reauthLocked = true;
+
+            try {
+                await reauthenticateUser(email, password);
+
+                // Identidade confirmada, agora atualizar o status do pedido
+                const { orderId, newStatus } = pendingOrderStatusUpdate;
+                const success = await updateOrderViewStatus(orderId, newStatus);
+
+                if (success) {
+                    // Aguardar 1 segundo após a resposta do Supabase
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Preparar mensagem de sucesso com detalhes
+                    const statusText = newStatus ? 'Concluído' : 'Pendente';
+                    const previousStatus = newStatus ? 'Pendente' : 'Concluído';
+                    const truncatedId = String(orderId).substring(0, 8) + '...';
+
+                    // Usar modal dedicado em Vue para animação de sucesso (se disponível)
+                    if (window.reauthSuccessModal && typeof window.reauthSuccessModal.show === 'function') {
+                        // Fechar o modal de reautenticação imediatamente e exibir o modal de sucesso Vue
+                        closeReauthModal(true);
+                        window.reauthSuccessModal.show({
+                            orderId: truncatedId,
+                            previousStatus,
+                            statusText,
+                            onHidden: () => {
+                                fetchOrders(currentOrderFilter);
+                            }
+                        });
+                    } else {
+                        // Fallback — comportamento anterior
+                        const successMessageContent = document.createElement('div');
+                        successMessageContent.innerHTML = `
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="ri-check-circle-line" style="font-size: 20px; color: #16a34a;"></i>
+                                    <span style="font-weight: 600; font-size: 0.95rem;">Operação bem-sucedida!</span>
+                                </div>
+                                <div style="background: var(--modal-accent-light); padding: 10px; border-radius: 6px; border-left: 3px solid var(--modal-accent);">
+                                    <div style="font-size: 0.85rem; margin-bottom: 6px;">
+                                        <strong>ID do Pedido:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-family: 'DM Mono';">${escapeHtml(truncatedId)}</code>
+                                    </div>
+                                    <div style="font-size: 0.85rem; margin-bottom: 6px;">
+                                        <strong>Status Anterior:</strong> <span style="color: #ea580c;">${previousStatus}</span>
+                                    </div>
+                                    <div style="font-size: 0.85rem;">
+                                        <strong>Status Atual:</strong> <span style="color: #16a34a; font-weight: 600;">${statusText}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        reauthSuccessMessage.innerHTML = '';
+                        reauthSuccessMessage.appendChild(successMessageContent);
+                        reauthSuccessMessage.classList.add('show');
+                        reauthForm.style.display = 'none';
+
+                        setTimeout(() => {
+                            closeReauthModal(true);
+                            fetchOrders(currentOrderFilter);
+                        }, 2000);
+                    }
+                } else {
+                    throw new Error('Falha ao atualizar o status do pedido');
+                }
+            } catch (error) {
+                console.error('Erro na confirmação:', error);
+                reauthErrorMessage.style.display = 'flex';
+                reauthErrorText.textContent = error.message || 'Erro na confirmação da identidade';
+                // Liberar o bloqueio em caso de erro
+                reauthLocked = false;
+                submitReauthBtn.disabled = false;
+                submitReauthBtn.textContent = originalText;
+                reauthForm.style.display = 'block';
+            }
+        });
+
+        // Fechar modal ao clicar fora (ignorando enquanto bloqueado)
+        window.addEventListener('click', (event) => {
+            if (event.target === reauthModal && !reauthLocked) closeReauthModal();
+        });
+
         // Variável global para rastrear o pedido expandido atualmente
         let expandedOrderCard = null;
         // Variável global para rastrear o filtro atual de pedidos
         let currentOrderFilter = 'pending';
+        // Variáveis para paginação de pedidos
+        let currentOrderPage = 1;
+        let totalOrderPages = 1;
+        let allOrdersData = []; // Armazenar todos os pedidos para paginação
+        
+        // Estado de paginação separado para cada filtro
+        let paginationState = {
+            'pending': { page: 1, data: [], totalPages: 1 },
+            'completed': { page: 1, data: [], totalPages: 1 },
+            'all': { page: 1, data: [], totalPages: 1 }
+        };
 
         function updateOrdersNotificationBadge() {
             const badge = document.getElementById('ordersNotificationBadge');
@@ -3448,6 +3831,34 @@
                     return true;
                 });
 
+                // Ordenar por created_at (mais recentes primeiro) se houver dados
+                if (displayOrders && displayOrders.length > 0) {
+                    displayOrders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                }
+
+                // Armazenar pedidos no estado de paginação do filtro atual
+                // SEMPRE atualizar, mesmo que vazio
+                const itemsPerPage = 4;
+                paginationState[filter].data = displayOrders;
+                paginationState[filter].totalPages = Math.ceil(Math.max(1, displayOrders.length) / itemsPerPage);
+                
+                // Restaurar página anterior para este filtro, ou começar em 1
+                currentOrderPage = paginationState[filter].page;
+                totalOrderPages = paginationState[filter].totalPages;
+                
+                // Se a página atual é maior que o total de páginas, resetar para 1
+                if (currentOrderPage > totalOrderPages) {
+                    currentOrderPage = 1;
+                    paginationState[filter].page = 1;
+                }
+                
+                // Manter referência global para compatibilidade
+                allOrdersData = displayOrders;
+
+                // Atualizar paginação mesmo se vazio
+                updatePaginationInfo();
+
+                // Se vazio, mostrar mensagem
                 if (!displayOrders || displayOrders.length === 0) {
                     const empty = document.getElementById('ordersEmpty');
                     if (empty) empty.style.display = 'block';
@@ -3458,109 +3869,8 @@
                     if (empty) empty.style.display = 'none';
                 }
 
-                // Ordenar por created_at (mais recentes primeiro)
-                displayOrders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-
-                if (ordersList) ordersList.innerHTML = '';
-                displayOrders.forEach(order => {
-                    const produtos = parseProducts(order.produto_nome_e_id || order.produto_nome || '');
-                    const pedidoTotal = formatCurrency(order.produto_valor || order.total || '');
-                    const clienteNome = order.cliente_nome || '';
-                    const clienteTel = formatPhone(order.cliente_telefone || '');
-                    const clienteCpf = formatCPF(order.cliente_cpf || '');
-                    const clienteEmail = order.cliente_email || '';
-                    const clienteEndereco = order.cliente_endereco || '';
-                    const isViewed = order.view || false;
-
-                    const prodHtml = produtos.map(p => `
-                        <div class="order-product-item">
-                            <div class="order-product-name">
-                                <strong>${escapeHtml(p.name)}</strong>
-                                <span class="order-product-meta">ID:${escapeHtml(p.prodId)} · Qtd:${escapeHtml(p.qty)}</span>
-                            </div>
-                        </div>
-                    `).join('');
-
-                    const card = document.createElement('div');
-                    card.className = `order-card ${isViewed ? 'viewed completed' : ''}`;
-                    const truncatedId = String(order.id).substring(0, 4) + '...';
-                    card.innerHTML = `
-                        <div class="order-header">
-                            <div class="order-header-left">
-                                <div class="order-toggle-icon">▼</div>
-                                <div class="order-summary">
-                                    <div class="order-id-badge">#${escapeHtml(truncatedId)}</div>
-                                    <div class="order-client-name">${escapeHtml(clienteNome)}</div>
-                                </div>
-                            </div>
-                            <div class="order-header-right">
-                                <div class="order-price">${pedidoTotal}</div>
-                                <label class="order-status-toggle" style="margin:0;cursor:pointer;" onclick="event.stopPropagation();">
-                                    <div class="toggle-switch">
-                                        <input type="checkbox" class="order-view-toggle" data-order-id="${escapeHtml(order.id)}" ${isViewed ? 'checked' : ''}>
-                                        <div class="toggle-track"></div>
-                                    </div>
-                                    <span class="order-status-text">${isViewed ? 'Concluído' : 'Pendente'}</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="order-content">
-                            <div class="order-content-inner">
-                                <div class="order-section">
-                                    <div class="order-section-title">Produtos</div>
-                                    <div class="order-products">${prodHtml}</div>
-                                </div>
-                                <div class="order-section">
-                                    <div class="order-section-title">Informações do Cliente</div>
-                                    <div class="order-info-row">
-                                        <div class="order-info-item">
-                                            <span class="order-info-label">Nome:</span>
-                                            <span class="order-info-value">${escapeHtml(clienteNome)}</span>
-                                        </div>
-                                    </div>
-                                    <div class="order-info-row">
-                                        <div class="order-info-item">
-                                            <span class="order-info-label">Telefone:</span>
-                                            <span class="order-info-value">${escapeHtml(clienteTel)}</span>
-                                        </div>
-                                        <div class="order-info-item">
-                                            <span class="order-info-label">Email:</span>
-                                            <span class="order-info-value">${escapeHtml(clienteEmail)}</span>
-                                        </div>
-                                    </div>
-                                    <div class="order-info-row">
-                                        <div class="order-info-item">
-                                            <span class="order-info-label">CPF:</span>
-                                            <span class="order-info-value">${escapeHtml(clienteCpf)}</span>
-                                        </div>
-                                    </div>
-                                    <div class="order-info-row">
-                                        <div class="order-info-item">
-                                            <span class="order-info-label">Endereço:</span>
-                                            <span class="order-info-value">${escapeHtml(clienteEndereco)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="order-datetime">${formatOrderDateTime(order.created_at)}</div>
-                            </div>
-                        </div>
-                    `;
-
-                    // Event listener para expandir/recolher
-                    const header = card.querySelector('.order-header');
-                    header.addEventListener('click', () => {
-                        // Se há um pedido expandido diferente do atual, fecha primeiro
-                        if (expandedOrderCard && expandedOrderCard !== card) {
-                            expandedOrderCard.classList.remove('expanded');
-                        }
-                        // Alterna o estado do pedido clicado
-                        card.classList.toggle('expanded');
-                        // Atualiza a referência do pedido expandido
-                        expandedOrderCard = card.classList.contains('expanded') ? card : null;
-                    });
-
-                    if (ordersList) ordersList.appendChild(card);
-                });
+                // Renderizar os pedidos da página atual
+                renderOrdersPage();
 
                 // Adicionar event listeners aos toggles
                 document.querySelectorAll('.order-view-toggle').forEach(toggle => {
@@ -3593,11 +3903,186 @@
             }
         }
 
+        function renderOrdersPage() {
+            const ordersList = document.getElementById('ordersList');
+            if (!ordersList) return;
+
+            const itemsPerPage = 4;
+            const startIndex = (currentOrderPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedOrders = allOrdersData.slice(startIndex, endIndex);
+
+            ordersList.innerHTML = '';
+
+            paginatedOrders.forEach(order => {
+                const produtos = parseProducts(order.produto_nome_e_id || order.produto_nome || '');
+                const pedidoTotal = formatCurrency(order.produto_valor || order.total || '');
+                const clienteNome = order.cliente_nome || '';
+                const clienteTel = formatPhone(order.cliente_telefone || '');
+                const clienteCpf = formatCPF(order.cliente_cpf || '');
+                const clienteEmail = order.cliente_email || '';
+                const clienteEndereco = order.cliente_endereco || '';
+                const isViewed = order.view || false;
+
+                const prodHtml = produtos.map(p => `
+                    <div class="order-product-item">
+                        <div class="order-product-name">
+                            <strong>${escapeHtml(p.name)}</strong>
+                            <span class="order-product-meta">ID:${escapeHtml(p.prodId)} · Qtd:${escapeHtml(p.qty)}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                const card = document.createElement('div');
+                card.className = `order-card ${isViewed ? 'viewed completed' : ''}`;
+                const truncatedId = String(order.id).substring(0, 4) + '...';
+                card.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-header-left">
+                            <div class="order-toggle-icon">▼</div>
+                            <div class="order-summary">
+                                <div class="order-id-badge">#${escapeHtml(truncatedId)}</div>
+                                <div class="order-client-name">${escapeHtml(clienteNome)}</div>
+                            </div>
+                        </div>
+                        <div class="order-header-right">
+                            <div class="order-price">${pedidoTotal}</div>
+                            <label class="order-status-toggle" style="margin:0;cursor:pointer;" onclick="event.stopPropagation();">
+                                <div class="toggle-switch">
+                                    <input type="checkbox" class="order-view-toggle" data-order-id="${escapeHtml(order.id)}" ${isViewed ? 'checked' : ''}>
+                                    <div class="toggle-track"></div>
+                                </div>
+                                <span class="order-status-text">${isViewed ? 'Concluído' : 'Pendente'}</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="order-content">
+                        <div class="order-content-inner">
+                            <div class="order-section">
+                                <div class="order-section-title">Produtos</div>
+                                <div class="order-products">${prodHtml}</div>
+                            </div>
+                            <div class="order-section">
+                                <div class="order-section-title">Informações do Cliente</div>
+                                <div class="order-info-row">
+                                    <div class="order-info-item">
+                                        <span class="order-info-label">Nome:</span>
+                                        <span class="order-info-value">${escapeHtml(clienteNome)}</span>
+                                    </div>
+                                </div>
+                                <div class="order-info-row">
+                                    <div class="order-info-item">
+                                        <span class="order-info-label">Telefone:</span>
+                                        <span class="order-info-value">${escapeHtml(clienteTel)}</span>
+                                    </div>
+                                    <div class="order-info-item">
+                                        <span class="order-info-label">Email:</span>
+                                        <span class="order-info-value">${escapeHtml(clienteEmail)}</span>
+                                    </div>
+                                </div>
+                                <div class="order-info-row">
+                                    <div class="order-info-item">
+                                        <span class="order-info-label">CPF:</span>
+                                        <span class="order-info-value">${escapeHtml(clienteCpf)}</span>
+                                    </div>
+                                </div>
+                                <div class="order-info-row">
+                                    <div class="order-info-item">
+                                        <span class="order-info-label">Endereço:</span>
+                                        <span class="order-info-value">${escapeHtml(clienteEndereco)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="order-datetime">${formatOrderDateTime(order.created_at)}</div>
+                        </div>
+                    </div>
+                `;
+
+                // Event listener para expandir/recolher
+                const header = card.querySelector('.order-header');
+                header.addEventListener('click', () => {
+                    // Se há um pedido expandido diferente do atual, fecha primeiro
+                    if (expandedOrderCard && expandedOrderCard !== card) {
+                        expandedOrderCard.classList.remove('expanded');
+                    }
+                    // Alterna o estado do pedido clicado
+                    card.classList.toggle('expanded');
+                    // Atualiza a referência do pedido expandido
+                    expandedOrderCard = card.classList.contains('expanded') ? card : null;
+                });
+
+                ordersList.appendChild(card);
+            });
+
+            // Atualizar informações de paginação
+            updatePaginationInfo();
+
+            // Adicionar event listeners aos toggles
+            document.querySelectorAll('.order-view-toggle').forEach(toggle => {
+                toggle.addEventListener('change', async (e) => {
+                    const orderId = toggle.getAttribute('data-order-id');
+                    const newStatus = toggle.checked;
+                    const card = toggle.closest('.order-card');
+
+                    // Reverter o checkbox enquanto não houver confirmação de reautenticação
+                    toggle.checked = !newStatus;
+                    toggle.disabled = true;
+
+                    // Abrir modal de reautenticação
+                    openReauthModal(orderId, newStatus);
+
+                    toggle.disabled = false;
+                });
+            });
+        }
+
+        function updatePaginationInfo() {
+            const paginationInfo = document.getElementById('paginationInfo');
+            const btnPrevPage = document.getElementById('btnPrevPage');
+            const btnNextPage = document.getElementById('btnNextPage');
+
+            if (paginationInfo) {
+                paginationInfo.textContent = `${currentOrderPage} de ${totalOrderPages}`;
+            }
+
+            if (btnPrevPage) {
+                btnPrevPage.disabled = currentOrderPage <= 1;
+            }
+
+            if (btnNextPage) {
+                btnNextPage.disabled = currentOrderPage >= totalOrderPages;
+            }
+        }
+
+        function goToOrderPage(pageNumber) {
+            if (pageNumber < 1 || pageNumber > totalOrderPages) return;
+            
+            currentOrderPage = pageNumber;
+            // Salvar página atual no estado do filtro
+            paginationState[currentOrderFilter].page = pageNumber;
+            
+            renderOrdersPage();
+            
+            // Scroll to top do modal
+            const modalBody = document.querySelector('#ordersModal .modal-body');
+            if (modalBody) {
+                modalBody.scrollTop = 0;
+            }
+        }
+
         function openOrdersModal() {
             const ordersModal = document.getElementById('ordersModal');
             if (ordersModal) ordersModal.style.display = 'flex';
             // Definir filtro padrão para pedidos pendentes ao abrir
             currentOrderFilter = 'pending';
+            
+            // Resetar estado do dropdown Vue
+            if (filterDropdownApp && filterDropdownApp.$data) {
+                filterDropdownApp.$data.selectedValue = 'pending';
+                filterDropdownApp.$data.selectedLabel = 'Pedidos pendentes';
+                filterDropdownApp.$data.isOpen = false;
+            }
+            
             const ordersFilterEl = document.getElementById('ordersFilter');
             if (ordersFilterEl) ordersFilterEl.value = 'pending';
             fetchOrders('pending');
@@ -3616,6 +4101,42 @@
             // Recarregar os pedidos com o novo filtro
             fetchOrders(filterValue);
         }
+
+        // Event listeners para paginação
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnPrevPage = document.getElementById('btnPrevPage');
+            const btnNextPage = document.getElementById('btnNextPage');
+
+            if (btnPrevPage) {
+                btnPrevPage.addEventListener('click', () => {
+                    goToOrderPage(currentOrderPage - 1);
+                });
+            }
+
+            if (btnNextPage) {
+                btnNextPage.addEventListener('click', () => {
+                    goToOrderPage(currentOrderPage + 1);
+                });
+            }
+        });
+
+        // Adicionar event listeners após a página carregar
+        window.addEventListener('load', () => {
+            const btnPrevPage = document.getElementById('btnPrevPage');
+            const btnNextPage = document.getElementById('btnNextPage');
+
+            if (btnPrevPage) {
+                btnPrevPage.addEventListener('click', () => {
+                    goToOrderPage(currentOrderPage - 1);
+                });
+            }
+
+            if (btnNextPage) {
+                btnNextPage.addEventListener('click', () => {
+                    goToOrderPage(currentOrderPage + 1);
+                });
+            }
+        });
 
         function closeOrdersModal() {
             const ordersModal = document.getElementById('ordersModal');
