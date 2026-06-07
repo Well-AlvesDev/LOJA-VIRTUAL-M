@@ -249,7 +249,7 @@
 
         /* ── WELCOME CARD ── */
         .welcome-card {
-            background: linear-gradient(135deg, var(--blue) 0%, #2d7ef0 60%, #4a9eff 100%);
+            background: linear-gradient(135deg, rgb(184, 106, 119) 0%, #b33e7f90 60%, #ffa2ce8e 100%);
             border-radius: var(--radius);
             padding: 28px 28px 24px;
             color: white;
@@ -688,6 +688,7 @@
 
         .modal-content {
             background: var(--modal-bg);
+            position: relative;
             padding: 0;
             border-radius: var(--radius-lg);
             width: 100%;
@@ -853,6 +854,17 @@
             transition: all var(--transition);
             background: var(--modal-surface);
             position: relative;
+        }
+
+        #publishDropZone2 {
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #publishDropZone2.enabled {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .file-upload-zone:hover,
@@ -1381,6 +1393,40 @@
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             flex-shrink: 0;
+        }
+
+        /* Loader overlay para modal */
+        .orders-loader {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--radius-lg);
+            z-index: 20;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .orders-loader.show {
+            display: flex;
+        }
+
+        .orders-loader-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e8eaed;
+            border-top: 3px solid var(--modal-accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .orders-loader-text {
+            font-size: 0.9rem;
+            color: var(--modal-muted);
+            font-weight: 500;
         }
 
         @keyframes spin {
@@ -2125,7 +2171,7 @@
             box-shadow: 0 0 0 3px rgba(29, 99, 211, 0.1);
         }
 
-        #reauthForm > .modal-body {
+        #reauthForm>.modal-body {
             flex: 1;
             min-height: 0;
             overflow-y: auto;
@@ -2182,6 +2228,7 @@
                 <span class="status-dot"></span>
                 online
             </div>
+
             <div class="navbar-user-badge">
                 <div class="navbar-avatar"><i class="ri-user-line" style="font-size:11px;"></i></div>
                 <span class="user-email" id="userEmail">Carregando...</span>
@@ -2238,21 +2285,36 @@
 
             <form id="publishForm">
                 <div class="modal-body">
-                    <p class="form-section-title">Imagem</p>
+                    <p class="form-section-title">Imagens (Máximo 2)</p>
                     <div class="form-group">
-                        <div class="file-upload-zone" id="publishDropZone">
-                            <input type="file" id="productImage" accept="image/*" required>
+                        <div class="file-upload-zone" id="publishDropZone1">
+                            <input type="file" id="productImage1" accept="image/*" required>
                             <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
-                            <div class="file-upload-text"><strong>Clique para selecionar</strong> ou arraste
-                                aqui<br><span style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
+                            <div class="file-upload-text"><strong>Imagem 1</strong><br><strong>Clique para
+                                    selecionar</strong> ou arraste aqui<br><span
+                                    style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
                         </div>
-                        <div class="image-preview-container" id="imagePreviewContainer">
-                            <img id="imagePreview" class="image-preview" alt="Prévia">
-                            <button type="button" class="remove-image-btn" id="removeImageBtn"
+                        <div class="image-preview-container" id="imagePreviewContainer1">
+                            <img id="imagePreview1" class="image-preview" alt="Prévia 1">
+                            <button type="button" class="remove-image-btn" id="removeImageBtn1"
                                 title="Remover">&times;</button>
                         </div>
-                        <span class="error-message" id="imageError">Selecione uma imagem válida</span>
                     </div>
+                    <div class="form-group">
+                        <div class="file-upload-zone" id="publishDropZone2">
+                            <input type="file" id="productImage2" accept="image/*">
+                            <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
+                            <div class="file-upload-text"><strong>Imagem 2 (Opcional)</strong><br><strong>Clique para
+                                    selecionar</strong> ou arraste aqui<br><span
+                                    style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
+                        </div>
+                        <div class="image-preview-container" id="imagePreviewContainer2">
+                            <img id="imagePreview2" class="image-preview" alt="Prévia 2">
+                            <button type="button" class="remove-image-btn" id="removeImageBtn2"
+                                title="Remover">&times;</button>
+                        </div>
+                    </div>
+                    <span class="error-message" id="imageError">Selecione pelo menos uma imagem válida</span>
 
                     <p class="form-section-title">Informações</p>
                     <div class="form-row">
@@ -2263,7 +2325,7 @@
                         </div>
                         <div class="form-group">
                             <label for="productPrice">Preço (R$) <span class="required-star">*</span></label>
-                            <input type="number" id="productPrice" placeholder="0,00" min="1" step="0.01" required>
+                            <input type="text" id="productPrice" placeholder="0,00" required>
                             <span class="error-message" id="priceError">Preço mínimo R$ 1,00</span>
                         </div>
                     </div>
@@ -2276,21 +2338,19 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="productDiscount">Desconto (%)</label>
-                            <input type="number" id="productDiscount" placeholder="0" min="0" max="100" step="0.01"
-                                value="0" required>
+                            <input type="text" id="productDiscount" placeholder="0" value="0" required>
                             <span class="error-message" id="discountError">Entre 0 e 100%</span>
                         </div>
                         <div class="form-group">
                             <label for="installments">Total de Parcelas <span class="required-star">*</span></label>
-                            <input type="number" id="installments" placeholder="1" min="1" max="12" value="1" required>
+                            <input type="text" id="installments" placeholder="1" value="1" required>
                             <span class="error-message" id="installmentsError">Máximo 12 parcelas</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="interestFreeInstallments">Parcelas Sem Juros <span
                                 class="required-star">*</span></label>
-                        <input type="number" id="interestFreeInstallments" placeholder="0" min="0" max="12" value="0"
-                            required>
+                        <input type="text" id="interestFreeInstallments" placeholder="0" value="0" required>
                         <span class="error-message" id="interestFreeError">Deve ser menor ou igual ao total</span>
                     </div>
                 </div>
@@ -2403,7 +2463,7 @@
                         </div>
                         <div class="form-group">
                             <label for="editProductPrice">Preço (R$) <span class="required-star">*</span></label>
-                            <input type="number" id="editProductPrice" min="1" step="0.01" required>
+                            <input type="text" id="editProductPrice" required>
                             <span class="error-message" id="editPriceError">Preço mínimo R$ 1,00</span>
                         </div>
                     </div>
@@ -2416,19 +2476,19 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editProductDiscount">Desconto (%)</label>
-                            <input type="number" id="editProductDiscount" min="0" max="100" step="0.01" required>
+                            <input type="text" id="editProductDiscount" required>
                             <span class="error-message" id="editDiscountError">Entre 0 e 100%</span>
                         </div>
                         <div class="form-group">
                             <label for="editInstallments">Total de Parcelas <span class="required-star">*</span></label>
-                            <input type="number" id="editInstallments" min="1" max="12" required>
+                            <input type="text" id="editInstallments" required>
                             <span class="error-message" id="editInstallmentsError">Máximo 12 parcelas</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="editInterestFreeInstallments">Parcelas Sem Juros <span
                                 class="required-star">*</span></label>
-                        <input type="number" id="editInterestFreeInstallments" min="0" max="12" required>
+                        <input type="text" id="editInterestFreeInstallments" required>
                         <span class="error-message" id="editInterestFreeError">Deve ser menor ou igual ao total</span>
                     </div>
 
@@ -2479,6 +2539,10 @@
             </div>
 
             <div class="modal-body">
+                <div class="orders-loader" id="ordersLoader">
+                    <div class="orders-loader-spinner"></div>
+                    <div class="orders-loader-text">Carregando pedidos...</div>
+                </div>
                 <div id="ordersList"></div>
                 <div id="ordersEmpty" class="no-results" style="display:none;">
                     <div class="no-results-icon">📭</div>
@@ -2526,7 +2590,8 @@
                         <span>Identidade confirmada com sucesso!</span>
                     </div>
 
-                    <div class="error-message" id="reauthErrorMessage" style="display: none; color: var(--modal-danger); font-size: 0.87rem; margin-bottom: 12px; align-items: center; gap: 6px;">
+                    <div class="error-message" id="reauthErrorMessage"
+                        style="display: none; color: var(--modal-danger); font-size: 0.87rem; margin-bottom: 12px; align-items: center; gap: 6px;">
                         <i class="ri-error-warning-line"></i>
                         <span id="reauthErrorText"></span>
                     </div>
@@ -2574,23 +2639,33 @@
         const publishForm = document.getElementById('publishForm');
         const closeModalBtn = document.getElementById('closeModal');
         const cancelBtn = document.getElementById('cancelBtn');
-        const productImageInput = document.getElementById('productImage');
-        const imagePreview = document.getElementById('imagePreview');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-        const removeImageBtn = document.getElementById('removeImageBtn');
+        const productImageInput1 = document.getElementById('productImage1');
+        const imagePreview1 = document.getElementById('imagePreview1');
+        const imagePreviewContainer1 = document.getElementById('imagePreviewContainer1');
+        const removeImageBtn1 = document.getElementById('removeImageBtn1');
+        const productImageInput2 = document.getElementById('productImage2');
+        const imagePreview2 = document.getElementById('imagePreview2');
+        const imagePreviewContainer2 = document.getElementById('imagePreviewContainer2');
+        const removeImageBtn2 = document.getElementById('removeImageBtn2');
+        const publishDropZone1 = document.getElementById('publishDropZone1');
+        const publishDropZone2 = document.getElementById('publishDropZone2');
 
         function openPublishModal() {
             publishModal.style.display = 'flex';
             publishForm.reset();
-            imagePreviewContainer.style.display = 'none';
-            productImageInput.value = '';
+            imagePreviewContainer1.style.display = 'none';
+            imagePreviewContainer2.style.display = 'none';
+            productImageInput1.value = '';
+            productImageInput2.value = '';
         }
 
         function closePublishModal() {
             publishModal.style.display = 'none';
             publishForm.reset();
-            imagePreviewContainer.style.display = 'none';
-            productImageInput.value = '';
+            imagePreviewContainer1.style.display = 'none';
+            imagePreviewContainer2.style.display = 'none';
+            productImageInput1.value = '';
+            productImageInput2.value = '';
         }
 
         // Buscar credenciais do ImageKit do Supabase
@@ -2761,25 +2836,239 @@
                 return null;
             }
         }
-        productImageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
+
+        // Função auxiliar para processar seleção de imagem
+        function handleImageSelect(inputElement, previewElement, containerElement) {
+            const file = inputElement.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    imagePreview.src = event.target.result;
-                    imagePreviewContainer.style.display = 'block';
+                    previewElement.src = event.target.result;
+                    containerElement.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        productImageInput1.addEventListener('change', (e) => {
+            handleImageSelect(productImageInput1, imagePreview1, imagePreviewContainer1);
+            // Mostrar a zona de upload 2 quando imagem 1 for selecionada
+            if (productImageInput1.files.length > 0) {
+                publishDropZone2.classList.add('enabled');
+            }
         });
 
-        // Remover imagem selecionada
-        removeImageBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            productImageInput.value = '';
-            imagePreviewContainer.style.display = 'none';
-            imagePreview.src = '';
+        productImageInput2.addEventListener('change', (e) => {
+            handleImageSelect(productImageInput2, imagePreview2, imagePreviewContainer2);
         });
+
+        // Remover imagens selecionadas
+        removeImageBtn1.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Verificar se existe uma imagem 2 selecionada
+            if (productImageInput2.files.length > 0) {
+                // Mover arquivo de input2 para input1 (sem duplicar)
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(productImageInput2.files[0]);
+                productImageInput1.files = dataTransfer.files;
+
+                // Atualizar preview
+                imagePreview1.src = imagePreview2.src;
+                imagePreviewContainer1.style.display = 'block';
+
+                // Limpar input2 e preview2
+                productImageInput2.value = '';
+                imagePreviewContainer2.style.display = 'none';
+                imagePreview2.src = '';
+
+                // Desabilitar zona 2
+                publishDropZone2.classList.remove('enabled');
+            } else {
+                // Se não houver imagem 2, apenas limpar a imagem 1
+                productImageInput1.value = '';
+                imagePreviewContainer1.style.display = 'none';
+                imagePreview1.src = '';
+                publishDropZone2.classList.remove('enabled');
+            }
+        });
+
+        removeImageBtn2.addEventListener('click', (e) => {
+            e.preventDefault();
+            productImageInput2.value = '';
+            imagePreviewContainer2.style.display = 'none';
+            imagePreview2.src = '';
+        });
+
+        // Função para formatar preço com centavos
+        function formatPriceInput(inputElement) {
+            let value = inputElement.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+
+            if (value === '') {
+                inputElement.value = '0,00';
+                return;
+            }
+
+            // Adiciona zeros à esquerda se necessário
+            value = value.padStart(3, '0');
+
+            // Formata como X,YZ (últimos 2 dígitos são centavos)
+            let integerPart = value.slice(0, -2);
+            const decimalPart = value.slice(-2);
+
+            // Remove zeros à esquerda do integerPart
+            integerPart = integerPart.replace(/^0+/, '') || '0';
+
+            inputElement.value = integerPart + ',' + decimalPart;
+        }
+
+        // Evento de formatação para campo de preço na publicação
+        const productPriceInput = document.getElementById('productPrice');
+        if (productPriceInput) {
+            productPriceInput.addEventListener('input', function () {
+                formatPriceInput(this);
+            });
+
+            productPriceInput.addEventListener('blur', function () {
+                let value = this.value.replace(/\D/g, '');
+                if (value === '') {
+                    this.value = '0,00';
+                }
+            });
+        }
+
+        // Evento de formatação para campo de preço na edição
+        const editProductPriceInput = document.getElementById('editProductPrice');
+        if (editProductPriceInput) {
+            editProductPriceInput.addEventListener('input', function () {
+                formatPriceInput(this);
+            });
+
+            editProductPriceInput.addEventListener('blur', function () {
+                let value = this.value.replace(/\D/g, '');
+                if (value === '') {
+                    this.value = '0,00';
+                }
+            });
+        }
+
+        // Função para formatar desconto (0-100, inteiros)
+        function formatDiscountInput(inputElement) {
+            let value = inputElement.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+
+            if (value === '') {
+                inputElement.value = '0';
+                return;
+            }
+
+            // Converte para número e limita a 100
+            let numValue = parseInt(value);
+            if (numValue > 100) {
+                numValue = 100;
+            }
+
+            inputElement.value = numValue.toString();
+        }
+
+        // Função para formatar parcelas (0-12, inteiros)
+        function formatInstallmentsInput(inputElement, maxValue = 24) {
+            let value = inputElement.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+
+            if (value === '') {
+                inputElement.value = '0';
+                return;
+            }
+
+            // Converte para número e limita ao maxValue
+            let numValue = parseInt(value);
+            if (numValue > maxValue) {
+                numValue = maxValue;
+            }
+
+            inputElement.value = numValue.toString();
+        }
+
+        // Event listeners para desconto e parcelas na publicação
+        const productDiscountInput = document.getElementById('productDiscount');
+        const installmentsInput = document.getElementById('installments');
+        const interestFreeInstallmentsInput = document.getElementById('interestFreeInstallments');
+
+        if (productDiscountInput) {
+            productDiscountInput.addEventListener('input', function () {
+                formatDiscountInput(this);
+            });
+
+            productDiscountInput.addEventListener('blur', function () {
+                if (this.value === '') {
+                    this.value = '0';
+                }
+            });
+        }
+
+        if (installmentsInput) {
+            installmentsInput.addEventListener('input', function () {
+                formatInstallmentsInput(this);
+            });
+
+            installmentsInput.addEventListener('blur', function () {
+                if (this.value === '') {
+                    this.value = '1';
+                }
+            });
+        }
+
+        if (interestFreeInstallmentsInput) {
+            interestFreeInstallmentsInput.addEventListener('input', function () {
+                formatInstallmentsInput(this);
+            });
+
+            interestFreeInstallmentsInput.addEventListener('blur', function () {
+                if (this.value === '') {
+                    this.value = '0';
+                }
+            });
+        }
+
+        // Event listeners para desconto e parcelas na edição
+        const editProductDiscountInput = document.getElementById('editProductDiscount');
+        const editInstallmentsInput = document.getElementById('editInstallments');
+        const editInterestFreeInstallmentsInput = document.getElementById('editInterestFreeInstallments');
+
+        if (editProductDiscountInput) {
+            editProductDiscountInput.addEventListener('input', function () {
+                formatDiscountInput(this);
+            });
+
+            editProductDiscountInput.addEventListener('blur', function () {
+                if (this.value === '') {
+                    this.value = '0';
+                }
+            });
+        }
+
+        if (editInstallmentsInput) {
+            editInstallmentsInput.addEventListener('input', function () {
+                formatInstallmentsInput(this);
+            });
+
+            editInstallmentsInput.addEventListener('blur', function () {
+                if (this.value === '') {
+                    this.value = '1';
+                }
+            });
+        }
+
+        if (editInterestFreeInstallmentsInput) {
+            editInterestFreeInstallmentsInput.addEventListener('input', function () {
+                formatInstallmentsInput(this);
+            });
+
+            editInterestFreeInstallmentsInput.addEventListener('blur', function () {
+                if (this.value === '') {
+                    this.value = '0';
+                }
+            });
+        }
         closeModalBtn.addEventListener('click', closePublishModal);
         cancelBtn.addEventListener('click', closePublishModal);
 
@@ -2799,16 +3088,18 @@
 
             // Validar campos
             const title = document.getElementById('productTitle').value.trim();
-            const price = parseFloat(document.getElementById('productPrice').value);
+            const priceStr = document.getElementById('productPrice').value.replace(',', '.');
+            const price = parseFloat(priceStr);
             const discount = parseFloat(document.getElementById('productDiscount').value);
             const installments = parseInt(document.getElementById('installments').value);
             const interestFreeInstallments = parseInt(document.getElementById('interestFreeInstallments').value);
-            const imageFile = productImageInput.files[0];
+            const imageFile1 = productImageInput1.files[0];
+            const imageFile2 = productImageInput2.files[0];
 
             let isValid = true;
 
             // Validações
-            if (!imageFile) {
+            if (!imageFile1) {
                 document.getElementById('imageError').style.display = 'block';
                 isValid = false;
             }
@@ -2828,7 +3119,7 @@
                 isValid = false;
             }
 
-            if (isNaN(installments) || installments < 1 || installments > 12) {
+            if (isNaN(installments) || installments < 1 || installments > 24) {
                 document.getElementById('installmentsError').style.display = 'block';
                 isValid = false;
             }
@@ -2849,23 +3140,48 @@
             submitBtn.disabled = true;
 
             try {
-                // Comprimir imagem para WebP (40-70 KB)
-                const compressedImage = await compressImageToWebP(imageFile);
-                const sizeInKB = (compressedImage.size / 1024).toFixed(2);
+                const imageUrls = [];
+                const imageIds = [];
 
-                // Atualizar feedback
-                submitBtn.textContent = '⏳ Enviando para ImageKit...';
+                // Processar primeira imagem
+                submitBtn.textContent = '⏳ Comprimindo imagem 1...';
+                const compressedImage1 = await compressImageToWebP(imageFile1);
+                const sizeInKB1 = (compressedImage1.size / 1024).toFixed(2);
 
-                // Fazer upload da imagem comprimida
-                const uploadResult = await uploadImageToImageKit(compressedImage);
+                submitBtn.textContent = '⏳ Enviando imagem 1 para ImageKit...';
+                const uploadResult1 = await uploadImageToImageKit(compressedImage1);
 
-                if (uploadResult) {
+                if (uploadResult1) {
+                    imageUrls.push(uploadResult1.url);
+                    imageIds.push(uploadResult1.fileId);
+                }
+
+                // Processar segunda imagem se fornecida
+                if (imageFile2) {
+                    submitBtn.textContent = '⏳ Comprimindo imagem 2...';
+                    const compressedImage2 = await compressImageToWebP(imageFile2);
+                    const sizeInKB2 = (compressedImage2.size / 1024).toFixed(2);
+
+                    submitBtn.textContent = '⏳ Enviando imagem 2 para ImageKit...';
+                    const uploadResult2 = await uploadImageToImageKit(compressedImage2);
+
+                    if (uploadResult2) {
+                        imageUrls.push(uploadResult2.url);
+                        imageIds.push(uploadResult2.fileId);
+                    }
+                }
+
+                if (imageUrls.length > 0) {
+                    // Concatenar URLs com separador '\:@\'
+                    const imageUrlsString = imageUrls.join('\\:@\\');
+                    const imageIdsString = imageIds.join('\\:@\\');
+
                     // Preparar dados do produto para inserir no Supabase
                     const productData = {
                         PRODUTO: title,
                         PREÇO: price.toString(),
-                        'IMAGE-URL': uploadResult.url,
-                        'IMAGE-ID': uploadResult.fileId,
+                        'IMAGE-URL': imageUrlsString,
+                        'IMAGE-ID': imageIdsString,
                         DESCONTO: discount.toString(),
                         PARCELAMENTO: `${installments},${interestFreeInstallments}`,
                         DESCRIPTION: document.getElementById('productDescription').value,
@@ -2878,14 +3194,15 @@
                         .insert([productData]);
 
                     if (insertError) {
-                        alert('❌ Imagem publicada, mas erro ao salvar produto:\n' + insertError.message);
+                        alert('❌ Imagem(ns) publicada(s), mas erro ao salvar produto:\n' + insertError.message);
                     } else {
-                        alert('✅ Produto publicado com sucesso!\n\nTítulo: ' + title + '\nTamanho: ' + sizeInKB + ' KB\nURL: ' + uploadResult.url);
+                        const imagenCount = imageUrls.length === 1 ? 'uma imagem' : 'duas imagens';
+                        alert('✅ Produto publicado com sucesso!\n\nTítulo: ' + title + '\nImagens: ' + imagenCount + '\nURLs: ' + imageUrlsString);
                         closePublishModal();
                     }
                 }
             } catch (error) {
-                alert('❌ Erro ao processar imagem:\n' + error.message);
+                alert('❌ Erro ao processar imagem(ns):\n' + error.message);
             }
 
             // Restaurar botão
@@ -3065,15 +3382,16 @@
 
             // Preencher formulário com dados do produto
             document.getElementById('editProductTitle').value = currentEditingProduct.PRODUTO;
-            document.getElementById('editProductPrice').value = parseFloat(currentEditingProduct.PREÇO);
-            document.getElementById('editProductDiscount').value = parseFloat(currentEditingProduct.DESCONTO);
+            const priceValue = parseFloat(currentEditingProduct.PREÇO);
+            document.getElementById('editProductPrice').value = priceValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('editProductDiscount').value = parseInt(currentEditingProduct.DESCONTO).toString();
             document.getElementById('editProductDescription').value = currentEditingProduct.DESCRIPTION || '';
             document.getElementById('editProductAvailability').checked = currentEditingProduct.DISPONIBILIDADE !== false;
 
             // Parsear parcelas
             const parcelas = currentEditingProduct.PARCELAMENTO?.split(',') || ['1', '0'];
-            document.getElementById('editInstallments').value = parseInt(parcelas[0]) || 1;
-            document.getElementById('editInterestFreeInstallments').value = parseInt(parcelas[1]) || 0;
+            document.getElementById('editInstallments').value = parseInt(parcelas[0]).toString() || '1';
+            document.getElementById('editInterestFreeInstallments').value = parseInt(parcelas[1]).toString() || '0';
 
             // Mostrar imagem atual
             document.getElementById('currentEditImage').src = currentEditingProduct['IMAGE-URL'];
@@ -3097,7 +3415,8 @@
 
             // Validar campos
             const title = document.getElementById('editProductTitle').value.trim();
-            const price = parseFloat(document.getElementById('editProductPrice').value);
+            const priceStr = document.getElementById('editProductPrice').value.replace(',', '.');
+            const price = parseFloat(priceStr);
             const discount = parseFloat(document.getElementById('editProductDiscount').value);
             const installments = parseInt(document.getElementById('editInstallments').value);
             const interestFreeInstallments = parseInt(document.getElementById('editInterestFreeInstallments').value);
@@ -3120,7 +3439,7 @@
                 isValid = false;
             }
 
-            if (isNaN(installments) || installments < 1 || installments > 12) {
+            if (isNaN(installments) || installments < 1 || installments > 24) {
                 document.getElementById('editInstallmentsError').style.display = 'block';
                 isValid = false;
             }
@@ -3370,9 +3689,9 @@
             mainContent.innerHTML = `
                 <div class="welcome-card">
                     <div class="welcome-greeting">Bem-vindo de volta</div>
-                    <h2>${firstName} 👋</h2>
+                    <h2>${firstName} </h2>
                     <p>${currentUser.email}</p>
-                    <div class="welcome-card-icon"><i class="ri-store-2-line"></i></div>
+                    <div class="welcome-card-icon"><img src="./recursos/identidade/1778169368015.png" alt="Icon" style="width: 150px"></div>
                 </div>
 
                 <div class="action-grid">
@@ -3411,9 +3730,6 @@
             document.getElementById('btnViewOrders').addEventListener('click', openOrdersModal);
 
             fetchImagekitCredentials();
-
-            // Verificar pedidos pendentes ao carregar a página
-            checkAndUpdatePendingOrders();
 
             // Vincular mudança do filtro para recarregar pedidos quando selecionado
             const ordersFilterEl = document.getElementById('ordersFilter');
@@ -3706,7 +4022,7 @@
         let currentOrderPage = 1;
         let totalOrderPages = 1;
         let allOrdersData = []; // Armazenar todos os pedidos para paginação
-        
+
         // Estado de paginação separado para cada filtro
         let paginationState = {
             'pending': { page: 1, data: [], totalPages: 1 },
@@ -3733,146 +4049,139 @@
             }
         }
 
-        async function checkAndUpdatePendingOrders() {
-            try {
-                const { data, error } = await supabase.from('pedidos_cps56').select('view');
-                if (error) throw error;
 
-                const orders = data || [];
-                const pendingCount = orders.filter(o => o.view === false).length;
-
-                const badge = document.getElementById('ordersNotificationBadge');
-                if (badge) {
-                    if (pendingCount > 0) {
-                        badge.textContent = pendingCount;
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
-                }
-            } catch (error) {
-                console.error('Erro ao verificar pedidos pendentes:', error);
-            }
-        }
-
-        async function checkAndUpdatePendingOrders() {
-            try {
-                const { data, error } = await supabase.from('pedidos_cps56').select('view');
-                if (error) throw error;
-
-                const orders = data || [];
-                const pendingCount = orders.filter(o => o.view === false).length;
-
-                const badge = document.getElementById('ordersNotificationBadge');
-                if (badge) {
-                    if (pendingCount > 0) {
-                        badge.textContent = pendingCount;
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
-                }
-            } catch (error) {
-                console.error('Erro ao verificar pedidos pendentes:', error);
-            }
-        }
 
         async function fetchOrders(filterType) {
+            // Mostrar loader
+            const loader = document.getElementById('ordersLoader');
+            if (loader) loader.classList.add('show');
+            const loaderStartTime = Date.now(); // Registrar quando o loader aparece
+
             const ordersList = document.getElementById('ordersList');
             const ordersCountText = document.getElementById('ordersCountText');
-            if (ordersList) ordersList.innerHTML = '<div style="text-align:center;padding:20px;"><span class="loading-spinner"></span> Carregando pedidos...</div>';
+            if (ordersList) ordersList.innerHTML = '';
+
             try {
-                const { data, error } = await supabase.from('pedidos_cps56').select('*');
+                const filter = filterType !== undefined ? filterType : currentOrderFilter;
+                if (filterType !== undefined) currentOrderFilter = filterType;
+
+                const viewValue = filter === 'pending' ? false : true;
+
+                // Fazer 2 requisições em paralelo: 1) contar pendentes e concluídos, 2) buscar dados do filtro
+                const [countResult, dataResult] = await Promise.all([
+                    // 1ª requisição: Contar pendentes e concluídos em paralelo
+                    Promise.all([
+                        supabase.from('pedidos_cps56').select('*', { count: 'exact', head: true }).eq('view', false),
+                        supabase.from('pedidos_cps56').select('*', { count: 'exact', head: true }).eq('view', true)
+                    ]),
+                    // 2ª requisição: Buscar dados do filtro atual
+                    supabase
+                        .from('pedidos_cps56')
+                        .select('*')
+                        .eq('view', viewValue)
+                        .order('created_at', { ascending: false })
+                        .limit(800)
+                ]);
+
+                // Processar contagens
+                const [pendingRes, completedRes] = countResult;
+                const pendingCount = (!pendingRes.error) ? pendingRes.count : 0;
+                const completedCount = (!completedRes.error) ? completedRes.count : 0;
+
+                // Processar dados do filtro
+                const { data, error } = dataResult;
                 if (error) {
                     if (ordersList) ordersList.innerHTML = `<div class="no-results">Erro ao carregar pedidos: ${error.message}</div>`;
                     if (ordersCountText) ordersCountText.textContent = 'Erro';
+
+                    // Calcular tempo decorrido e esperar se necessário (mínimo 1.5s)
+                    const elapsedTime = Date.now() - loaderStartTime;
+                    const minLoaderTime = 1500; // 1.5 segundos em ms
+                    const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
+
+                    if (remainingTime > 0) {
+                        await new Promise(resolve => setTimeout(resolve, remainingTime));
+                    }
+
+                    // Esconder loader
+                    if (loader) loader.classList.remove('show');
                     return;
                 }
+
                 const orders = data || [];
 
-                // Calcular totais
-                const totalOrders = orders.length;
-                const completedOrders = orders.filter(o => o.view === true).length;
-                const pendingOrders = orders.filter(o => o.view === false).length;
-
+                // Atualizar texto de contagem
                 if (ordersCountText) {
-                    ordersCountText.innerHTML = `${totalOrders} ped. · <span style="color: #16a34a; font-weight: 600;">${completedOrders} concl.</span> · <span style="color: #e53935; font-weight: 600;">${pendingOrders} pend.</span>`;
+                    const total = pendingCount + completedCount;
+                    ordersCountText.innerHTML = `${total} ped. · <span style="color: #16a34a; font-weight: 600;">${completedCount} concl.</span> · <span style="color: #e53935; font-weight: 600;">${pendingCount} pend.</span>`;
                 }
 
                 // Atualizar badge de notificação com pedidos pendentes
                 const notificationBadge = document.getElementById('ordersNotificationBadge');
                 if (notificationBadge) {
-                    if (pendingOrders > 0) {
-                        notificationBadge.textContent = pendingOrders;
+                    if (pendingCount > 0) {
+                        notificationBadge.textContent = pendingCount;
                         notificationBadge.classList.remove('hidden');
                     } else {
                         notificationBadge.classList.add('hidden');
                     }
                 }
 
-                // Determinar filtro atual (usar parâmetro ou manter o global)
-                const filter = filterType !== undefined ? filterType : currentOrderFilter;
-                // Atualizar a variável global de filtro
-                if (filterType !== undefined) {
-                    currentOrderFilter = filterType;
-                }
-
-                if (!orders || orders.length === 0) {
-                    const empty = document.getElementById('ordersEmpty');
-                    if (empty) empty.style.display = 'block';
-                    if (ordersList) ordersList.innerHTML = '';
-                    return;
-                }
-
-                // Filtrar pedidos de acordo com o filtro selecionado
-                let displayOrders = orders.filter(o => {
-                    if (filter === 'pending') return !o.view;
-                    if (filter === 'completed') return o.view === true;
-                    return true;
-                });
-
-                // Ordenar por created_at (mais recentes primeiro) se houver dados
-                if (displayOrders && displayOrders.length > 0) {
-                    displayOrders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-                }
-
-                // Armazenar pedidos no estado de paginação do filtro atual
-                // SEMPRE atualizar, mesmo que vazio
+                // Atualizar estado de paginação com os pedidos retornados (no máximo 800)
                 const itemsPerPage = 4;
+                const displayOrders = orders.slice();
                 paginationState[filter].data = displayOrders;
                 paginationState[filter].totalPages = Math.ceil(Math.max(1, displayOrders.length) / itemsPerPage);
-                
-                // Restaurar página anterior para este filtro, ou começar em 1
+
                 currentOrderPage = paginationState[filter].page;
                 totalOrderPages = paginationState[filter].totalPages;
-                
-                // Se a página atual é maior que o total de páginas, resetar para 1
+
                 if (currentOrderPage > totalOrderPages) {
                     currentOrderPage = 1;
                     paginationState[filter].page = 1;
                 }
-                
-                // Manter referência global para compatibilidade
+
                 allOrdersData = displayOrders;
 
-                // Atualizar paginação mesmo se vazio
                 updatePaginationInfo();
 
-                // Se vazio, mostrar mensagem
                 if (!displayOrders || displayOrders.length === 0) {
                     const empty = document.getElementById('ordersEmpty');
                     if (empty) empty.style.display = 'block';
                     if (ordersList) ordersList.innerHTML = '';
+
+                    // Calcular tempo decorrido e esperar se necessário (mínimo 1.5s)
+                    const elapsedTime = Date.now() - loaderStartTime;
+                    const minLoaderTime = 1500; // 1.5 segundos em ms
+                    const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
+
+                    if (remainingTime > 0) {
+                        await new Promise(resolve => setTimeout(resolve, remainingTime));
+                    }
+
+                    // Esconder loader
+                    if (loader) loader.classList.remove('show');
                     return;
                 } else {
                     const empty = document.getElementById('ordersEmpty');
                     if (empty) empty.style.display = 'none';
                 }
 
-                // Renderizar os pedidos da página atual
                 renderOrdersPage();
 
-                // Adicionar event listeners aos toggles
+                // Calcular tempo decorrido e esperar se necessário (mínimo 1.5s)
+                const elapsedTime = Date.now() - loaderStartTime;
+                const minLoaderTime = 1500; // 1.5 segundos em ms
+                const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
+
+                if (remainingTime > 0) {
+                    await new Promise(resolve => setTimeout(resolve, remainingTime));
+                }
+
+                // Esconder loader
+                if (loader) loader.classList.remove('show');
+
+                // Adicionar event listeners aos toggles (mesma lógica anterior)
                 document.querySelectorAll('.order-view-toggle').forEach(toggle => {
                     toggle.addEventListener('change', async (e) => {
                         const orderId = toggle.getAttribute('data-order-id');
@@ -3900,6 +4209,19 @@
             } catch (err) {
                 const ordersListEl = document.getElementById('ordersList');
                 if (ordersListEl) ordersListEl.innerHTML = `<div class="no-results">Erro inesperado: ${err.message}</div>`;
+
+                // Calcular tempo decorrido e esperar se necessário (mínimo 1.5s)
+                const elapsedTime = Date.now() - loaderStartTime;
+                const minLoaderTime = 1500; // 1.5 segundos em ms
+                const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
+
+                if (remainingTime > 0) {
+                    await new Promise(resolve => setTimeout(resolve, remainingTime));
+                }
+
+                // Esconder loader em caso de erro
+                const loader = document.getElementById('ordersLoader');
+                if (loader) loader.classList.remove('show');
             }
         }
 
@@ -4056,13 +4378,13 @@
 
         function goToOrderPage(pageNumber) {
             if (pageNumber < 1 || pageNumber > totalOrderPages) return;
-            
+
             currentOrderPage = pageNumber;
             // Salvar página atual no estado do filtro
             paginationState[currentOrderFilter].page = pageNumber;
-            
+
             renderOrdersPage();
-            
+
             // Scroll to top do modal
             const modalBody = document.querySelector('#ordersModal .modal-body');
             if (modalBody) {
@@ -4075,14 +4397,14 @@
             if (ordersModal) ordersModal.style.display = 'flex';
             // Definir filtro padrão para pedidos pendentes ao abrir
             currentOrderFilter = 'pending';
-            
+
             // Resetar estado do dropdown Vue
             if (filterDropdownApp && filterDropdownApp.$data) {
                 filterDropdownApp.$data.selectedValue = 'pending';
                 filterDropdownApp.$data.selectedLabel = 'Pedidos pendentes';
                 filterDropdownApp.$data.isOpen = false;
             }
-            
+
             const ordersFilterEl = document.getElementById('ordersFilter');
             if (ordersFilterEl) ordersFilterEl.value = 'pending';
             fetchOrders('pending');

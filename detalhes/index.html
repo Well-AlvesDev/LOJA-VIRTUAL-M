@@ -432,6 +432,79 @@
         filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.12));
     }
 
+    /* Botões laterais (anterior/próximo) e contador */
+    .produto-imagem .img-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        z-index: 4;
+    }
+
+    .produto-imagem .img-prev {
+        left: 12px;
+    }
+
+    .produto-imagem .img-next {
+        right: 12px;
+    }
+
+    .produto-imagem .img-nav i {
+        font-size: 20px;
+        color: #670e49;
+    }
+
+    .produto-imagem .img-nav[disabled] {
+        opacity: 0.45;
+        pointer-events: none;
+        cursor: default;
+    }
+
+    .produto-imagem .img-counter {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 18px;
+        font-size: 13px;
+        z-index: 4;
+    }
+
+    @media (max-width: 768px) {
+        .produto-imagem .img-nav {
+            width: 36px;
+            height: 36px;
+        }
+
+        .produto-imagem .img-nav i {
+            font-size: 18px;
+        }
+
+        .produto-imagem .img-prev {
+            left: 8px;
+        }
+
+        .produto-imagem .img-next {
+            right: 8px;
+        }
+
+        .produto-imagem .img-counter {
+            font-size: 12px;
+            padding: 5px 8px;
+        }
+    }
+
     .produto-imagem.carregando {
         background: linear-gradient(90deg, #fde8f2 25%, #fff4f8 50%, #fde8f2 75%);
         background-size: 200% 100%;
@@ -1551,15 +1624,15 @@
                 }
             }
 
-            // Salvar imagem no cache
-            async function saveImageToCache(productId, imageUrl, imageData) {
+            // Salvar imagem no cache (chave por imagem)
+            async function saveImageToCache(cacheKey, imageUrl, imageData) {
                 try {
                     const db = await initDB();
                     const transaction = db.transaction(OBJECT_STORE, 'readwrite');
                     const store = transaction.objectStore(OBJECT_STORE);
 
                     const cacheEntry = {
-                        id: productId,
+                        id: cacheKey,
                         url: imageUrl,
                         data: imageData,
                         timestamp: Date.now()
@@ -1569,7 +1642,7 @@
 
                     return new Promise((resolve, reject) => {
                         transaction.oncomplete = () => {
-                            console.log(`✅ Imagem ${productId} salva em cache`);
+                            console.log(`✅ Imagem ${cacheKey} salva em cache`);
                             resolve(true);
                         };
                         transaction.onerror = () => {
@@ -1583,18 +1656,18 @@
                 }
             }
 
-            // Buscar imagem do cache
-            async function getImageFromCache(productId) {
+            // Buscar imagem do cache (por chave)
+            async function getImageFromCache(cacheKey) {
                 try {
                     const db = await initDB();
                     const transaction = db.transaction(OBJECT_STORE, 'readonly');
                     const store = transaction.objectStore(OBJECT_STORE);
-                    const request = store.get(productId);
+                    const request = store.get(cacheKey);
 
                     return new Promise((resolve, reject) => {
                         request.onsuccess = () => {
                             if (request.result) {
-                                console.log(`✅ Imagem ${productId} recuperada do cache`);
+                                console.log(`✅ Imagem ${cacheKey} recuperada do cache`);
                             }
                             resolve(request.result);
                         };
@@ -1654,7 +1727,7 @@
         }
 
         function extrairUrlImagem(item) {
-            // Tentar múltiplas variações de nome de coluna para URL de imagem
+            // Retorna a PRIMEIRA URL encontrada (compatibilidade com código existente)
             let imagemUrl = item['IMAGEM-URL'] || item['Imagem-URL'] || item['IMAGEM_URL'] ||
                 item['imagem-url'] || item['imagem'] || item['IMAGEM'] || item['url-imagem'] ||
                 item['URL_IMAGEM'] || '';
@@ -1673,7 +1746,37 @@
                 }
             }
 
+            // Se o campo contiver múltiplas URLs separadas por "\\:@\\", retornar a primeira
+            if (imagemUrl && imagemUrl.includes('\\:@\\')) {
+                const partes = imagemUrl.split('\\:@\\').map(s => s.trim()).filter(Boolean);
+                if (partes.length > 0) return partes[0];
+            }
+
             return imagemUrl;
+        }
+
+        // Retorna todas as URLs encontradas (separador literal "\\:@\\")
+        function extrairUrlsImagens(item) {
+            let raw = item['IMAGEM-URL'] || item['Imagem-URL'] || item['IMAGEM_URL'] ||
+                item['imagem-url'] || item['imagem'] || item['IMAGEM'] || item['url-imagem'] ||
+                item['URL_IMAGEM'] || '';
+
+            if (!raw) {
+                const allKeys = Object.keys(item);
+                const imagemKey = allKeys.find(key =>
+                    key.toLowerCase().includes('imagem') ||
+                    key.toLowerCase().includes('image') ||
+                    key.toLowerCase().includes('url') ||
+                    key.toLowerCase().includes('foto')
+                );
+                if (imagemKey) raw = item[imagemKey] || '';
+            }
+
+            if (!raw) return [];
+
+            const parts = raw.split('\\:@\\').map(p => p.trim()).filter(Boolean);
+            // Se não houver separador, retornar a própria string como único item
+            return parts.length > 0 ? parts : [raw.trim()].filter(Boolean);
         }
 
         function gerarLinkWhatsApp(nomeProduto, preco) {
@@ -1681,6 +1784,76 @@
             const mensagem = `Olá! Gostaria de fazer um pedido do produto: *${nomeProduto}* - R$ ${preco}`;
             const urlEncodedMsg = encodeURIComponent(mensagem);
             return `https://wa.me/${telefone}?text=${urlEncodedMsg}`;
+        }
+
+        // Adiciona ao carrinho usando a imagem atualmente exibida na galeria
+        function adicionarAoCarrinhoComImagemAtual(botao, produtoId, nomeProduto, preco) {
+            try {
+                const imgEl = document.querySelector('.produto-imagem img');
+                const imagemAtual = imgEl && imgEl.src ? imgEl.src : null;
+                return CartSystem.adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, imagemAtual);
+            } catch (e) {
+                console.warn('Erro ao adicionar ao carrinho com imagem atual:', e);
+                return CartSystem.adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, null);
+            }
+        }
+
+        // TTL global para cache de imagens (1 hora)
+        const CACHE_IMAGE_TTL_MS = 1 * 60 * 60 * 1000;
+
+        // Gera chave única para cache baseada em productId + URL
+        function makeCacheKey(productId, imageUrl) {
+            try {
+                return `${productId}::${btoa(unescape(encodeURIComponent(imageUrl || '')))}`;
+            } catch (e) {
+                return `${productId}::${encodeURIComponent(imageUrl || '')}`;
+            }
+        }
+
+        // Busca (ou busca+salva) imagem no cache — retorna base64 ou null
+        async function fetchAndCacheImage(productId, imageUrl) {
+            if (!imageUrl) return null;
+
+            const cacheKey = makeCacheKey(productId, imageUrl);
+
+            try {
+                const cached = await CacheManager.getImageFromCache(cacheKey);
+                if (cached && cached.data) {
+                    const age = Date.now() - (cached.timestamp || 0);
+                    if (age < CACHE_IMAGE_TTL_MS) return cached.data;
+                }
+
+                // Data URLs não precisam de fetch
+                if (String(imageUrl).startsWith('data:')) {
+                    try { await CacheManager.saveImageToCache(cacheKey, imageUrl, imageUrl); } catch (e) { /* ignore */ }
+                    return imageUrl;
+                }
+
+                const resp = await fetch(imageUrl);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const blob = await resp.blob();
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => resolve(ev.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+
+                try { await CacheManager.saveImageToCache(cacheKey, imageUrl, base64); } catch (e) { console.warn('Falha ao salvar cache:', e); }
+                return base64;
+            } catch (err) {
+                console.warn('fetchAndCacheImage falhou para', imageUrl, err);
+                return null;
+            }
+        }
+
+        // Pré-carrega todas as imagens (não aguarda conclusão)
+        function preloadAllImages(productId, imageUrls) {
+            if (!Array.isArray(imageUrls) || imageUrls.length === 0) return;
+            imageUrls.forEach(url => {
+                // Iniciar fetch em background
+                fetchAndCacheImage(productId, url).catch(() => { });
+            });
         }
 
         // ===== CARREGAR IMAGEM COM CACHE =====
@@ -1692,12 +1865,11 @@
                 return;
             }
 
-            // TTL para forçar revalidação periódica (1 hora)
-            const CACHE_IMAGE_TTL_MS = 1 * 60 * 60 * 1000;
-
             try {
-                // 1. Tentar buscar do cache
-                const cachedImage = await CacheManager.getImageFromCache(productId);
+                const cacheKey = makeCacheKey(productId, imageUrl);
+
+                // 1. Tentar buscar do cache usando a chave da imagem
+                const cachedImage = await CacheManager.getImageFromCache(cacheKey);
 
                 if (cachedImage && cachedImage.data) {
                     const isSameUrl = (cachedImage.url === imageUrl);
@@ -1705,7 +1877,7 @@
                     const isFresh = ageMs < CACHE_IMAGE_TTL_MS;
 
                     if (isSameUrl && isFresh) {
-                        console.log(`✅ Imagem carregada do cache para produto ${productId}`);
+                        console.log(`✅ Imagem carregada do cache para chave ${cacheKey}`);
                         imgElement.src = cachedImage.data;
                         document.querySelector('.produto-imagem').classList.remove('carregando');
                         return;
@@ -1714,7 +1886,7 @@
                     if (!isSameUrl) {
                         console.log(`🔁 URL da imagem mudou para produto ${productId} — atualizando cache.`);
                     } else if (!isFresh) {
-                        console.log(`⌛ Cache expirado para produto ${productId} (idade ${Math.round(ageMs / 1000)}s) — revalidando.`);
+                        console.log(`⌛ Cache expirado para chave ${cacheKey} (idade ${Math.round(ageMs / 1000)}s) — revalidando.`);
                     }
                     // Se chegamos aqui, vamos rebaixar para buscar nova versão da imagem
                 }
@@ -1742,11 +1914,15 @@
                     const base64Data = event.target.result;
 
                     // Salvar em cache (substitui entrada anterior)
-                    await CacheManager.saveImageToCache(productId, imageUrl, base64Data);
+                    try {
+                        await CacheManager.saveImageToCache(cacheKey, imageUrl, base64Data);
+                    } catch (e) {
+                        console.warn('⚠️ Falha ao salvar imagem em cache:', e);
+                    }
 
                     imgElement.src = base64Data;
                     document.querySelector('.produto-imagem').classList.remove('carregando');
-                    console.log(`✅ Imagem carregada e salva em cache para produto ${productId}`);
+                    console.log(`✅ Imagem carregada para produto ${productId}`);
                 };
 
                 reader.onerror = () => {
@@ -1878,7 +2054,10 @@
                 </div>
                 <div class="produto-container">
                     <div class="produto-imagem carregando">
+                        <button class="img-nav img-prev" aria-label="Imagem anterior"><i class="ri-arrow-left-s-line"></i></button>
                         <img src="" alt="${nomeProduto}" />
+                        <button class="img-nav img-next" aria-label="Próxima imagem"><i class="ri-arrow-right-s-line"></i></button>
+                        <div class="img-counter" id="image-counter" aria-hidden="true">1 / 1</div>
                     </div>
                     <div class="produto-info">
                         <div>
@@ -1912,7 +2091,7 @@
                                 <i class="ri-shopping-bag-4-fill"></i>
                                 Comprar agora
                             </button>
-                            <button class="btn-adicionar-carrinho" onclick="CartSystem.adicionarProdutoComDesabilitar(this, ${produto.ID}, '${nomeProduto}', ${precoComDesconto}, '${extrairUrlImagem(produto)}')">
+                            <button class="btn-adicionar-carrinho" onclick="adicionarAoCarrinhoComImagemAtual(this, ${produto.ID}, '${nomeProduto}', ${precoComDesconto})">
                                 <i class="ri-add-line"></i>
                                 Adicionar ao carrinho
                             </button>
@@ -1921,8 +2100,50 @@
                 </div>
             `;
 
-            // Carregar imagem com cache
-            carregarImagem(productId, imagemUrl);
+            // Inicializar gallery (sem miniaturas) — controla botões laterais
+            (function initImageGallery() {
+                const imageUrls = extrairUrlsImagens(produto);
+                const container = document.querySelector('.produto-imagem');
+                const imgEl = container.querySelector('img');
+                const prevBtn = container.querySelector('.img-prev');
+                const nextBtn = container.querySelector('.img-next');
+                const counter = container.querySelector('.img-counter');
+
+                let currentIndex = 0;
+
+                function atualizarControles() {
+                    if (!counter) return;
+                    counter.textContent = `${currentIndex + 1} / ${Math.max(1, imageUrls.length)}`;
+                    if (prevBtn) prevBtn.disabled = (currentIndex === 0 || imageUrls.length <= 1);
+                    if (nextBtn) nextBtn.disabled = (currentIndex === imageUrls.length - 1 || imageUrls.length <= 1);
+                }
+
+                async function mostrarIndice(idx) {
+                    if (!imgEl) return;
+                    if (!imageUrls || imageUrls.length === 0) {
+                        imgEl.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="Arial"%3EImagem não disponível%3C/text%3E%3C/svg%3E';
+                        container.classList.remove('carregando');
+                        atualizarControles();
+                        return;
+                    }
+
+                    currentIndex = Math.max(0, Math.min(idx, imageUrls.length - 1));
+                    container.classList.add('carregando');
+                    try {
+                        await carregarImagem(productId, imageUrls[currentIndex]);
+                    } catch (e) {
+                        console.warn('Erro ao mostrar imagem:', e);
+                    }
+                    atualizarControles();
+                }
+
+                if (prevBtn) prevBtn.addEventListener('click', () => mostrarIndice(currentIndex - 1));
+                if (nextBtn) nextBtn.addEventListener('click', () => mostrarIndice(currentIndex + 1));
+
+                // Pré-carregar todas as imagens em background e inicializar com a primeira
+                preloadAllImages(productId, imageUrls);
+                mostrarIndice(0);
+            })();
         }
 
         function exibirErro(mensagem) {
