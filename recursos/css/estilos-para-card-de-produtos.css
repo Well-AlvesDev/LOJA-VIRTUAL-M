@@ -64,9 +64,9 @@
 /* BADGE DE DESCONTO */
 .desconto-badge {
     display: inline-block;
-    background: #aa2f60;
+    background: #c21a63a2;
     border-radius: 8px;
-    color: #ffffff;
+    color: #ffebeb;
     padding: 6px 12px;
     font-size: 12px;
     font-weight: 700;
