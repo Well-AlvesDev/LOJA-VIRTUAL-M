@@ -418,6 +418,46 @@
             text-align: center;
         }
 
+        /* Estilo para mensagem 'Exibindo resultados' */
+        .exibindo-resultados-para {
+            display: flex;
+            justify-content: center;
+            margin: 18px 0 22px;
+        }
+
+        .exibindo-resultados-para .exibindo-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 245, 255, 0.96));
+            color: #444;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(67, 123, 218, 0.07);
+            border: 1px solid rgba(67, 123, 218, 0.08);
+        }
+
+        .exibindo-resultados-para .exibindo-text #termo-pesquisado {
+            color: #447bda;
+            font-weight: 700;
+        }
+
+        .exibindo-resultados-para.promo .exibindo-text {
+            background: linear-gradient(90deg, #eeeeee, #fefefe);
+            border-color: rgba(235, 58, 117, 0.15);
+            color: #be9914;
+            box-shadow: 0 8px 24px rgba(220, 196, 35, 0.06);
+        }
+
+        @media (max-width: 520px) {
+            .exibindo-resultados-para .exibindo-text {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+        }
+
         /* Estilos do Footer */
         footer {
             background-color: #ffffff00;
@@ -475,9 +515,8 @@
 
         .footer-bottom {
             text-align: center;
-            margin-top: auto;
+            margin-top: -40px;
             padding: 30px 20px;
-            border-top: 1px solid #f0f0f0;
             font-size: 10px;
             color: #999;
             width: 100%;
@@ -1081,8 +1120,8 @@
     <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
     <!-- SEÇÃO DE PRODUTOS -->
     <main>
-        <div class="exibindo-resultados-para">
-            <p style="text-align: center; font-size: 14px; color: #555;">
+        <div class="exibindo-resultados-para" aria-live="polite">
+            <p class="exibindo-text">
                 Exibindo resultados para "<strong id="termo-pesquisado"></strong>"
             </p>
         </div>
@@ -2941,15 +2980,62 @@
             try {
                 const params = new URLSearchParams(window.location.search);
                 const q = params.get('q');
-                const termoEl = document.getElementById('termo-pesquisado');
+                const exibBox = document.querySelector('.exibindo-resultados-para');
+                let termoEl = exibBox ? exibBox.querySelector('#termo-pesquisado') : document.getElementById('termo-pesquisado');
+                const exibContainer = exibBox ? exibBox.querySelector('p') : document.querySelector('.exibindo-resultados-para p');
 
                 if (!q) {
-                    if (termoEl) termoEl.textContent = 'todos os produtos';
+                    // Quando estiver no modo promo, mostrar mensagem dedicada
+                    if (modoPromocao) {
+                        if (exibContainer) {
+                            exibContainer.innerHTML = '<strong>Exibindo os melhores preços! 🏷️</strong>';
+                        }
+                        if (exibBox) exibBox.classList.add('promo');
+                        if (termoEl) termoEl.textContent = '';
+
+                        // Atualizar região aria-live para leitores de tela
+                        let livePromo = document.getElementById('busca-term-live');
+                        if (!livePromo) {
+                            livePromo = document.createElement('div');
+                            livePromo.id = 'busca-term-live';
+                            livePromo.setAttribute('aria-live', 'polite');
+                            livePromo.style.position = 'absolute';
+                            livePromo.style.width = '1px';
+                            livePromo.style.height = '1px';
+                            livePromo.style.margin = '-1px';
+                            livePromo.style.border = '0';
+                            livePromo.style.padding = '0';
+                            livePromo.style.overflow = 'hidden';
+                            livePromo.style.clip = 'rect(0 0 0 0)';
+                            document.body.appendChild(livePromo);
+                        }
+                        livePromo.textContent = 'Exibindo os melhores preços!';
+                        setTimeout(() => { livePromo.textContent = ''; }, 2000);
+                    } else {
+                        if (exibBox) exibBox.classList.remove('promo');
+                        // Restaurar aparência padrão e termo "todos os produtos"
+                        if (exibContainer) {
+                            exibContainer.innerHTML = 'Exibindo resultados para "<strong id="termo-pesquisado"></strong>"';
+                            termoEl = document.getElementById('termo-pesquisado');
+                            if (termoEl) termoEl.textContent = 'todos os produtos';
+                        } else {
+                            if (termoEl) termoEl.textContent = 'todos os produtos';
+                        }
+                    }
                     return;
                 }
 
                 const termoRaw = decodeURIComponent(q).replace(/-/g, ' ').trim();
                 const termo = formatarTermoCapitalizado(termoRaw);
+
+                // Se estava em modo promo, garantir remoção da classe ao mostrar um termo
+                if (exibBox && exibBox.classList.contains('promo')) exibBox.classList.remove('promo');
+
+                // Caso o container tenha sido alterado pelo modo promo, restaurar estrutura padrão para exibir o termo
+                if (exibContainer && /melhores preços/i.test(exibContainer.textContent || '')) {
+                    exibContainer.innerHTML = 'Exibindo resultados para "<strong id="termo-pesquisado"></strong>"';
+                    termoEl = document.getElementById('termo-pesquisado');
+                }
 
                 if (termoEl) termoEl.textContent = termo;
                 if (buscaInput) {
@@ -2973,6 +3059,7 @@
                     live.style.clip = 'rect(0 0 0 0)';
                     document.body.appendChild(live);
                 }
+
                 live.textContent = `Exibindo resultados para ${termo}`;
                 setTimeout(() => { live.textContent = ''; }, 2000);
             } catch (err) {
