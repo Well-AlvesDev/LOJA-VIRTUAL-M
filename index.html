@@ -2578,12 +2578,12 @@
                 return `
                     <div class="produto-card" data-id="${produto.id}">
                         <div class="produto-imagem-wrapper">
-                            <img data-src="${produto.imagem}" alt="${produto.nome}" 
+                            <img data-src="${produto.imagem}" data-images='${JSON.stringify(produto.imagens || [produto.imagem])}' alt="${produto.nome}" 
                                 class="produto-imagem" 
                                 loading="lazy"
                                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23f0f0f0' width='300' height='400'/%3E%3C/svg%3E"
                                 onerror="this.src='https://via.placeholder.com/300x400?text=Produto'">
-                        </div> 
+                        </div>
                         <div class="produto-info">
                             <div>
                                 <h3 class="produto-nome">${produto.nome}</h3>
@@ -3027,11 +3027,36 @@
                         }
                     }
 
+                    // Suporte a múltiplas imagens: campo `IMAGE-URL` pode conter várias URLs
+                    // separadas por "\\:@\\" (formato informado). Também suportar alguns delimitadores
+                    // alternativos como '|' e ';' por robustez.
+                    const imagemRaw = item['IMAGE-URL'] || '';
+                    let imagens = [];
+                    try {
+                        const raw = String(imagemRaw).trim();
+                        if (!raw) {
+                            imagens = [];
+                        } else if (raw.indexOf('\\:@\\') !== -1) {
+                            imagens = raw.split('\\:@\\').map(s => s.trim()).filter(Boolean);
+                        } else if (raw.indexOf('|') !== -1) {
+                            imagens = raw.split('|').map(s => s.trim()).filter(Boolean);
+                        } else if (raw.indexOf(';') !== -1) {
+                            imagens = raw.split(';').map(s => s.trim()).filter(Boolean);
+                        } else {
+                            imagens = [raw];
+                        }
+                    } catch (e) {
+                        imagens = String(imagemRaw).trim() ? [String(imagemRaw).trim()] : [];
+                    }
+
                     return {
                         id: item.ID,
                         nome: item.PRODUTO,
                         preco: item.PREÇO,
-                        imagem: item['IMAGE-URL'],
+                        // `imagem` mantém compatibilidade com código existente (primeira imagem)
+                        imagem: imagens[0] || (typeof item['IMAGE-URL'] === 'string' ? item['IMAGE-URL'] : ''),
+                        // `imagens` é a lista completa (pode ser vazia)
+                        imagens: imagens,
                         desconto: item.DESCONTO || 0,
                         parcelamento: parcelamento,
                         disponibilidade: item.DISPONIBILIDADE === true || item.DISPONIBILIDADE === 'true'

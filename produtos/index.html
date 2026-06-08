@@ -960,10 +960,10 @@
                 transform: translateX(100%);
             }
         }
-</style>
+    </style>
     <!-- Checkout MP: estilos → ../recursos/css/checkout.css -->
     <link rel="stylesheet" href="../recursos/css/checkout.css">
-</style>
+    </style>
 </head>
 
 <body>
@@ -1257,12 +1257,13 @@
         }
 
         // Função auxiliar para transformar dados do Supabase para formato esperado pelo app
+        // Suporte a múltiplas imagens: o campo de imagem pode conter várias URLs separadas por "\\:@\\"
         function transformarDadosSupabase(dados) {
             if (!Array.isArray(dados)) return [];
             return dados.map((item, idx) => {
                 // Tentar múltiplas variações de nome de coluna para URL de imagem
                 let imagemUrl = item['IMAGEM-URL'] || item['Imagem-URL'] || item['IMAGEM_URL'] || item['imagem-url'] ||
-                    item['imagem'] || item['IMAGEM'] || item['url-imagem'] || item['URL_IMAGEM'] || '';
+                    item['imagem'] || item['IMAGEM'] || item['url-imagem'] || item['URL_IMAGEM'] || item['IMAGE-URL'] || item['IMAGE_URL'] || '';
 
                 // Se ainda não encontrou, procurar em todas as chaves do item
                 if (!imagemUrl) {
@@ -1278,6 +1279,26 @@
                     }
                 }
 
+                // Parsear múltiplas imagens (separador principal: '\\:@\\') e fallbacks
+                const imagemRaw = imagemUrl || '';
+                let imagens = [];
+                try {
+                    const raw = String(imagemRaw).trim();
+                    if (!raw) {
+                        imagens = [];
+                    } else if (raw.indexOf('\\:@\\') !== -1) {
+                        imagens = raw.split('\\:@\\').map(s => s.trim()).filter(Boolean);
+                    } else if (raw.indexOf('|') !== -1) {
+                        imagens = raw.split('|').map(s => s.trim()).filter(Boolean);
+                    } else if (raw.indexOf(';') !== -1) {
+                        imagens = raw.split(';').map(s => s.trim()).filter(Boolean);
+                    } else {
+                        imagens = [raw];
+                    }
+                } catch (e) {
+                    imagens = String(imagemRaw).trim() ? [String(imagemRaw).trim()] : [];
+                }
+
                 // Gerar ID único: usar ID do Supabase (testar maiúscula e minúscula)
                 const produtoId = item.ID || item.id || item.Id || idx;
 
@@ -1285,6 +1306,7 @@
                     id: produtoId,
                     nome: item.PRODUTO,
                     imagemUrl: imagemUrl,
+                    imagens: imagens,
                     todasAsColunas: Object.keys(item)
                 });
 
@@ -1292,7 +1314,10 @@
                     id: produtoId,
                     nome: item.PRODUTO || '',
                     preco: item.PREÇO || '0.00',
-                    imagem: imagemUrl,
+                    // manter compatibilidade: `imagem` é a primeira URL
+                    imagem: imagens[0] || imagemUrl,
+                    // lista completa de imagens
+                    imagens: imagens,
                     desconto: item.DESCONTO || 0,
                     parcelamento: parseParcelamento(item.PARCELAMENTO || ''),
                     disponibilidade: item.DISPONIBILIDADE !== false
@@ -3115,6 +3140,7 @@
                         <div class="produto-imagem-wrapper">
                             <img 
                                 data-src="${produto.imagem}" 
+                                data-images='${JSON.stringify(produto.imagens || [produto.imagem])}'
                                 alt="${produto.nome}" 
                                 class="produto-imagem" 
                                 loading="lazy"
