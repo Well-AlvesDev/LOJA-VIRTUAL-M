@@ -7,7 +7,6 @@
     <title>Painel Administrativo</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="recursos/js/reauth-success-modal.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <script src="config.js"></script>
     <style>
@@ -2569,55 +2568,31 @@
         </div>
     </div>
 
-    <!-- Modal Reautenticação para Alterar Status de Pedido -->
+    <!-- Modal de Confirmação de Alteração de Status -->
     <div id="reauthModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-header-left">
-                    <div class="modal-icon"><i class="ri-lock-line"></i></div>
+                    <div class="modal-icon"><i class="ri-question-line"></i></div>
                     <div>
-                        <h2>Confirmar Identidade</h2>
-                        <p class="modal-subtitle">Digite suas credenciais para alterar o status do pedido</p>
+                        <h2>Confirmar Alteração</h2>
+                        <p class="modal-subtitle" id="confirmSubtitle">Confirme para prosseguir</p>
                     </div>
                 </div>
                 <button type="button" class="close-btn" id="closeReauthModal"><i class="ri-close-line"></i></button>
             </div>
 
-            <form id="reauthForm">
-                <div class="modal-body">
-                    <div class="success-message" id="reauthSuccessMessage">
-                        <i class="ri-check-line"></i>
-                        <span>Identidade confirmada com sucesso!</span>
-                    </div>
+            <div class="modal-body">
+                <div id="confirmMessage" style="font-size:0.95rem;"></div>
+            </div>
 
-                    <div class="error-message" id="reauthErrorMessage"
-                        style="display: none; color: var(--modal-danger); font-size: 0.87rem; margin-bottom: 12px; align-items: center; gap: 6px;">
-                        <i class="ri-error-warning-line"></i>
-                        <span id="reauthErrorText"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="reauthEmail">Email</label>
-                        <input type="email" id="reauthEmail" placeholder="seu@email.com" required>
-                        <div class="error-message"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="reauthPassword">Senha</label>
-                        <input type="password" id="reauthPassword" placeholder="••••••••" required>
-                        <div class="error-message"></div>
-                    </div>
+            <div class="modal-footer">
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="cancelReauthBtn">Cancelar</button>
+                    <div class="spacer"></div>
+                    <button type="button" class="btn-submit" id="submitReauthBtn">Confirmar</button>
                 </div>
-
-                <div class="modal-footer">
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" id="cancelReauthBtn">Cancelar</button>
-                        <button type="submit" class="btn-submit" id="submitReauthBtn">
-                            <span>Confirmar</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -3731,6 +3706,9 @@
 
             fetchImagekitCredentials();
 
+            // Buscar pedidos pendentes logo ao carregar o painel para atualizar o badge
+            fetchOrders('pending').catch(err => console.error('Erro ao buscar pedidos pendentes:', err));
+
             // Vincular mudança do filtro para recarregar pedidos quando selecionado
             const ordersFilterEl = document.getElementById('ordersFilter');
             if (ordersFilterEl) {
@@ -3832,186 +3810,80 @@
             }
         }
 
-        // ===== SISTEMA DE REAUTENTICAÇÃO =====
-        let pendingOrderStatusUpdate = null;
+        // ===== CONFIRMAÇÃO SIMPLES =====
+        let pendingConfirm = null;
         const reauthModal = document.getElementById('reauthModal');
-        const reauthForm = document.getElementById('reauthForm');
-        const reauthEmailInput = document.getElementById('reauthEmail');
-        const reauthPasswordInput = document.getElementById('reauthPassword');
         const submitReauthBtn = document.getElementById('submitReauthBtn');
         const cancelReauthBtn = document.getElementById('cancelReauthBtn');
         const closeReauthModalBtn = document.getElementById('closeReauthModal');
-        const reauthErrorMessage = document.getElementById('reauthErrorMessage');
-        const reauthErrorText = document.getElementById('reauthErrorText');
-        const reauthSuccessMessage = document.getElementById('reauthSuccessMessage');
-        // Bloqueio para evitar que o modal seja fechado acidentalmente
-        let reauthLocked = false;
+        const confirmMessageEl = document.getElementById('confirmMessage');
 
-        function openReauthModal(orderId, newStatus) {
-            pendingOrderStatusUpdate = { orderId, newStatus };
+        function openConfirmModal(orderId, newStatus, toggle, card) {
+            pendingConfirm = { orderId, newStatus, toggle, card };
+            const truncated = String(orderId).length > 8 ? String(orderId).substring(0, 8) + '...' : String(orderId);
+            confirmMessageEl.textContent = `Tem certeza que deseja marcar o pedido #${truncated} como ${newStatus ? 'Concluído' : 'Pendente'}?`;
             reauthModal.style.display = 'flex';
-            reauthForm.reset();
-            reauthErrorMessage.style.display = 'none';
-            reauthSuccessMessage.classList.remove('show');
-            reauthEmailInput.value = currentUser?.email || '';
-            reauthPasswordInput.value = '';
-            reauthPasswordInput.focus();
+            if (toggle) toggle.disabled = true;
         }
 
-        function closeReauthModal(force = false) {
-            // Se estiver bloqueado (mostrando sucesso ou processando), só fecha se for forçado
-            if (reauthLocked && !force) return;
-
-            reauthLocked = false;
+        function closeConfirmModal(force = false) {
             reauthModal.style.display = 'none';
-            reauthForm.reset();
-            reauthForm.style.display = 'block';
-            reauthErrorMessage.style.display = 'none';
-            reauthSuccessMessage.classList.remove('show');
-            reauthSuccessMessage.innerHTML = '<i class="ri-check-line"></i><span>Identidade confirmada com sucesso!</span>';
-            pendingOrderStatusUpdate = null;
-            submitReauthBtn.disabled = false;
-            submitReauthBtn.textContent = 'Confirmar';
+            if (pendingConfirm && pendingConfirm.toggle) {
+                pendingConfirm.toggle.disabled = false;
+                pendingConfirm.toggle.checked = !pendingConfirm.newStatus;
+            }
+            pendingConfirm = null;
         }
 
-        async function reauthenticateUser(email, password) {
-            try {
-                // Validar credenciais sem criar uma nova sessão
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                    options: {
-                        shouldCreateSession: false
-                    }
-                });
-
-                if (error) {
-                    console.error('Erro na reautenticação:', error);
-                    throw new Error(error.message || 'Falha ao validar credenciais');
-                }
-
-                if (!data.user) {
-                    throw new Error('Falha na autenticação');
-                }
-
-                // Verificar se o email coincide com o usuário logado
-                if (data.user.email !== currentUser.email) {
-                    throw new Error('As credenciais fornecidas não correspondem ao usuário logado');
-                }
-
-                return true;
-            } catch (error) {
-                console.error('Erro reauthenticateUser:', error);
-                throw error;
-            }
-        }
-
-        // Event listeners para reautenticação
-        closeReauthModalBtn.addEventListener('click', () => closeReauthModal(true));
-        cancelReauthBtn.addEventListener('click', () => closeReauthModal(true));
-
-        reauthForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!pendingOrderStatusUpdate) {
-                closeReauthModal(true);
-                return;
-            }
-
-            const email = reauthEmailInput.value.trim();
-            const password = reauthPasswordInput.value;
-
-            if (!email || !password) {
-                reauthErrorMessage.style.display = 'flex';
-                reauthErrorText.textContent = 'Por favor, preencha todos os campos';
-                return;
-            }
-
+        // Confirmar ação
+        submitReauthBtn.addEventListener('click', async () => {
+            if (!pendingConfirm) { closeConfirmModal(true); return; }
             submitReauthBtn.disabled = true;
-            const originalText = submitReauthBtn.textContent;
-            submitReauthBtn.innerHTML = '<span class="loading-spinner"></span> Confirmando...';
-            // Bloquear fechamento acidental enquanto o processo está em andamento
-            reauthLocked = true;
-
-            try {
-                await reauthenticateUser(email, password);
-
-                // Identidade confirmada, agora atualizar o status do pedido
-                const { orderId, newStatus } = pendingOrderStatusUpdate;
-                const success = await updateOrderViewStatus(orderId, newStatus);
-
-                if (success) {
-                    // Aguardar 1 segundo após a resposta do Supabase
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-
-                    // Preparar mensagem de sucesso com detalhes
-                    const statusText = newStatus ? 'Concluído' : 'Pendente';
-                    const previousStatus = newStatus ? 'Pendente' : 'Concluído';
-                    const truncatedId = String(orderId).substring(0, 8) + '...';
-
-                    // Usar modal dedicado em Vue para animação de sucesso (se disponível)
-                    if (window.reauthSuccessModal && typeof window.reauthSuccessModal.show === 'function') {
-                        // Fechar o modal de reautenticação imediatamente e exibir o modal de sucesso Vue
-                        closeReauthModal(true);
-                        window.reauthSuccessModal.show({
-                            orderId: truncatedId,
-                            previousStatus,
-                            statusText,
-                            onHidden: () => {
-                                fetchOrders(currentOrderFilter);
-                            }
-                        });
-                    } else {
-                        // Fallback — comportamento anterior
-                        const successMessageContent = document.createElement('div');
-                        successMessageContent.innerHTML = `
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <i class="ri-check-circle-line" style="font-size: 20px; color: #16a34a;"></i>
-                                    <span style="font-weight: 600; font-size: 0.95rem;">Operação bem-sucedida!</span>
-                                </div>
-                                <div style="background: var(--modal-accent-light); padding: 10px; border-radius: 6px; border-left: 3px solid var(--modal-accent);">
-                                    <div style="font-size: 0.85rem; margin-bottom: 6px;">
-                                        <strong>ID do Pedido:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-family: 'DM Mono';">${escapeHtml(truncatedId)}</code>
-                                    </div>
-                                    <div style="font-size: 0.85rem; margin-bottom: 6px;">
-                                        <strong>Status Anterior:</strong> <span style="color: #ea580c;">${previousStatus}</span>
-                                    </div>
-                                    <div style="font-size: 0.85rem;">
-                                        <strong>Status Atual:</strong> <span style="color: #16a34a; font-weight: 600;">${statusText}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-
-                        reauthSuccessMessage.innerHTML = '';
-                        reauthSuccessMessage.appendChild(successMessageContent);
-                        reauthSuccessMessage.classList.add('show');
-                        reauthForm.style.display = 'none';
-
-                        setTimeout(() => {
-                            closeReauthModal(true);
-                            fetchOrders(currentOrderFilter);
-                        }, 2000);
-                    }
-                } else {
-                    throw new Error('Falha ao atualizar o status do pedido');
+            const { orderId, newStatus, toggle, card } = pendingConfirm;
+            const success = await updateOrderViewStatus(orderId, newStatus);
+            if (success) {
+                if (card) {
+                    card.classList.toggle('viewed', newStatus);
+                    const labelText = card.querySelector('.order-status-text');
+                    if (labelText) labelText.textContent = newStatus ? 'Concluído' : 'Pendente';
                 }
-            } catch (error) {
-                console.error('Erro na confirmação:', error);
-                reauthErrorMessage.style.display = 'flex';
-                reauthErrorText.textContent = error.message || 'Erro na confirmação da identidade';
-                // Liberar o bloqueio em caso de erro
-                reauthLocked = false;
-                submitReauthBtn.disabled = false;
-                submitReauthBtn.textContent = originalText;
-                reauthForm.style.display = 'block';
+                if (toggle) toggle.checked = newStatus;
+                fetchOrders(currentOrderFilter);
+                closeConfirmModal(true);
+            } else {
+                if (toggle) toggle.checked = !newStatus;
+                alert('Erro ao atualizar o pedido');
+                closeConfirmModal(true);
             }
+            submitReauthBtn.disabled = false;
         });
 
-        // Fechar modal ao clicar fora (ignorando enquanto bloqueado)
+        // Cancelar / fechar
+        cancelReauthBtn.addEventListener('click', () => {
+            if (pendingConfirm && pendingConfirm.toggle) {
+                pendingConfirm.toggle.disabled = false;
+                pendingConfirm.toggle.checked = !pendingConfirm.newStatus;
+            }
+            closeConfirmModal(true);
+        });
+
+        closeReauthModalBtn.addEventListener('click', () => {
+            if (pendingConfirm && pendingConfirm.toggle) {
+                pendingConfirm.toggle.disabled = false;
+                pendingConfirm.toggle.checked = !pendingConfirm.newStatus;
+            }
+            closeConfirmModal(true);
+        });
+
+        // Fechar modal ao clicar fora
         window.addEventListener('click', (event) => {
-            if (event.target === reauthModal && !reauthLocked) closeReauthModal();
+            if (event.target === reauthModal) {
+                if (pendingConfirm && pendingConfirm.toggle) {
+                    pendingConfirm.toggle.disabled = false;
+                    pendingConfirm.toggle.checked = !pendingConfirm.newStatus;
+                }
+                closeConfirmModal(true);
+            }
         });
 
         // Variável global para rastrear o pedido expandido atualmente
@@ -4079,7 +3951,7 @@
                         .from('pedidos_cps56')
                         .select('*')
                         .eq('view', viewValue)
-                        .order('created_at', { ascending: false })
+                        .order('created_at', { ascending: filter === 'pending' })
                         .limit(800)
                 ]);
 
@@ -4181,31 +4053,7 @@
                 // Esconder loader
                 if (loader) loader.classList.remove('show');
 
-                // Adicionar event listeners aos toggles (mesma lógica anterior)
-                document.querySelectorAll('.order-view-toggle').forEach(toggle => {
-                    toggle.addEventListener('change', async (e) => {
-                        const orderId = toggle.getAttribute('data-order-id');
-                        const newStatus = toggle.checked;
-                        const card = toggle.closest('.order-card');
-
-                        toggle.disabled = true;
-                        const success = await updateOrderViewStatus(orderId, newStatus);
-
-                        if (success) {
-                            if (card) {
-                                card.classList.toggle('viewed', newStatus);
-                                const labelText = card.querySelector('.order-status-text');
-                                if (labelText) labelText.textContent = newStatus ? 'Concluído' : 'Pendente';
-                            }
-                            // Recarregar a lista para respeitar o filtro atual
-                            fetchOrders(currentOrderFilter);
-                        } else {
-                            toggle.checked = !newStatus;
-                        }
-
-                        toggle.disabled = false;
-                    });
-                });
+                // (Removed old direct-update listeners here.)
             } catch (err) {
                 const ordersListEl = document.getElementById('ordersList');
                 if (ordersListEl) ordersListEl.innerHTML = `<div class="no-results">Erro inesperado: ${err.message}</div>`;
@@ -4320,17 +4168,52 @@
                     </div>
                 `;
 
-                // Event listener para expandir/recolher
+                // Event listener para expandir/recolher com scroll suave
                 const header = card.querySelector('.order-header');
                 header.addEventListener('click', () => {
                     // Se há um pedido expandido diferente do atual, fecha primeiro
                     if (expandedOrderCard && expandedOrderCard !== card) {
                         expandedOrderCard.classList.remove('expanded');
                     }
+
+                    // Detectar se vamos expandir (antes da toggle)
+                    const willExpand = !card.classList.contains('expanded');
+
                     // Alterna o estado do pedido clicado
                     card.classList.toggle('expanded');
+
                     // Atualiza a referência do pedido expandido
                     expandedOrderCard = card.classList.contains('expanded') ? card : null;
+
+                    if (willExpand) {
+                        // Rolagem suave para deixar o pedido em uma área confortável do modal
+                        const modalBody = document.querySelector('#ordersModal .modal-body');
+                        if (modalBody) {
+                            // Delay curto para permitir que a expansão ajuste o layout (transição de max-height)
+                            setTimeout(() => {
+                                const modalRect = modalBody.getBoundingClientRect();
+                                const cardRect = card.getBoundingClientRect();
+
+                                // Distância do topo do modal até o topo do card
+                                const topOffset = cardRect.top - modalRect.top;
+                                const margin = 16; // px de folga
+
+                                const maxScroll = modalBody.scrollHeight - modalBody.clientHeight;
+                                let target = modalBody.scrollTop + topOffset - margin;
+                                if (target < 0) target = 0;
+                                if (target > maxScroll) target = maxScroll;
+
+                                modalBody.scrollTo({ top: target, behavior: 'smooth' });
+
+                                // Garantir que a parte inferior do card expandido também fique visível
+                                const cardBottom = (cardRect.bottom - modalRect.top) + modalBody.scrollTop;
+                                if (cardBottom > modalBody.scrollTop + modalBody.clientHeight) {
+                                    const bottomTarget = Math.min(cardBottom - modalBody.clientHeight + margin, maxScroll);
+                                    modalBody.scrollTo({ top: bottomTarget, behavior: 'smooth' });
+                                }
+                            }, 200);
+                        }
+                    }
                 });
 
                 ordersList.appendChild(card);
@@ -4339,21 +4222,17 @@
             // Atualizar informações de paginação
             updatePaginationInfo();
 
-            // Adicionar event listeners aos toggles
+            // Adicionar event listeners aos toggles (abre modal de confirmação)
             document.querySelectorAll('.order-view-toggle').forEach(toggle => {
-                toggle.addEventListener('change', async (e) => {
+                toggle.addEventListener('change', (e) => {
                     const orderId = toggle.getAttribute('data-order-id');
                     const newStatus = toggle.checked;
                     const card = toggle.closest('.order-card');
 
-                    // Reverter o checkbox enquanto não houver confirmação de reautenticação
+                    // Reverter o checkbox e abrir modal de confirmação
                     toggle.checked = !newStatus;
                     toggle.disabled = true;
-
-                    // Abrir modal de reautenticação
-                    openReauthModal(orderId, newStatus);
-
-                    toggle.disabled = false;
+                    openConfirmModal(orderId, newStatus, toggle, card);
                 });
             });
         }

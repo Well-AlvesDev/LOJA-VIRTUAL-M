@@ -433,12 +433,101 @@ function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
 
     const el = document.getElementById('mp-status');
     el.className = 'mp-status visivel ' + tipo;
-    document.getElementById('mp-status-icon').textContent = icone;
-    document.getElementById('mp-status-titulo').textContent = titulo;
+
+    // Remove conteúdo dinâmico de chamadas anteriores (QR code, botões, confetti)
+    const manter = new Set(['mp-status-icon', 'mp-status-titulo', 'mp-status-descricao', 'mp-polling-info', 'pix-logo']);
+    Array.from(el.children).forEach(child => {
+        if (!manter.has(child.id)) child.remove();
+    });
+
+    // ─── Ícone animado ───────────────────────────────────────────
+    const iconEl = document.getElementById('mp-status-icon');
+
+    if (tipo === 'aprovado') {
+        iconEl.innerHTML = `
+            <div class="status-icon-wrapper">
+                <div class="status-ripple"></div>
+                <svg class="status-icon-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="check-circle" cx="26" cy="26" r="24"/>
+                    <path   class="check-path"   d="M14 27l8 8 16-16"/>
+                </svg>
+            </div>`;
+        _spawnConfetti(el);
+
+    } else if (tipo === 'rejeitado') {
+        iconEl.innerHTML = `
+            <div class="status-icon-wrapper">
+                <div class="status-ripple"></div>
+                <svg class="status-icon-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="x-circle" cx="26" cy="26" r="24"/>
+                    <line   class="x-line-1" x1="17" y1="17" x2="35" y2="35"/>
+                    <line   class="x-line-2" x1="35" y1="17" x2="17" y2="35"/>
+                </svg>
+            </div>`;
+
+    } else {
+        // Pendente / outros — mantém comportamento original
+        iconEl.innerHTML = icone
+            ? `<span style="font-size:58px;display:block;margin-bottom:12px">${icone}</span>`
+            : '';
+    }
+
+    document.getElementById('mp-status-titulo').textContent    = titulo;
     document.getElementById('mp-status-descricao').textContent = descricao;
+
+    // ─── Botões de ação (apenas aprovado e rejeitado) ────────────
+    if (tipo === 'aprovado') {
+        const div = document.createElement('div');
+        div.className = 'status-actions';
+        div.innerHTML = `
+            <button class="btn-status-primary" onclick="fecharCheckout()">
+                <i class="ri-check-double-line"></i> Concluir
+            </button>`;
+        el.appendChild(div);
+
+    } else if (tipo === 'rejeitado') {
+        const div = document.createElement('div');
+        div.className = 'status-actions';
+        div.innerHTML = `
+            <button class="btn-status-primary" onclick="resetarCheckout()">
+                <i class="ri-refresh-line"></i> Tentar novamente
+            </button>
+            <button class="btn-status-secondary" onclick="fecharCheckout()">
+                Fechar
+            </button>`;
+        el.appendChild(div);
+    }
 
     const polling = document.getElementById('mp-polling-info');
     polling.style.display = mostrarPolling ? 'flex' : 'none';
+}
+
+// ─── Partículas de confetti para pagamento aprovado ──────────────
+function _spawnConfetti(container) {
+    const COLORS = ['#22c55e', '#4ade80', '#86efac', '#fbbf24', '#60a5fa', '#a78bfa', '#fb7185'];
+    const COUNT  = 22;
+    for (let i = 0; i < COUNT; i++) {
+        const p     = document.createElement('div');
+        p.className = 'confetti-particle';
+        // Distribui as partículas em ângulos uniformes + variação aleatória
+        const angle = (i / COUNT) * 360 + (Math.random() - 0.5) * 28;
+        const dist  = 55 + Math.random() * 75;
+        const rad   = angle * (Math.PI / 180);
+        const size  = 5 + Math.random() * 6;
+        const delay = 0.55 + Math.random() * 0.35;
+        p.style.cssText = `
+            width:${size}px; height:${size}px;
+            background:${COLORS[i % COLORS.length]};
+            border-radius:${Math.random() > 0.4 ? '50%' : '2px'};
+            --cx:${Math.round(Math.cos(rad) * dist)}px;
+            --cy:${Math.round(Math.sin(rad) * dist)}px;
+            --cr:${Math.round(Math.random() * 720 - 360)}deg;
+            animation: confettiFly ${0.7 + Math.random() * 0.5}s ease-out ${delay}s forwards;
+        `;
+        container.appendChild(p);
+        // Limpa o DOM após a animação terminar
+        setTimeout(() => p.remove(), (delay + 1.5) * 1000);
+    }
 }
 
 // ================================================================

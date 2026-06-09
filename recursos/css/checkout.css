@@ -745,3 +745,228 @@
         width: 100%;
     }
 }
+/* ============================================================
+   ANIMAÇÕES DE STATUS — APROVADO & RECUSADO
+   Adicione checkout.css ao seu HTML e as animações estarão
+   automaticamente ativas para ambos os estados.
+   ============================================================ */
+
+/* ─── Reset: o elemento ícone vira um container sem tamanho
+       próprio quando aprovado/rejeitado ─── */
+.mp-status.aprovado #mp-status-icon,
+.mp-status.rejeitado #mp-status-icon {
+    font-size: 0;
+    line-height: 0;
+    margin-bottom: 0;
+}
+
+/* ─── Fundo suave no estado final ─── */
+.mp-status.aprovado {
+    background: linear-gradient(180deg, #f0fdf4 0%, transparent 55%);
+}
+.mp-status.rejeitado {
+    background: linear-gradient(180deg, #fff5f5 0%, transparent 55%);
+}
+
+/* ─── Wrapper do ícone ─── */
+.status-icon-wrapper {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: stIconIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards;
+}
+
+.mp-status.aprovado  .status-icon-wrapper { background: #dcfce7; }
+.mp-status.rejeitado .status-icon-wrapper {
+    background: #fee2e2;
+    animation:
+        stIconIn   0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards,
+        stShake    0.5s ease 0.58s;
+}
+
+/* ─── SVG ─── */
+.status-icon-svg {
+    width: 46px;
+    height: 46px;
+    overflow: visible;
+}
+
+/* ─── Ripple ─── */
+.status-ripple {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0;
+}
+.mp-status.aprovado  .status-ripple {
+    background: rgba(34, 197, 94, 0.35);
+    animation: stRipple 1.6s ease-out 0.72s infinite;
+}
+.mp-status.rejeitado .status-ripple {
+    background: rgba(239, 68, 68, 0.30);
+    animation: stRipple 1s ease-out 0.72s;
+}
+
+/* ─── Check (aprovado) ─── */
+.check-circle {
+    fill: none;
+    stroke: #22c55e;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 157;
+    stroke-dashoffset: 157;
+    animation: stDraw 0.55s ease-out 0.28s forwards;
+}
+.check-path {
+    fill: none;
+    stroke: #16a34a;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 36;
+    stroke-dashoffset: 36;
+    animation: stDraw 0.35s ease-out 0.65s forwards;
+}
+
+/* ─── X (rejeitado) ─── */
+.x-circle {
+    fill: none;
+    stroke: #ef4444;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 157;
+    stroke-dashoffset: 157;
+    animation: stDraw 0.55s ease-out 0.28s forwards;
+}
+.x-line-1,
+.x-line-2 {
+    fill: none;
+    stroke: #dc2626;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+}
+.x-line-1 { animation: stDraw 0.28s ease-out 0.65s forwards; }
+.x-line-2 { animation: stDraw 0.28s ease-out 0.83s forwards; }
+
+/* ─── Título e descrição fade-up ─── */
+.mp-status.aprovado  #mp-status-titulo,
+.mp-status.rejeitado #mp-status-titulo  {
+    opacity: 0;
+    animation: stFadeUp 0.4s ease 0.70s forwards;
+}
+.mp-status.aprovado  #mp-status-descricao,
+.mp-status.rejeitado #mp-status-descricao {
+    opacity: 0;
+    animation: stFadeUp 0.4s ease 0.85s forwards;
+}
+
+/* ─── Botões de ação ─── */
+.status-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    animation: stFadeUp 0.4s ease 1.00s forwards;
+}
+
+.btn-status-primary {
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+}
+.btn-status-primary:active { transform: scale(0.98); }
+
+.mp-status.aprovado .btn-status-primary {
+    background: #16a34a;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.28);
+}
+.mp-status.aprovado .btn-status-primary:hover {
+    background: #15803d;
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.38);
+}
+
+.mp-status.rejeitado .btn-status-primary {
+    background: #dc2626;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
+}
+.mp-status.rejeitado .btn-status-primary:hover {
+    background: #b91c1c;
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
+}
+
+.btn-status-secondary {
+    width: 100%;
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    background: transparent;
+    border: 1.5px solid #e5e7eb;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn-status-secondary:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+/* ─── Confetti ─── */
+.confetti-particle {
+    position: absolute;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    margin-left: -3px;
+    margin-top: -3px;
+    opacity: 0;
+}
+@keyframes confettiFly {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--cx), var(--cy)) rotate(var(--cr)); }
+}
+
+/* ─── Keyframes ─── */
+@keyframes stIconIn {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+@keyframes stShake {
+    0%,  100% { transform: translateX(0); }
+    20%        { transform: translateX(-5px); }
+    40%        { transform: translateX( 5px); }
+    60%        { transform: translateX(-3px); }
+    80%        { transform: translateX( 3px); }
+}
+@keyframes stDraw {
+    to { stroke-dashoffset: 0; }
+}
+@keyframes stRipple {
+    0%   { transform: scale(1);   opacity: 0.55; }
+    100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes stFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
