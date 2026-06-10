@@ -2342,7 +2342,7 @@
                         </div>
                         <div class="form-group">
                             <label for="installments">Total de Parcelas <span class="required-star">*</span></label>
-                            <input type="text" id="installments" placeholder="1" value="1" required>
+                            <input type="text" id="installments" placeholder="0" value="0" required>
                             <span class="error-message" id="installmentsError">Máximo 12 parcelas</span>
                         </div>
                     </div>
@@ -2987,7 +2987,7 @@
 
             installmentsInput.addEventListener('blur', function () {
                 if (this.value === '') {
-                    this.value = '1';
+                    this.value = '0';
                 }
             });
         }
@@ -3028,7 +3028,7 @@
 
             editInstallmentsInput.addEventListener('blur', function () {
                 if (this.value === '') {
-                    this.value = '1';
+                    this.value = '0';
                 }
             });
         }
@@ -3094,7 +3094,7 @@
                 isValid = false;
             }
 
-            if (isNaN(installments) || installments < 1 || installments > 24) {
+            if (isNaN(installments) || installments < 0 || installments > 24) {
                 document.getElementById('installmentsError').style.display = 'block';
                 isValid = false;
             }
@@ -3414,7 +3414,7 @@
                 isValid = false;
             }
 
-            if (isNaN(installments) || installments < 1 || installments > 24) {
+            if (isNaN(installments) || installments < 0 || installments > 24) {
                 document.getElementById('editInstallmentsError').style.display = 'block';
                 isValid = false;
             }
@@ -4276,6 +4276,14 @@
             if (ordersModal) ordersModal.style.display = 'flex';
             // Definir filtro padrão para pedidos pendentes ao abrir
             currentOrderFilter = 'pending';
+
+            // Resetar paginação para a primeira página ao abrir o modal
+            currentOrderPage = 1;
+            if (paginationState && paginationState[currentOrderFilter]) {
+                paginationState[currentOrderFilter].page = 1;
+            } else if (paginationState) {
+                paginationState[currentOrderFilter] = { page: 1, data: [], totalPages: 1 };
+            }
 
             // Resetar estado do dropdown Vue
             if (filterDropdownApp && filterDropdownApp.$data) {
