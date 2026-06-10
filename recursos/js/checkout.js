@@ -24,9 +24,29 @@ const MP_CONFIG = {
     pollingInterval: 5000,
 
     // Máximo de tentativas de polling antes de parar
-    // 600 tentativas × 5 segundos = 3000 segundos = 50 minutos (cobre os 30 min do PIX com margem)
-    pollingMaxTentativas: 600,
+    // 360 tentativas × 5 segundos = 1800 segundos = 30 minutos, que é o tempo de expiração típico do PIX
+    pollingMaxTentativas: 360,
 };
+
+// ================================================================
+//  HELPER: Converter preço BR (com vírgula) para número JS
+// ================================================================
+function parsePreco(valor) {
+    if (typeof valor === 'number' && !isNaN(valor)) return valor;
+    const str = String(valor || '').trim().replace(/[^\d,\.]/g, '');
+    if (!str) return 0;
+    // Tem vírgula E ponto → ponto é separador de milhar: "1.234,56"
+    if (str.includes(',') && str.includes('.')) {
+        return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+    }
+    // Só vírgula → decimal BR: "91,08"
+    if (str.includes(',')) {
+        return parseFloat(str.replace(',', '.')) || 0;
+    }
+    // Só ponto → decimal padrão: "91.08"
+    return parseFloat(str) || 0;
+}
+
 
 // Helper: chama a Edge Function com uma action específica
 async function mpEdge(action, dados) {
@@ -85,7 +105,7 @@ function abrirCheckout(produtosArray, paramPreco, paramId) {
 
         // Multiplica o preço unitário pela quantidade de cada item
         _co.precoProduto = produtosArray.reduce((sum, p) => {
-            const preco = parseFloat(p.preco) || 0;
+            const preco = parsePreco(p.preco);
             const qtd = parseInt(p.quantidade) || 1;
             return sum + (preco * qtd);
         }, 0);
@@ -93,7 +113,7 @@ function abrirCheckout(produtosArray, paramPreco, paramId) {
     } else {
         // Suporte para compra direta de um único produto (via botão "Comprar agora")
         const idNumerico = parseInt(paramId) || 0;
-        const precoNumerico = parseFloat(paramPreco) || 0;
+        const precoNumerico = parsePreco(paramPreco);
         const nomeProd = String(produtosArray || '');
 
         _co.idProduto = idNumerico;
@@ -132,7 +152,7 @@ function renderizarResumoCheckout() {
     if (_co.totalProdutos === 1) {
         // Um único produto - mostrar nome e preço normalmente
         containerNome.textContent = _co.produtos[0].nome;
-        containerPreco.textContent = 'R$ ' + parseFloat(_co.produtos[0].preco).toFixed(2).replace('.', ',');
+        containerPreco.textContent = 'R$ ' + parsePreco(_co.produtos[0].preco).toFixed(2).replace('.', ',');
     } else {
         // Múltiplos produtos - mostrar "Ver produtos" com link
         containerNome.innerHTML = `
@@ -213,7 +233,7 @@ function renderizarProdutosCheckout() {
             </thead>
             <tbody>
                 ${_co.produtos.map(p => {
-        const preco = parseFloat(p.preco) || 0;
+        const preco = parsePreco(p.preco);
         const qtd = p.quantidade || 1;
         const subtotal = preco * qtd;
         return `
@@ -433,6 +453,11 @@ function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
 
     const el = document.getElementById('mp-status');
     el.className = 'mp-status visivel ' + tipo;
+    // Oculta o logo do PIX durante as animações finais (aprovado/rejeitado/expirado)
+    const pixLogo = document.getElementById('pix-logo');
+    if (pixLogo && (tipo === 'aprovado' || tipo === 'rejeitado' || tipo === 'expirado')) {
+        pixLogo.style.display = 'none';
+    }
 
     // Remove conteúdo dinâmico de chamadas anteriores (QR code, botões, confetti)
     const manter = new Set(['mp-status-icon', 'mp-status-titulo', 'mp-status-descricao', 'mp-polling-info', 'pix-logo']);
@@ -464,6 +489,12 @@ function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
                     <line   class="x-line-2" x1="35" y1="17" x2="17" y2="35"/>
                 </svg>
             </div>`;
+    } else if (tipo === 'expirado') {
+        iconEl.innerHTML = `
+            <div class="status-icon-wrapper">
+                <div class="status-ripple"></div>
+                <span class="status-emoji">⏳</span>
+            </div>`;
 
     } else {
         // Pendente / outros — mantém comportamento original
@@ -472,7 +503,7 @@ function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
             : '';
     }
 
-    document.getElementById('mp-status-titulo').textContent    = titulo;
+    document.getElementById('mp-status-titulo').textContent = titulo;
     document.getElementById('mp-status-descricao').textContent = descricao;
 
     // ─── Botões de ação (apenas aprovado e rejeitado) ────────────
@@ -496,6 +527,17 @@ function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
                 Fechar
             </button>`;
         el.appendChild(div);
+    } else if (tipo === 'expirado') {
+        const divExp = document.createElement('div');
+        divExp.className = 'status-actions';
+        divExp.innerHTML = `
+            <button class="btn-status-primary" onclick="resetarCheckout()">
+                <i class="ri-refresh-line"></i> Gerar novo PIX
+            </button>
+            <button class="btn-status-secondary" onclick="fecharCheckout()">
+                Fechar
+            </button>`;
+        el.appendChild(divExp);
     }
 
     const polling = document.getElementById('mp-polling-info');
@@ -505,15 +547,15 @@ function mostrarStatusTela(tipo, icone, titulo, descricao, mostrarPolling) {
 // ─── Partículas de confetti para pagamento aprovado ──────────────
 function _spawnConfetti(container) {
     const COLORS = ['#22c55e', '#4ade80', '#86efac', '#fbbf24', '#60a5fa', '#a78bfa', '#fb7185'];
-    const COUNT  = 22;
+    const COUNT = 22;
     for (let i = 0; i < COUNT; i++) {
-        const p     = document.createElement('div');
+        const p = document.createElement('div');
         p.className = 'confetti-particle';
         // Distribui as partículas em ângulos uniformes + variação aleatória
         const angle = (i / COUNT) * 360 + (Math.random() - 0.5) * 28;
-        const dist  = 55 + Math.random() * 75;
-        const rad   = angle * (Math.PI / 180);
-        const size  = 5 + Math.random() * 6;
+        const dist = 55 + Math.random() * 75;
+        const rad = angle * (Math.PI / 180);
+        const size = 5 + Math.random() * 6;
         const delay = 0.55 + Math.random() * 0.35;
         p.style.cssText = `
             width:${size}px; height:${size}px;
@@ -551,8 +593,8 @@ async function verificarStatusPagamento(paymentId) {
 
     if (_co.tentativasPolling > MP_CONFIG.pollingMaxTentativas) {
         pararPolling();
-        mostrarStatusTela('pendente', '', 'Tempo expirado',
-            'Não conseguimos confirmar seu pagamento automaticamente. Se o pagamento foi realizado, entre em contato conosco.', false);
+        mostrarStatusTela('expirado', '', 'Pagamento expirado',
+            'O pagamento expirou e não foi confirmado automaticamente. Gere um novo PIX ou entre em contato conosco.', false);
         return;
     }
 
@@ -574,7 +616,7 @@ async function verificarStatusPagamento(paymentId) {
         if (status === 'approved') {
             pararPolling();
             mostrarStatusTela('aprovado', '', 'Pagamento aprovado!',
-                'Seu pagamento foi confirmado com sucesso. Em breve você receberá mais informações.', false);
+                'PARABÉNS! Seu pagamento foi confirmado com sucesso e seu pedido em breve estará a caminho. Entraremos em contato com você em breve para passar mais detalhes sobre o sua compra.', false);
 
         } else if (status === 'rejected' || status === 'cancelled') {
             pararPolling();
