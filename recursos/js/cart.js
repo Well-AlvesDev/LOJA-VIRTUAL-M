@@ -455,6 +455,17 @@ const CartSystem = (() => {
         }
     }
 
+    // ===== SINCRONIZAÇÃO COM localStorage / VISIBILIDADE / PAGESHOW =====
+    function sincronizarDoLocalStorage() {
+        const dados = carregarDoLocalStorage();
+        carrinhoData = dados || [];
+        atualizarBadgeCarrinho();
+        const overlay = document.getElementById('cart-overlay');
+        if (overlay && overlay.classList.contains('aberto')) {
+            renderizarCarrinho();
+        }
+    }
+
     function mostrarNotificacaoAdicao(nomeProduto) {
         // Criar notificação temporária
         const notificacao = document.createElement('div');
@@ -551,13 +562,42 @@ const CartSystem = (() => {
         }).format(valor);
     }
 
+    let listenersGlobaisAnexados = false;
     function anexarListenersGlobais() {
+        if (listenersGlobaisAnexados) return;
+        listenersGlobaisAnexados = true;
+
         // Botão de abertura do carrinho (pode estar em qualquer lugar)
         document.addEventListener('click', (e) => {
             if (e.target.closest('.cart-icon-trigger')) {
                 abrirCarrinho();
                 e.preventDefault();
                 e.stopPropagation();
+            }
+        });
+
+        // Ouvir alterações em localStorage vindas de outras abas/janelas
+        window.addEventListener('storage', (e) => {
+            try {
+                // Quando a chave for nossa chave do carrinho ou for um clear (key === null)
+                if (!e) return;
+                if (e.key === null || e.key === STORAGE_KEY) {
+                    sincronizarDoLocalStorage();
+                }
+            } catch (err) {
+                console.warn('Erro ao tratar evento storage do carrinho', err);
+            }
+        });
+
+        // Quando a página for mostrada novamente (back/forward cache), garantir sincronização
+        window.addEventListener('pageshow', (ev) => {
+            sincronizarDoLocalStorage();
+        });
+
+        // Quando a aba voltar a ficar visível, sincronizar (útil em mobile/alternância de abas)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                sincronizarDoLocalStorage();
             }
         });
     }

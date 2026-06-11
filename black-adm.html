@@ -1913,6 +1913,56 @@
             border-top: 1px solid var(--modal-border);
         }
 
+        /* Tabelas para visualização de pedido (produtos + informações do cliente) */
+        .order-products-table,
+        .order-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: var(--modal-bg);
+        }
+
+        .order-products-table th,
+        .order-products-table td,
+        .order-info-table td {
+            border: 1px solid var(--modal-border);
+            padding: 8px 10px;
+            text-align: left;
+            color: #14528f;
+        }
+
+        .order-products-table th {
+            background: var(--modal-surface);
+            color: var(--modal-text);
+            font-weight: 600;
+        }
+
+        .order-products-table td:nth-child(3),
+        .order-info-table td.value {
+            text-align: right;
+        }
+
+        .order-info-table td.label {
+            width: 140px;
+            font-weight: 600;
+            color: var(--modal-muted);
+            background: var(--modal-surface);
+        }
+
+        @media (max-width: 640px) {
+
+            .order-products-table th,
+            .order-products-table td,
+            .order-info-table td {
+                padding: 8px 6px;
+                font-size: 0.88rem;
+            }
+
+            .order-info-table td.label {
+                width: 100px;
+            }
+        }
+
         /* ===== CUSTOM DROPDOWN WITH VUE ===== */
         .custom-dropdown {
             position: relative;
@@ -3509,13 +3559,12 @@
                 const clienteEndereco = order.cliente_endereco || '';
                 const isViewed = order.view || false;
 
-                const prodHtml = produtos.map(p => `
-                    <div class="order-product-item">
-                        <div class="order-product-name">
-                            <strong>${escapeHtml(p.name)}</strong>
-                            <span class="order-product-meta">ID:${escapeHtml(p.prodId)} · Qtd:${escapeHtml(p.qty)}</span>
-                        </div>
-                    </div>
+                const prodTableRows = produtos.map(p => `
+                    <tr>
+                        <td>${escapeHtml(p.name)}</td>
+                        <td>${escapeHtml(p.prodId)}</td>
+                        <td style="text-align:center;">${escapeHtml(p.qty)}</td>
+                    </tr>
                 `).join('');
 
                 const card = document.createElement('div');
@@ -3545,37 +3594,34 @@
                         <div class="order-content-inner">
                             <div class="order-section">
                                 <div class="order-section-title">Produtos</div>
-                                <div class="order-products">${prodHtml}</div>
+                                <div class="order-products">
+                                    <table class="order-products-table" role="table" aria-label="Produtos do pedido">
+                                        <thead>
+                                            <tr>
+                                                <th>Produto</th>
+                                                <th>ID</th>
+                                                <th style="text-align:center;">Qtd</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${prodTableRows}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div class="order-section">
                                 <div class="order-section-title">Informações do Cliente</div>
-                                <div class="order-info-row">
-                                    <div class="order-info-item">
-                                        <span class="order-info-label">Nome:</span>
-                                        <span class="order-info-value">${escapeHtml(clienteNome)}</span>
-                                    </div>
-                                </div>
-                                <div class="order-info-row">
-                                    <div class="order-info-item">
-                                        <span class="order-info-label">Telefone:</span>
-                                        <span class="order-info-value">${escapeHtml(clienteTel)}</span>
-                                    </div>
-                                    <div class="order-info-item">
-                                        <span class="order-info-label">Email:</span>
-                                        <span class="order-info-value">${escapeHtml(clienteEmail)}</span>
-                                    </div>
-                                </div>
-                                <div class="order-info-row">
-                                    <div class="order-info-item">
-                                        <span class="order-info-label">CPF:</span>
-                                        <span class="order-info-value">${escapeHtml(clienteCpf)}</span>
-                                    </div>
-                                </div>
-                                <div class="order-info-row">
-                                    <div class="order-info-item">
-                                        <span class="order-info-label">Endereço:</span>
-                                        <span class="order-info-value">${escapeHtml(clienteEndereco)}</span>
-                                    </div>
+                                <div class="order-info-table-container">
+                                    <table class="order-info-table" role="table" aria-label="Informações do Cliente">
+                                        <tbody>
+                                            <tr><td class="label">Nome</td><td class="value">${escapeHtml(clienteNome)}</td></tr>
+                                            <tr><td class="label">Telefone</td><td class="value">${escapeHtml(clienteTel)}</td></tr>
+                                            <tr><td class="label">Email</td><td class="value">${escapeHtml(clienteEmail)}</td></tr>
+                                            <tr><td class="label">CPF</td><td class="value">${escapeHtml(clienteCpf)}</td></tr>
+                                            <tr><td class="label">Endereço</td><td class="value">${escapeHtml(clienteEndereco)}</td></tr>
+                                            <tr><td class="label">Total</td><td class="value">${pedidoTotal}</td></tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                             <div class="order-datetime">${formatOrderDateTime(order.created_at)}</div>
