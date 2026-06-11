@@ -1052,6 +1052,25 @@
                 transform: translateX(100%);
             }
         }
+
+        /* Mensagem PIX abaixo do preço quando não há parcelamento */
+        .produto-pix {
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            margin-top: 6px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-size: 0.8rem;
+            color: #535353;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .produto-pix i {
+            font-size: 1rem;
+            color: #19ad83;
+        }
     </style>
 
     <!-- Checkout MP: estilos → ./recursos/css/checkout.css -->
@@ -2557,8 +2576,9 @@
                 const precoFormatado = formatarPreco(precoFinal);
                 const precoOriginal = formatarPreco(produto.preco);
 
-                const parcelamento = produto.parcelamento;
+                const parcelamento = produto.parcelamento || { 'parcelado-em-ate': 0, 'sem-juros-ate': 0 };
                 let textoParcelamento = '';
+                let pixHtml = '';
                 if (parcelamento) {
                     if (parcelamento['sem-juros-ate'] > 0) {
                         textoParcelamento = `<div class="produto-parcelamento">
@@ -2568,6 +2588,8 @@
                         textoParcelamento = `<div class="produto-parcelamento">
                             Em até <span class="parcelas-count">${parcelamento['parcelado-em-ate']}x</span> <span class="parcelas-info">no cartão de crédito</span>
                         </div>`;
+                    } else if (parcelamento['parcelado-em-ate'] === 0) {
+                        pixHtml = `<div class="produto-pix"><i class="ri-pix-fill"></i> Pague via PIX</div>`;
                     }
                 }
 
@@ -2595,6 +2617,7 @@
                                     <span class="produto-preco-atual">R$ ${precoFormatado}</span>
                                 </div>
                                 ${textoParcelamento}
+                                ${pixHtml}
                                 ${statusHtml}
                             </div>
                             
