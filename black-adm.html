@@ -2366,157 +2366,6 @@
         </div>
     </div>
 
-    <!-- Modal Gerenciar/Buscar Produtos -->
-    <div id="manageProductsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-header-left">
-                    <div class="modal-icon"><i class="ri-store-2-line"></i></div>
-                    <div>
-                        <h2>Gerenciar Produtos</h2>
-                        <p class="modal-subtitle">Busque e selecione um produto para editar</p>
-                    </div>
-                </div>
-                <button class="close-btn" id="closeManageModal" title="Fechar">&times;</button>
-            </div>
-
-            <div class="modal-body">
-                <div class="search-container">
-                    <input type="text" id="productSearch" class="search-input" placeholder="Buscar por nome ou ID...">
-                    <button class="search-button" id="btnSearch"><i class="ri-search-line"></i> Buscar</button>
-                </div>
-
-                <div id="successMessage" class="success-message"></div>
-                <div id="currentProductInfo" class="current-product-info"></div>
-                <div id="searchResults"></div>
-
-                <!-- Selected product panel -->
-                <div class="selected-product-panel" id="selectedProductPanel">
-                    <img class="selected-product-thumb" id="selectedProductThumb" src="" alt="">
-                    <div class="selected-product-info">
-                        <strong id="selectedProductName"></strong>
-                        <span id="selectedProductPrice"></span>
-                    </div>
-                    <i class="ri-checkbox-circle-fill"
-                        style="color: var(--modal-accent); font-size: 20px; flex-shrink:0;"></i>
-                </div>
-            </div>
-
-            <div class="modal-footer" id="manageActions" style="display: none;">
-                <div class="form-actions">
-                    <button type="button" class="btn-cancel" id="closeBtnManage">Fechar</button>
-                    <div class="spacer"></div>
-                    <button type="button" class="btn-edit" id="btnEditProduct"><i class="ri-edit-line"></i> Editar
-                        Produto</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Editar Produto -->
-    <div id="editProductModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-header-left">
-                    <div class="modal-icon"><i class="ri-edit-line"></i></div>
-                    <div>
-                        <h2>Editar Produto</h2>
-                        <p class="modal-subtitle">Atualize as informações do produto</p>
-                    </div>
-                </div>
-                <button class="close-btn" id="closeEditModal" title="Fechar">&times;</button>
-            </div>
-
-            <form id="editForm">
-                <div class="modal-body">
-                    <p class="form-section-title">Imagem</p>
-                    <div class="form-group">
-                        <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 10px;">
-                            <img id="currentEditImage" class="current-product-image" alt="Imagem atual">
-                            <div style="font-size:0.8rem; color: var(--modal-muted); line-height: 1.5;">
-                                <strong style="color: var(--modal-text); display:block; margin-bottom: 2px;">Imagem
-                                    atual</strong>
-                                Selecione abaixo para substituir
-                            </div>
-                        </div>
-                        <div class="file-upload-zone" id="editDropZone">
-                            <input type="file" id="editProductImage" accept="image/*">
-                            <div class="file-upload-icon"><i class="ri-image-edit-line"></i></div>
-                            <div class="file-upload-text"><strong>Clique para trocar a imagem</strong><br><span
-                                    style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
-                        </div>
-                        <div class="image-preview-container" id="editImagePreviewContainer">
-                            <img id="editImagePreview" class="image-preview" alt="Nova prévia">
-                            <button type="button" class="remove-image-btn" id="removeEditImageBtn"
-                                title="Remover">&times;</button>
-                        </div>
-                        <span class="error-message" id="editImageError">Erro ao processar imagem</span>
-                    </div>
-
-                    <p class="form-section-title">Informações</p>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="editProductTitle">Título <span class="required-star">*</span></label>
-                            <input type="text" id="editProductTitle" required>
-                            <span class="error-message" id="editTitleError">Digite um título válido</span>
-                        </div>
-                        <div class="form-group">
-                            <label for="editProductPrice">Preço (R$) <span class="required-star">*</span></label>
-                            <input type="text" id="editProductPrice" required>
-                            <span class="error-message" id="editPriceError">Preço mínimo R$ 1,00</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="editProductDescription">Descrição</label>
-                        <textarea id="editProductDescription" placeholder="Descreva o produto..."></textarea>
-                    </div>
-
-                    <p class="form-section-title">Pagamento</p>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="editProductDiscount">Desconto (%)</label>
-                            <input type="text" id="editProductDiscount" required>
-                            <span class="error-message" id="editDiscountError">Entre 0 e 100%</span>
-                        </div>
-                        <div class="form-group">
-                            <label for="editInstallments">Total de Parcelas <span class="required-star">*</span></label>
-                            <input type="text" id="editInstallments" required>
-                            <span class="error-message" id="editInstallmentsError">Máximo 12 parcelas</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="editInterestFreeInstallments">Parcelas Sem Juros <span
-                                class="required-star">*</span></label>
-                        <input type="text" id="editInterestFreeInstallments" required>
-                        <span class="error-message" id="editInterestFreeError">Deve ser menor ou igual ao total</span>
-                    </div>
-
-                    <p class="form-section-title">Disponibilidade</p>
-                    <label class="toggle-group" for="editProductAvailability">
-                        <div class="toggle-label-text">
-                            <span>Produto disponível para venda</span>
-                            <span>Quando desativado, o produto fica oculto da loja</span>
-                        </div>
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="editProductAvailability" checked>
-                            <span class="toggle-track"></span>
-                        </div>
-                    </label>
-                </div>
-
-                <div class="modal-footer">
-                    <div class="form-actions">
-                        <button type="button" class="btn-delete" id="btnDeleteProduct"><i
-                                class="ri-delete-bin-line"></i> Deletar</button>
-                        <div class="spacer"></div>
-                        <button type="button" class="btn-cancel" id="cancelEditBtn">Cancelar</button>
-                        <button type="submit" class="btn-submit"><i class="ri-save-line"></i> Salvar Alterações</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Modal Visualizador de Pedidos -->
     <div id="ordersModal" class="modal">
         <div class="modal-content">
@@ -3186,435 +3035,57 @@
         });
 
         // ===== GERENCIAMENTO DE PRODUTOS =====
-        const manageProductsModal = document.getElementById('manageProductsModal');
-        const editProductModal = document.getElementById('editProductModal');
-        const closeManageModalBtn = document.getElementById('closeManageModal');
-        const closeEditModalBtn = document.getElementById('closeEditModal');
-        const closeBtnManage = document.getElementById('closeBtnManage');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const productSearchInput = document.getElementById('productSearch');
-        const btnSearch = document.getElementById('btnSearch');
-        const editForm = document.getElementById('editForm');
-        const editProductImageInput = document.getElementById('editProductImage');
-        const editImagePreview = document.getElementById('editImagePreview');
-        const editImagePreviewContainer = document.getElementById('editImagePreviewContainer');
-        const removeEditImageBtn = document.getElementById('removeEditImageBtn');
-        const btnDeleteProduct = document.getElementById('btnDeleteProduct');
+        // Gerenciador de produtos removido — HTML e JS eliminados conforme solicitado.
+        // Mantém apenas o carregamento do painel administrativo sem a opção de gerenciar produtos.
+        function loadAdminContent() {
+            const firstName = (currentUser.email || '').split('@')[0];
 
-        let selectedProductData = null;
-        let currentEditingProduct = null;
-        let newImageSelected = false;
+            mainContent.innerHTML = `
+                <div class="welcome-card">
+                    <div class="welcome-greeting">Bem-vindo de volta</div>
+                    <h2>${firstName} </h2>
+                    <p>${currentUser.email}</p>
+                    <div class="welcome-card-icon"><img src="./recursos/identidade/1778169368015.png" alt="Icon" style="width: 150px"></div>
+                </div>
 
-        function openManageProductsModal() {
-            manageProductsModal.style.display = 'flex';
-            productSearchInput.value = '';
-            document.getElementById('searchResults').innerHTML = '';
-            document.getElementById('currentProductInfo').classList.remove('show');
-            document.getElementById('successMessage').classList.remove('show');
-            document.getElementById('selectedProductPanel').classList.remove('show');
-            document.getElementById('manageActions').style.display = 'none';
-            selectedProductData = null;
-            productSearchInput.focus();
-        }
-
-        function closeManageProductsModal() {
-            manageProductsModal.style.display = 'none';
-            productSearchInput.value = '';
-            document.getElementById('searchResults').innerHTML = '';
-            document.getElementById('currentProductInfo').classList.remove('show');
-            document.getElementById('selectedProductPanel').classList.remove('show');
-            selectedProductData = null;
-        }
-
-        function closeEditProductModal() {
-            editProductModal.style.display = 'none';
-            editForm.reset();
-            document.getElementById('editImagePreviewContainer').style.display = 'none';
-            document.getElementById('currentEditImage').style.display = 'none';
-            newImageSelected = false;
-            currentEditingProduct = null;
-        }
-
-        async function searchProducts() {
-            const searchTerm = productSearchInput.value.trim();
-
-            if (!searchTerm) {
-                alert('Digite um ID ou nome do produto');
-                return;
-            }
-
-            btnSearch.disabled = true;
-            btnSearch.innerHTML = '<span class="loading-spinner"></span>';
-            document.getElementById('searchResults').innerHTML = '';
-
-            try {
-                let allResults = [];
-
-                // Tentar como ID primeiro (se for número)
-                if (!isNaN(searchTerm)) {
-                    const { data: idResults, error: idError } = await supabase
-                        .from('j-box')
-                        .select('*')
-                        .eq('ID', parseInt(searchTerm));
-
-                    if (!idError) {
-                        if (idResults && idResults.length > 0) {
-                            allResults = idResults;
-                        }
-                    }
-                }
-
-                // Se não encontrou por ID, buscar por nome
-                if (allResults.length === 0) {
-                    const { data: nameResults, error: nameError } = await supabase
-                        .from('j-box')
-                        .select('*')
-                        .ilike('PRODUTO', `%${searchTerm}%`);
-
-                    if (nameError) {
-                        throw nameError;
-                    }
-
-                    if (nameResults && nameResults.length > 0) {
-                        allResults = nameResults;
-                    }
-                }
-
-                // Exibir resultados
-                if (allResults.length > 0) {
-                    displayProductResults(allResults);
-                } else {
-                    document.getElementById('searchResults').innerHTML =
-                        '<div class="no-results">📭 Nenhum produto encontrado</div>';
-                }
-            } catch (error) {
-                alert('❌ Erro ao buscar produtos:\n\n' + error.message);
-                document.getElementById('searchResults').innerHTML = '';
-            }
-
-            btnSearch.disabled = false;
-            btnSearch.textContent = 'Buscar';
-
-            // Fechar teclado mobile
-            productSearchInput.blur();
-        }
-
-        function displayProductResults(products) {
-            const resultsContainer = document.getElementById('searchResults');
-
-            if (products.length === 1) {
-                selectProduct(products[0]);
-                resultsContainer.innerHTML = '';
-            } else {
-                resultsContainer.innerHTML = `<div style="font-size:0.78rem;color:var(--modal-muted);margin-bottom:8px;">${products.length} produto(s) encontrado(s) — clique para selecionar</div><div class="products-grid" id="productsGrid"></div>`;
-                const grid = document.getElementById('productsGrid');
-
-                products.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    const available = product.DISPONIBILIDADE !== false;
-                    card.innerHTML = `
-                        <img src="${product['IMAGE-URL']}" alt="${product.PRODUTO}" class="product-card-image" onerror="this.src='https://via.placeholder.com/150?text=Sem+Imagem'">
-                        <div class="product-card-info">
-                            <div class="product-card-name">${product.PRODUTO}</div>
-                            <div class="product-card-price">R$ ${parseFloat(product.PREÇO).toFixed(2)}</div>
-                            <span class="product-card-badge ${available ? 'badge-available' : 'badge-unavailable'}">${available ? 'Disponível' : 'Indisponível'}</span>
+                <div class="action-grid">
+                    <button class="action-card" id="btnPublishProduct">
+                        <div class="action-card-icon blue"><i class="ri-upload-cloud-2-line"></i></div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Publicar Produto</div>
+                            <div class="action-card-desc">Adicione um novo produto à loja com imagem e preço</div>
                         </div>
-                    `;
-                    card.addEventListener('click', (e) => selectProduct(product, card));
-                    grid.appendChild(card);
-                });
+                    </button>
+                    <button class="action-card" id="btnViewOrders" style="position: relative;">
+                        <div class="orders-notification-badge hidden" id="ordersNotificationBadge">0</div>
+                        <div class="action-card-icon blue"><i class="ri-file-list-3-line"></i></div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Visualizar Pedidos</div>
+                            <div class="action-card-desc">Veja a lista de pedidos e detalhes dos clientes</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="info-strip">
+                    <i class="ri-shield-check-line"></i>
+                    Sessão autenticada com segurança · Todas as alterações são salvas em tempo real no Supabase
+                </div>
+            `;
+
+            document.getElementById('btnPublishProduct').addEventListener('click', openPublishModal);
+            document.getElementById('btnViewOrders').addEventListener('click', openOrdersModal);
+
+            fetchImagekitCredentials();
+
+            // Buscar pedidos pendentes logo ao carregar o painel para atualizar o badge
+            fetchOrders('pending').catch(err => console.error('Erro ao buscar pedidos pendentes:', err));
+
+            // Vincular mudança do filtro para recarregar pedidos quando selecionado
+            const ordersFilterEl = document.getElementById('ordersFilter');
+            if (ordersFilterEl) {
+                ordersFilterEl.addEventListener('change', fetchOrders);
             }
         }
-
-        function selectProduct(product, cardEl) {
-            selectedProductData = product;
-
-            // Update selected product panel
-            const panel = document.getElementById('selectedProductPanel');
-            document.getElementById('selectedProductThumb').src = product['IMAGE-URL'] || '';
-            document.getElementById('selectedProductName').textContent = product.PRODUTO;
-            document.getElementById('selectedProductPrice').textContent = `R$ ${parseFloat(product.PREÇO).toFixed(2)} · ID: ${product.ID}`;
-            panel.classList.add('show');
-
-            // Mostrar footer com botões de ação
-            const manageActions = document.getElementById('manageActions');
-            manageActions.style.display = 'flex';
-
-            // Highlight selected card
-            document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
-            if (cardEl) cardEl.classList.add('selected');
-        }
-
-        function openEditModal() {
-            if (!selectedProductData) {
-                alert('Nenhum produto selecionado');
-                return;
-            }
-
-            // Copiar dados ANTES de fechar o modal
-            currentEditingProduct = { ...selectedProductData };
-
-            // Preencher formulário com dados do produto
-            document.getElementById('editProductTitle').value = currentEditingProduct.PRODUTO;
-            const priceValue = parseFloat(currentEditingProduct.PREÇO);
-            document.getElementById('editProductPrice').value = priceValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('editProductDiscount').value = parseInt(currentEditingProduct.DESCONTO).toString();
-            document.getElementById('editProductDescription').value = currentEditingProduct.DESCRIPTION || '';
-            document.getElementById('editProductAvailability').checked = currentEditingProduct.DISPONIBILIDADE !== false;
-
-            // Parsear parcelas
-            const parcelas = currentEditingProduct.PARCELAMENTO?.split(',') || ['1', '0'];
-            document.getElementById('editInstallments').value = parseInt(parcelas[0]).toString() || '1';
-            document.getElementById('editInterestFreeInstallments').value = parseInt(parcelas[1]).toString() || '0';
-
-            // Mostrar imagem atual
-            document.getElementById('currentEditImage').src = currentEditingProduct['IMAGE-URL'];
-            document.getElementById('currentEditImage').style.display = 'block';
-            document.getElementById('editImagePreviewContainer').style.display = 'none';
-
-            newImageSelected = false;
-
-            // Fechar modal de busca DEPOIS de ter copiado tudo
-            closeManageProductsModal();
-
-            // Abrir modal de edição
-            editProductModal.style.display = 'flex';
-        }
-
-        async function saveProductChanges() {
-            if (!currentEditingProduct) {
-                alert('Nenhum produto selecionado');
-                return;
-            }
-
-            // Validar campos
-            const title = document.getElementById('editProductTitle').value.trim();
-            const priceStr = document.getElementById('editProductPrice').value.replace(',', '.');
-            const price = parseFloat(priceStr);
-            const discount = parseFloat(document.getElementById('editProductDiscount').value);
-            const installments = parseInt(document.getElementById('editInstallments').value);
-            const interestFreeInstallments = parseInt(document.getElementById('editInterestFreeInstallments').value);
-
-            let isValid = true;
-            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-
-            if (!title) {
-                document.getElementById('editTitleError').style.display = 'block';
-                isValid = false;
-            }
-
-            if (isNaN(price) || price < 1) {
-                document.getElementById('editPriceError').style.display = 'block';
-                isValid = false;
-            }
-
-            if (isNaN(discount) || discount < 0 || discount > 100) {
-                document.getElementById('editDiscountError').style.display = 'block';
-                isValid = false;
-            }
-
-            if (isNaN(installments) || installments < 0 || installments > 24) {
-                document.getElementById('editInstallmentsError').style.display = 'block';
-                isValid = false;
-            }
-
-            if (isNaN(interestFreeInstallments) || interestFreeInstallments < 0 || interestFreeInstallments > installments) {
-                document.getElementById('editInterestFreeError').style.display = 'block';
-                isValid = false;
-            }
-
-            if (!isValid) {
-                return;
-            }
-
-            const submitBtn = editForm.querySelector('.btn-submit');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-
-            try {
-                let imageUrl = currentEditingProduct['IMAGE-URL'];
-                let imageId = currentEditingProduct['IMAGE-ID']; // 👈 Recupera o ID da imagem atual
-
-                // Se uma nova imagem foi selecionada, fazer upload e deletar a antiga
-                if (newImageSelected) {
-
-                    // 1. Deletar a imagem antiga em background (não bloqueia o fluxo)
-                    if (imageId) {
-                        deleteOldImage(imageId); // Sem await - executa em background
-                    }
-
-                    submitBtn.textContent = '⏳ Comprimindo imagem...';
-                    const imageFile = editProductImageInput.files[0];
-                    const compressedImage = await compressImageToWebP(imageFile);
-
-                    submitBtn.textContent = '⏳ Enviando nova imagem...';
-                    const uploadResult = await uploadImageToImageKit(compressedImage);
-
-                    if (!uploadResult) {
-                        throw new Error('Erro ao fazer upload da imagem');
-                    }
-
-                    imageUrl = uploadResult.url;
-                    imageId = uploadResult.fileId; // 👈 Atualiza com o novo ID
-                }
-
-                submitBtn.textContent = '⏳ Salvando produto...';
-
-                // Preparar dados para atualizar (agora incluindo o IMAGE-ID)
-                const updateData = {
-                    PRODUTO: title,
-                    PREÇO: price.toString(),
-                    DESCONTO: discount.toString(),
-                    'IMAGE-URL': imageUrl,
-                    'IMAGE-ID': imageId, // 👈 Não esqueça de adicionar no update
-                    PARCELAMENTO: `${installments},${interestFreeInstallments}`,
-                    DESCRIPTION: document.getElementById('editProductDescription').value,
-                    DISPONIBILIDADE: document.getElementById('editProductAvailability').checked
-                };
-
-                // Atualizar no Supabase
-                const { data, error } = await supabase
-                    .from('j-box')
-                    .update(updateData)
-                    .eq('ID', currentEditingProduct.ID)
-                    .select();
-
-                if (error) {
-                    throw error;
-                }
-
-                alert('✅ Produto atualizado com sucesso!');
-                closeEditProductModal();
-                openManageProductsModal();
-            } catch (error) {
-                alert('❌ Erro ao salvar:\n' + error.message);
-            }
-
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        }
-
-        async function deleteProduct() {
-            if (!currentEditingProduct) {
-                alert('Nenhum produto selecionado');
-                return;
-            }
-
-            if (!confirm(`Tem certeza que deseja deletar "${currentEditingProduct.PRODUTO}"? Esta ação não pode ser desfeita.`)) {
-                return;
-
-            }
-
-            const deleteBtn = document.getElementById('btnDeleteProduct');
-            const originalText = deleteBtn.textContent;
-            deleteBtn.disabled = true;
-            deleteBtn.textContent = '⏳ Deletando...';
-
-            try {
-                // Deletar imagem do ImageKit em background (não bloqueia o fluxo)
-                const imageFileId = currentEditingProduct['IMAGE-ID'];
-                if (imageFileId) {
-                    deleteOldImage(imageFileId); // Sem await - executa em background
-                }
-
-                const { error } = await supabase
-                    .from('j-box')
-                    .delete()
-                    .eq('ID', currentEditingProduct.ID);
-
-                if (error) {
-                    throw error;
-                }
-
-                alert('✅ Produto deletado com sucesso!');
-                closeEditProductModal();
-                openManageProductsModal();
-            } catch (error) {
-                alert('❌ Erro ao deletar:\n' + error.message);
-            }
-
-            deleteBtn.textContent = originalText;
-            deleteBtn.disabled = false;
-        }
-
-        // Event listeners para Gerenciamento de Produtos
-        closeManageModalBtn.addEventListener('click', closeManageProductsModal);
-        closeBtnManage.addEventListener('click', closeManageProductsModal);
-        closeEditModalBtn.addEventListener('click', closeEditProductModal);
-        cancelEditBtn.addEventListener('click', closeEditProductModal);
-
-        // Usar setTimeout para garantir que o botão existe
-        setTimeout(() => {
-            const btnEditProduct = document.getElementById('btnEditProduct');
-            if (btnEditProduct) {
-                btnEditProduct.addEventListener('click', () => {
-                    openEditModal();
-                });
-            }
-        }, 100);
-
-        productSearchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                searchProducts();
-            }
-        });
-
-        btnSearch.addEventListener('click', searchProducts);
-
-        editProductImageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                newImageSelected = true;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    editImagePreview.src = event.target.result;
-                    editImagePreviewContainer.style.display = 'block';
-                    document.getElementById('currentEditImage').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        removeEditImageBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            editProductImageInput.value = '';
-            editImagePreviewContainer.style.display = 'none';
-            document.getElementById('currentEditImage').style.display = 'block';
-            newImageSelected = false;
-        });
-
-        btnDeleteProduct.addEventListener('click', deleteProduct);
-
-        editForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await saveProductChanges();
-        });
-
-        // Fechar modais ao clicar fora
-        window.addEventListener('click', (event) => {
-            if (event.target === manageProductsModal) {
-                closeManageProductsModal();
-            }
-            if (event.target === editProductModal) {
-                closeEditProductModal();
-            }
-        });
-
-        // Criar função para abrir modal de gerenciar (será chamada pelo botão)
-        function openManageProductsModalFromButton() {
-            openManageProductsModal();
-        }
-
-        // Adicionar um ID temporário para o botão
-        setTimeout(() => {
-            const btnManage = document.getElementById('btnManageProducts');
-            if (btnManage) {
-                btnManage.removeEventListener('click', openPublishModal);
-                btnManage.addEventListener('click', openManageProductsModal);
-            }
-        }, 100);
 
         // Atualizar display do email em diferentes tamanhos de tela
         function updateUserEmailDisplay(email) {
@@ -3658,63 +3129,7 @@
             }
         }
 
-        function loadAdminContent() {
-            const firstName = (currentUser.email || '').split('@')[0];
 
-            mainContent.innerHTML = `
-                <div class="welcome-card">
-                    <div class="welcome-greeting">Bem-vindo de volta</div>
-                    <h2>${firstName} </h2>
-                    <p>${currentUser.email}</p>
-                    <div class="welcome-card-icon"><img src="./recursos/identidade/1778169368015.png" alt="Icon" style="width: 150px"></div>
-                </div>
-
-                <div class="action-grid">
-                    <button class="action-card" id="btnPublishProduct">
-                        <div class="action-card-icon blue"><i class="ri-upload-cloud-2-line"></i></div>
-                        <div class="action-card-body">
-                            <div class="action-card-title">Publicar Produto</div>
-                            <div class="action-card-desc">Adicione um novo produto à loja com imagem e preço</div>
-                        </div>
-                    </button>
-                    <button class="action-card" id="btnManageProducts">
-                        <div class="action-card-icon orange"><i class="ri-edit-line"></i></div>
-                        <div class="action-card-body">
-                            <div class="action-card-title">Gerenciar Produtos</div>
-                            <div class="action-card-desc">Edite, remova ou atualize produtos existentes</div>
-                        </div>
-                    </button>
-                    <button class="action-card" id="btnViewOrders" style="position: relative;">
-                        <div class="orders-notification-badge hidden" id="ordersNotificationBadge">0</div>
-                        <div class="action-card-icon blue"><i class="ri-file-list-3-line"></i></div>
-                        <div class="action-card-body">
-                            <div class="action-card-title">Visualizar Pedidos</div>
-                            <div class="action-card-desc">Veja a lista de pedidos e detalhes dos clientes</div>
-                        </div>
-                    </button>
-                </div>
-
-                <div class="info-strip">
-                    <i class="ri-shield-check-line"></i>
-                    Sessão autenticada com segurança · Todas as alterações são salvas em tempo real no Supabase
-                </div>
-            `;
-
-            document.getElementById('btnPublishProduct').addEventListener('click', openPublishModal);
-            document.getElementById('btnManageProducts').addEventListener('click', openManageProductsModal);
-            document.getElementById('btnViewOrders').addEventListener('click', openOrdersModal);
-
-            fetchImagekitCredentials();
-
-            // Buscar pedidos pendentes logo ao carregar o painel para atualizar o badge
-            fetchOrders('pending').catch(err => console.error('Erro ao buscar pedidos pendentes:', err));
-
-            // Vincular mudança do filtro para recarregar pedidos quando selecionado
-            const ordersFilterEl = document.getElementById('ordersFilter');
-            if (ordersFilterEl) {
-                ordersFilterEl.addEventListener('change', fetchOrders);
-            }
-        }
 
         // ---------- Visualizador de Pedidos ----------
         function formatOrderDateTime(createdAt) {
