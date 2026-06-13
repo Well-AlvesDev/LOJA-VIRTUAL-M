@@ -854,17 +854,7 @@
             background: var(--modal-surface);
             position: relative;
         }
-
-        #publishDropZone2 {
-            opacity: 0.5;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        #publishDropZone2.enabled {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        /* Single publish drop zone will be used (carousel handles multiple images) */
 
         .file-upload-zone:hover,
         .file-upload-zone.drag-over {
@@ -948,6 +938,63 @@
 
         .remove-image-btn:hover {
             background: var(--modal-danger);
+        }
+
+        /* Multi-image carousel for product publish */
+        .images-carousel {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            position: relative;
+        }
+
+        .images-track {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 6px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .image-item {
+            flex: 0 0 auto;
+            width: 120px;
+            height: 120px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            position: relative;
+            border: 1.5px solid var(--modal-border);
+            background: var(--modal-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .carousel-nav {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--modal-surface);
+            border: 1px solid var(--modal-border);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .carousel-nav i {
+            font-size: 18px;
+            color: var(--modal-accent);
         }
 
         /* Availability toggle */
@@ -2270,7 +2317,7 @@
     <nav class="navbar">
         <div class="navbar-left">
             <div class="navbar-logo-dot"><i class="ri-settings-3-line"></i></div>
-            <h1>WKH@DK - V0.1</h1>
+            <h1>KHOLSON - V0.1</h1>
         </div>
         <div class="navbar-right">
             <div class="online-status">
@@ -2334,33 +2381,18 @@
 
             <form id="publishForm">
                 <div class="modal-body">
-                    <p class="form-section-title">Imagens (Máximo 2)</p>
+                    <p class="form-section-title">Imagens (Máximo 5)</p>
                     <div class="form-group">
-                        <div class="file-upload-zone" id="publishDropZone1">
-                            <input type="file" id="productImage1" accept="image/*" required>
+                        <div class="file-upload-zone" id="publishDropZone">
+                            <input type="file" id="productImagesInput" accept="image/*" multiple>
                             <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
-                            <div class="file-upload-text"><strong>Imagem 1</strong><br><strong>Clique para
-                                    selecionar</strong> ou arraste aqui<br><span
-                                    style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
+                            <div class="file-upload-text"><strong>Arraste ou clique para adicionar imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 5 imagens — JPG, PNG, WEBP</span></div>
                         </div>
-                        <div class="image-preview-container" id="imagePreviewContainer1">
-                            <img id="imagePreview1" class="image-preview" alt="Prévia 1">
-                            <button type="button" class="remove-image-btn" id="removeImageBtn1"
-                                title="Remover">&times;</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="file-upload-zone" id="publishDropZone2">
-                            <input type="file" id="productImage2" accept="image/*">
-                            <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
-                            <div class="file-upload-text"><strong>Imagem 2 (Opcional)</strong><br><strong>Clique para
-                                    selecionar</strong> ou arraste aqui<br><span
-                                    style="font-size:0.75rem;opacity:0.7;">JPG, PNG, WEBP</span></div>
-                        </div>
-                        <div class="image-preview-container" id="imagePreviewContainer2">
-                            <img id="imagePreview2" class="image-preview" alt="Prévia 2">
-                            <button type="button" class="remove-image-btn" id="removeImageBtn2"
-                                title="Remover">&times;</button>
+
+                        <div class="images-carousel" id="imagesCarousel" style="display:none;">
+                            <button type="button" class="carousel-nav left" id="carouselPrev" aria-label="Imagem anterior"><i class="ri-arrow-left-s-line"></i></button>
+                            <div class="images-track" id="imagesTrack" role="list"></div>
+                            <button type="button" class="carousel-nav right" id="carouselNext" aria-label="Próxima imagem"><i class="ri-arrow-right-s-line"></i></button>
                         </div>
                     </div>
                     <span class="error-message" id="imageError">Selecione pelo menos uma imagem válida</span>
@@ -2513,33 +2545,31 @@
         const publishForm = document.getElementById('publishForm');
         const closeModalBtn = document.getElementById('closeModal');
         const cancelBtn = document.getElementById('cancelBtn');
-        const productImageInput1 = document.getElementById('productImage1');
-        const imagePreview1 = document.getElementById('imagePreview1');
-        const imagePreviewContainer1 = document.getElementById('imagePreviewContainer1');
-        const removeImageBtn1 = document.getElementById('removeImageBtn1');
-        const productImageInput2 = document.getElementById('productImage2');
-        const imagePreview2 = document.getElementById('imagePreview2');
-        const imagePreviewContainer2 = document.getElementById('imagePreviewContainer2');
-        const removeImageBtn2 = document.getElementById('removeImageBtn2');
-        const publishDropZone1 = document.getElementById('publishDropZone1');
-        const publishDropZone2 = document.getElementById('publishDropZone2');
+        const productImagesInput = document.getElementById('productImagesInput');
+        const publishDropZone = document.getElementById('publishDropZone');
+        const imagesTrack = document.getElementById('imagesTrack');
+        const imagesCarousel = document.getElementById('imagesCarousel');
+        const carouselPrev = document.getElementById('carouselPrev');
+        const carouselNext = document.getElementById('carouselNext');
+
+        let selectedImages = []; // array of { file, dataUrl }
 
         function openPublishModal() {
             publishModal.style.display = 'flex';
             publishForm.reset();
-            imagePreviewContainer1.style.display = 'none';
-            imagePreviewContainer2.style.display = 'none';
-            productImageInput1.value = '';
-            productImageInput2.value = '';
+            selectedImages = [];
+            if (imagesTrack) imagesTrack.innerHTML = '';
+            if (imagesCarousel) imagesCarousel.style.display = 'none';
+            if (productImagesInput) productImagesInput.value = '';
         }
 
         function closePublishModal() {
             publishModal.style.display = 'none';
             publishForm.reset();
-            imagePreviewContainer1.style.display = 'none';
-            imagePreviewContainer2.style.display = 'none';
-            productImageInput1.value = '';
-            productImageInput2.value = '';
+            selectedImages = [];
+            if (imagesTrack) imagesTrack.innerHTML = '';
+            if (imagesCarousel) imagesCarousel.style.display = 'none';
+            if (productImagesInput) productImagesInput.value = '';
         }
 
         // Buscar credenciais do ImageKit do Supabase
@@ -2711,68 +2741,102 @@
             }
         }
 
-        // Função auxiliar para processar seleção de imagem
-        function handleImageSelect(inputElement, previewElement, containerElement) {
-            const file = inputElement.files[0];
-            if (file) {
+        // Helpers for multi-image input and carousel
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = (event) => {
-                    previewElement.src = event.target.result;
-                    containerElement.style.display = 'block';
-                };
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
                 reader.readAsDataURL(file);
+            });
+        }
+
+        async function addFiles(fileList) {
+            if (!fileList) return;
+            const files = Array.from(fileList);
+            for (const file of files) {
+                if (!file.type || !file.type.startsWith('image/')) continue;
+                if (selectedImages.length >= 5) break;
+                const dataUrl = await readFileAsDataURL(file);
+                selectedImages.push({ file, dataUrl });
+                renderImagesCarousel();
             }
         }
 
-        productImageInput1.addEventListener('change', (e) => {
-            handleImageSelect(productImageInput1, imagePreview1, imagePreviewContainer1);
-            // Mostrar a zona de upload 2 quando imagem 1 for selecionada
-            if (productImageInput1.files.length > 0) {
-                publishDropZone2.classList.add('enabled');
+        function renderImagesCarousel() {
+            if (!imagesTrack || !imagesCarousel) return;
+            imagesTrack.innerHTML = '';
+            if (!selectedImages || selectedImages.length === 0) {
+                imagesCarousel.style.display = 'none';
+                return;
             }
-        });
+            imagesCarousel.style.display = 'flex';
+            selectedImages.forEach((imgObj, idx) => {
+                const item = document.createElement('div');
+                item.className = 'image-item';
+                const img = document.createElement('img');
+                img.src = imgObj.dataUrl;
+                img.alt = `Prévia ${idx + 1}`;
+                img.loading = 'lazy';
+                item.appendChild(img);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'remove-image-btn';
+                btn.title = 'Remover';
+                btn.innerHTML = '&times;';
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    selectedImages.splice(idx, 1);
+                    renderImagesCarousel();
+                });
+                item.appendChild(btn);
+                imagesTrack.appendChild(item);
+            });
 
-        productImageInput2.addEventListener('change', (e) => {
-            handleImageSelect(productImageInput2, imagePreview2, imagePreviewContainer2);
-        });
-
-        // Remover imagens selecionadas
-        removeImageBtn1.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            // Verificar se existe uma imagem 2 selecionada
-            if (productImageInput2.files.length > 0) {
-                // Mover arquivo de input2 para input1 (sem duplicar)
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(productImageInput2.files[0]);
-                productImageInput1.files = dataTransfer.files;
-
-                // Atualizar preview
-                imagePreview1.src = imagePreview2.src;
-                imagePreviewContainer1.style.display = 'block';
-
-                // Limpar input2 e preview2
-                productImageInput2.value = '';
-                imagePreviewContainer2.style.display = 'none';
-                imagePreview2.src = '';
-
-                // Desabilitar zona 2
-                publishDropZone2.classList.remove('enabled');
+            // show/hide nav
+            if (selectedImages.length <= 1) {
+                if (carouselPrev) carouselPrev.style.display = 'none';
+                if (carouselNext) carouselNext.style.display = 'none';
             } else {
-                // Se não houver imagem 2, apenas limpar a imagem 1
-                productImageInput1.value = '';
-                imagePreviewContainer1.style.display = 'none';
-                imagePreview1.src = '';
-                publishDropZone2.classList.remove('enabled');
+                if (carouselPrev) carouselPrev.style.display = 'flex';
+                if (carouselNext) carouselNext.style.display = 'flex';
             }
-        });
+        }
 
-        removeImageBtn2.addEventListener('click', (e) => {
-            e.preventDefault();
-            productImageInput2.value = '';
-            imagePreviewContainer2.style.display = 'none';
-            imagePreview2.src = '';
-        });
+        function scrollCarousel(direction) {
+            if (!imagesTrack) return;
+            const item = imagesTrack.querySelector('.image-item');
+            const gap = 8;
+            const step = (item ? item.offsetWidth : 130) + gap;
+            imagesTrack.scrollBy({ left: direction * step, behavior: 'smooth' });
+        }
+
+        if (publishDropZone) {
+            publishDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                publishDropZone.classList.add('drag-over');
+            });
+            publishDropZone.addEventListener('dragleave', () => {
+                publishDropZone.classList.remove('drag-over');
+            });
+            publishDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                publishDropZone.classList.remove('drag-over');
+                if (e.dataTransfer && e.dataTransfer.files) {
+                    addFiles(e.dataTransfer.files);
+                }
+            });
+        }
+
+        if (productImagesInput) {
+            productImagesInput.addEventListener('change', (e) => {
+                addFiles(e.target.files);
+                e.target.value = '';
+            });
+        }
+
+        if (carouselPrev) carouselPrev.addEventListener('click', () => scrollCarousel(-1));
+        if (carouselNext) carouselNext.addEventListener('click', () => scrollCarousel(1));
 
         // Função para formatar preço com centavos
         function formatPriceInput(inputElement) {
@@ -2967,13 +3031,12 @@
             const discount = parseFloat(document.getElementById('productDiscount').value);
             const installments = parseInt(document.getElementById('installments').value);
             const interestFreeInstallments = parseInt(document.getElementById('interestFreeInstallments').value);
-            const imageFile1 = productImageInput1.files[0];
-            const imageFile2 = productImageInput2.files[0];
+            const imagesFiles = selectedImages.map(i => i.file);
 
             let isValid = true;
 
             // Validações
-            if (!imageFile1) {
+            if (!imagesFiles || imagesFiles.length === 0) {
                 document.getElementById('imageError').style.display = 'block';
                 isValid = false;
             }
@@ -3010,43 +3073,28 @@
             // Mostrar feedback de upload
             const submitBtn = publishForm.querySelector('.btn-submit');
             const originalText = submitBtn.textContent;
-            submitBtn.textContent = '⏳ Comprimindo imagem...';
+            submitBtn.textContent = '⏳ Preparando imagens...';
             submitBtn.disabled = true;
 
             try {
                 const imageUrls = [];
                 const imageIds = [];
 
-                // Processar primeira imagem
-                submitBtn.textContent = '⏳ Comprimindo imagem 1...';
-                const compressedImage1 = await compressImageToWebP(imageFile1);
-                const sizeInKB1 = (compressedImage1.size / 1024).toFixed(2);
+                for (let i = 0; i < imagesFiles.length; i++) {
+                    const file = imagesFiles[i];
+                    submitBtn.textContent = `⏳ Comprimindo imagem ${i + 1} de ${imagesFiles.length}...`;
+                    const compressed = await compressImageToWebP(file);
 
-                submitBtn.textContent = '⏳ Enviando imagem 1 para ImageKit...';
-                const uploadResult1 = await uploadImageToImageKit(compressedImage1);
+                    submitBtn.textContent = `⏳ Enviando imagem ${i + 1} de ${imagesFiles.length} para ImageKit...`;
+                    const uploadResult = await uploadImageToImageKit(compressed);
 
-                if (uploadResult1) {
-                    imageUrls.push(uploadResult1.url);
-                    imageIds.push(uploadResult1.fileId);
-                }
-
-                // Processar segunda imagem se fornecida
-                if (imageFile2) {
-                    submitBtn.textContent = '⏳ Comprimindo imagem 2...';
-                    const compressedImage2 = await compressImageToWebP(imageFile2);
-                    const sizeInKB2 = (compressedImage2.size / 1024).toFixed(2);
-
-                    submitBtn.textContent = '⏳ Enviando imagem 2 para ImageKit...';
-                    const uploadResult2 = await uploadImageToImageKit(compressedImage2);
-
-                    if (uploadResult2) {
-                        imageUrls.push(uploadResult2.url);
-                        imageIds.push(uploadResult2.fileId);
+                    if (uploadResult) {
+                        imageUrls.push(uploadResult.url);
+                        imageIds.push(uploadResult.fileId);
                     }
                 }
 
                 if (imageUrls.length > 0) {
-                    // Concatenar URLs com separador '\:@\'
                     const imageUrlsString = imageUrls.join('\\:@\\');
                     const imageIdsString = imageIds.join('\\:@\\');
 
@@ -3070,18 +3118,20 @@
                     if (insertError) {
                         alert('❌ Imagem(ns) publicada(s), mas erro ao salvar produto:\n' + insertError.message);
                     } else {
-                        const imagenCount = imageUrls.length === 1 ? 'uma imagem' : 'duas imagens';
+                        const imagenCount = imageUrls.length === 1 ? 'uma imagem' : `${imageUrls.length} imagens`;
                         alert('✅ Produto publicado com sucesso!\n\nTítulo: ' + title + '\nImagens: ' + imagenCount + '\nURLs: ' + imageUrlsString);
                         closePublishModal();
                     }
+                } else {
+                    alert('❌ Nenhuma imagem foi enviada.');
                 }
             } catch (error) {
                 alert('❌ Erro ao processar imagem(ns):\n' + error.message);
+            } finally {
+                // Restaurar botão
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             }
-
-            // Restaurar botão
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
         });
 
         // ===== GERENCIAMENTO DE PRODUTOS =====
