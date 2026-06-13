@@ -921,7 +921,9 @@
         .banner {
             margin-top: -30px;
             width: 100%;
-            display: flex;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
             justify-content: center;
             align-items: center;
             overflow: hidden;
@@ -979,7 +981,7 @@
 
         @media (max-width: 768px) {
             .banner img {
-                width: 120%;
+                width: 105%;
                 margin-top: 0px;
                 margin-left: -5%;
             }
@@ -987,9 +989,8 @@
 
         @media (max-width: 480px) {
             .banner img {
-                width: 130%;
+                width: 105%;
                 margin-top: 0px;
-                margin-left: -10%;
             }
         }
 
@@ -1168,12 +1169,91 @@
                 </ul>
             </div>
         </div>
-        <div id="banner-app" class="banner">
+        <style>
+            /* Banner rotativo simples */
+            .banner {
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+            }
+
+            .banner-slides {
+                position: relative;
+                display: block;
+            }
+
+            .banner-image {
+                width: 100%;
+                height: auto;
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                opacity: 0;
+                transition: opacity 600ms ease;
+                object-fit: cover;
+            }
+
+            .banner-image.active {
+                opacity: 1;
+                position: relative;
+            }
+
+            .banner-skeleton .skeleton {
+                height: 240px;
+                background: linear-gradient(90deg, #eee, #f5f5f5, #eee);
+            }
+
+            .banner-indicators {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: 10px;
+                display: flex;
+                gap: 8px;
+            }
+
+            .banner-indicators button {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                border: none;
+                background: rgba(255, 255, 255, 0.6);
+                cursor: pointer;
+                padding: 0;
+            }
+
+            .banner-indicators button.active {
+                background: #fff;
+                box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+            }
+
+            @media (max-width:520px) {
+                .banner-skeleton .skeleton {
+                    height: 150px;
+                }
+            }
+        </style>
+
+        <div id="banner-app" class="banner" role="region" aria-label="Banner rotativo">
             <div v-if="carregando" class="banner-skeleton">
                 <div class="skeleton"></div>
             </div>
-            <img v-show="!carregando" src="./recursos/identidade/banner.webp" alt="Banner Dona Flor" @load="imageLoad"
-                @error="imageError">
+
+            <div v-show="!carregando" class="banner-slides" @mouseenter="stopTimer" @mouseleave="startTimer">
+                <img v-for="(b, idx) in banners" :key="idx" :src="b.displaySrc" :alt="b.alt || ('Banner ' + (idx+1))"
+                    :class="['banner-image', { active: currentIndex === idx }]" @load="onImageLoad"
+                    @error="onImageError">
+            </div>
+
+            <!-- controles laterais removidos conforme solicitado -->
+
+            <div class="banner-indicators" v-show="banners.length > 1 && !carregando">
+                <button v-for="(b, idx) in banners" :key="'ind-'+idx" :class="{active: idx === currentIndex}"
+                    @click="goTo(idx)" :aria-label="'Ir para banner ' + (idx+1)"></button>
+            </div>
         </div>
         <div class="criptografia-desc" id="stop-point">
             <p style="text-align: center; font-size: 12px; max-width: 300px; margin: 20px auto; color: #878787;">
@@ -1522,22 +1602,85 @@
             }
         }).mount('#logo-app');
 
-        // ===== VUE APP PARA BANNER COM SKELETON LOADER =====
+        // ===== VUE APP PARA BANNER COM SKELETON LOADER E CARROSSEL =====
         const bannerApp = Vue.createApp({
             data() {
                 return {
-                    carregando: true
+                    carregando: true,
+                    banners: [],
+                    currentIndex: 0,
+                    intervalMs: 5000,
+                    timerId: null
                 };
             },
             methods: {
-                imageLoad() {
-                    this.carregando = false;
-                    console.log('🖼️ Banner carregado com sucesso');
+                async loadConfigBanners() {
+                    try {
+                        const meta = await fetchMetadados();
+                        const cfg = (meta || []).find(it => it.elemento === 'banners-home' || it.arquivo === 'banners');
+                        if (cfg && Array.isArray(cfg.banners) && cfg.banners.length) return cfg.banners;
+                    } catch (e) { /* silent */ }
+                    return null;
                 },
-                imageError() {
+                async initBanners() {
+                    const fromMeta = await this.loadConfigBanners();
+                    const urls = (fromMeta && fromMeta.length) ? fromMeta : [
+                        './recursos/identidade/banner.webp',
+                        './recursos/identidade/banner2.webp'
+                    ];
+
+                    this.banners = urls.map(u => ({ src: u, displaySrc: u, alt: '' }));
+
+                    // Prefetch / cache via ImagemCacheManager
+                    await Promise.all(this.banners.map(async (b, i) => {
+                        try {
+                            const cached = await imagemCache.obterImagemComCache(b.src);
+                            if (cached) this.banners[i].displaySrc = cached;
+                        } catch (err) {
+                            console.warn('Erro cache banner', b.src, err);
+                        }
+                    }));
+
                     this.carregando = false;
-                    console.error('❌ Erro ao carregar banner');
+                    if (this.banners.length > 1) this.startTimer();
+                },
+                startTimer() {
+                    if (this.timerId) return;
+                    this.timerId = setInterval(() => {
+                        this.currentIndex = (this.currentIndex + 1) % this.banners.length;
+                    }, this.intervalMs);
+                },
+                stopTimer() {
+                    if (this.timerId) {
+                        clearInterval(this.timerId);
+                        this.timerId = null;
+                    }
+                },
+                /* navegação por botões laterais removida */
+                goTo(i) {
+                    this.currentIndex = i;
+                    this.restartTimer();
+                },
+                restartTimer() {
+                    this.stopTimer();
+                    this.startTimer();
+                },
+                onImageLoad() {
+                    this.carregando = false;
+                },
+                onImageError(evt) {
+                    console.error('Erro ao carregar banner', evt);
+                    this.carregando = false;
                 }
+            },
+            mounted() {
+                this.initBanners().catch(err => { console.error('Erro ao inicializar banners', err); this.carregando = false; });
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) this.stopTimer(); else if (this.banners.length > 1) this.startTimer();
+                });
+            },
+            beforeUnmount() {
+                this.stopTimer();
             }
         }).mount('#banner-app');
 
