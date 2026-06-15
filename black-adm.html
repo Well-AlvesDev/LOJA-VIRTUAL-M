@@ -854,6 +854,7 @@
             background: var(--modal-surface);
             position: relative;
         }
+
         /* Single publish drop zone will be used (carousel handles multiple images) */
 
         .file-upload-zone:hover,
@@ -2386,13 +2387,17 @@
                         <div class="file-upload-zone" id="publishDropZone">
                             <input type="file" id="productImagesInput" accept="image/*" multiple>
                             <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
-                            <div class="file-upload-text"><strong>Arraste ou clique para adicionar imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 5 imagens — JPG, PNG, WEBP</span></div>
+                            <div class="file-upload-text"><strong>Arraste ou clique para adicionar
+                                    imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 5 imagens —
+                                    JPG, PNG, WEBP</span></div>
                         </div>
 
                         <div class="images-carousel" id="imagesCarousel" style="display:none;">
-                            <button type="button" class="carousel-nav left" id="carouselPrev" aria-label="Imagem anterior"><i class="ri-arrow-left-s-line"></i></button>
+                            <button type="button" class="carousel-nav left" id="carouselPrev"
+                                aria-label="Imagem anterior"><i class="ri-arrow-left-s-line"></i></button>
                             <div class="images-track" id="imagesTrack" role="list"></div>
-                            <button type="button" class="carousel-nav right" id="carouselNext" aria-label="Próxima imagem"><i class="ri-arrow-right-s-line"></i></button>
+                            <button type="button" class="carousel-nav right" id="carouselNext"
+                                aria-label="Próxima imagem"><i class="ri-arrow-right-s-line"></i></button>
                         </div>
                     </div>
                     <span class="error-message" id="imageError">Selecione pelo menos uma imagem válida</span>
@@ -2413,6 +2418,18 @@
                     <div class="form-group">
                         <label for="productDescription">Descrição</label>
                         <textarea id="productDescription" placeholder="Descreva o produto..."></textarea>
+                    </div>
+
+                    <p class="form-section-title">Modelos</p>
+                    <div class="form-group">
+                        <label for="modelInput">Adicionar modelo</label>
+                        <input type="text" id="modelInput" placeholder="Ex: Modelo A">
+                        <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                            <button type="button" class="btn-edit" id="addModelBtn">Adicionar modelo</button>
+                            <span class="error-message" id="modelError" style="display:none;">Digite um modelo
+                                válido</span>
+                        </div>
+                        <div id="modelsContainer" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;"></div>
                     </div>
 
                     <p class="form-section-title">Pagamento</p>
@@ -2553,6 +2570,11 @@
         const carouselNext = document.getElementById('carouselNext');
 
         let selectedImages = []; // array of { file, dataUrl }
+        // Modelos (variáveis do DOM e estado)
+        const modelInput = document.getElementById('modelInput');
+        const addModelBtn = document.getElementById('addModelBtn');
+        const modelsContainer = document.getElementById('modelsContainer');
+        let selectedModels = []; // array of strings
 
         function openPublishModal() {
             publishModal.style.display = 'flex';
@@ -2561,6 +2583,10 @@
             if (imagesTrack) imagesTrack.innerHTML = '';
             if (imagesCarousel) imagesCarousel.style.display = 'none';
             if (productImagesInput) productImagesInput.value = '';
+            // Reset modelos
+            selectedModels = [];
+            if (modelsContainer) modelsContainer.innerHTML = '';
+            if (modelInput) modelInput.value = '';
         }
 
         function closePublishModal() {
@@ -2570,6 +2596,10 @@
             if (imagesTrack) imagesTrack.innerHTML = '';
             if (imagesCarousel) imagesCarousel.style.display = 'none';
             if (productImagesInput) productImagesInput.value = '';
+            // Reset modelos
+            selectedModels = [];
+            if (modelsContainer) modelsContainer.innerHTML = '';
+            if (modelInput) modelInput.value = '';
         }
 
         // Buscar credenciais do ImageKit do Supabase
@@ -2810,6 +2840,63 @@
             const step = (item ? item.offsetWidth : 130) + gap;
             imagesTrack.scrollBy({ left: direction * step, behavior: 'smooth' });
         }
+
+        // ===== Modelos helpers =====
+        function addModelFromInput() {
+            if (!modelInput) return;
+            const errEl = document.getElementById('modelError');
+            if (errEl) errEl.style.display = 'none';
+            const val = modelInput.value.trim();
+            if (!val) {
+                if (errEl) errEl.style.display = 'block';
+                return;
+            }
+            // evitar duplicatas (case-insensitive)
+            if (selectedModels.some(m => m.toLowerCase() === val.toLowerCase())) {
+                modelInput.value = '';
+                return;
+            }
+            selectedModels.push(val);
+            renderModelBadges();
+            modelInput.value = '';
+            modelInput.focus();
+        }
+
+        function renderModelBadges() {
+            if (!modelsContainer) return;
+            modelsContainer.innerHTML = '';
+            selectedModels.forEach((m, idx) => {
+                const badge = document.createElement('div');
+                badge.className = 'model-badge';
+                badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:var(--modal-surface);border:1px solid var(--modal-border);font-weight:600;color:var(--modal-text);';
+
+                const text = document.createElement('span');
+                text.textContent = m;
+                text.style.whiteSpace = 'nowrap';
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-model';
+                removeBtn.style.cssText = 'background:transparent;border:none;color:var(--modal-muted);cursor:pointer;font-weight:700;padding:0 6px;margin-left:4px;';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.addEventListener('click', () => {
+                    selectedModels.splice(idx, 1);
+                    renderModelBadges();
+                });
+
+                badge.appendChild(text);
+                badge.appendChild(removeBtn);
+                modelsContainer.appendChild(badge);
+            });
+        }
+
+        if (addModelBtn) addModelBtn.addEventListener('click', addModelFromInput);
+        if (modelInput) modelInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addModelFromInput();
+            }
+        });
 
         if (publishDropZone) {
             publishDropZone.addEventListener('dragover', (e) => {
@@ -3098,6 +3185,16 @@
                     const imageUrlsString = imageUrls.join('\\:@\\');
                     const imageIdsString = imageIds.join('\\:@\\');
 
+                    // Preparar string de modelos: ordenar, maiúsculas e separar por vírgula
+                    let modelsString = 'ÚNICO';
+                    if (selectedModels && selectedModels.length > 0) {
+                        modelsString = selectedModels
+                            .slice()
+                            .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
+                            .map(s => s.toUpperCase())
+                            .join(',');
+                    }
+
                     // Preparar dados do produto para inserir no Supabase
                     const productData = {
                         PRODUTO: title,
@@ -3107,6 +3204,7 @@
                         DESCONTO: discount.toString(),
                         PARCELAMENTO: `${installments},${interestFreeInstallments}`,
                         DESCRIPTION: document.getElementById('productDescription').value,
+                        product_model: modelsString,
                         DISPONIBILIDADE: true
                     };
 

@@ -1783,15 +1783,120 @@
             return `https://wa.me/${telefone}?text=${urlEncodedMsg}`;
         }
 
+        // Mostrar mensagem UI personalizada para erro de seleção de modelo
+        function showModeloError(message, duration = 3500) {
+            const appContainer = document.getElementById('produto-modelo-app');
+            if (!appContainer) {
+                try { alert(message); } catch (e) { /* ignore */ }
+                return;
+            }
+
+            let msgEl = appContainer.querySelector('.modelo-error-message');
+            if (!msgEl) {
+                msgEl = document.createElement('div');
+                msgEl.className = 'modelo-error-message';
+                msgEl.setAttribute('role', 'alert');
+                appContainer.appendChild(msgEl);
+            }
+
+            if (msgEl._timeoutId) { clearTimeout(msgEl._timeoutId); msgEl._timeoutId = null; }
+            msgEl.textContent = message;
+            msgEl.style.display = 'block';
+            // trigger visible state
+            msgEl.classList.add('visible');
+
+            // aplicar estilização de erro ao container e focar toggle
+            appContainer.classList.add('modelo-error');
+            setTimeout(() => { try { appContainer.classList.remove('modelo-error'); } catch (e) { } }, 2200);
+            const toggle = appContainer.querySelector('.vue-dropdown-toggle');
+            if (toggle && typeof toggle.focus === 'function') toggle.focus();
+
+            msgEl._timeoutId = setTimeout(() => {
+                try { msgEl.classList.remove('visible'); setTimeout(() => { msgEl.style.display = 'none'; }, 180); } catch (e) { }
+            }, duration);
+        }
+
         // Adiciona ao carrinho usando a imagem atualmente exibida na galeria
+        // Agora também lê o modelo selecionado (se existir) e exige seleção quando necessário
         function adicionarAoCarrinhoComImagemAtual(botao, produtoId, nomeProduto, preco) {
             try {
                 const imgEl = document.querySelector('.produto-imagem img');
                 const imagemAtual = imgEl && imgEl.src ? imgEl.src : null;
-                return CartSystem.adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, imagemAtual);
+
+                const appContainer = document.getElementById('produto-modelo-app');
+                const hidden = document.getElementById('produto-modelo-select');
+
+                const requiresSelection = appContainer && appContainer.dataset && appContainer.dataset.modelosRequired === '1';
+                const modeloSelecionado = (hidden && hidden.value) ? hidden.value : null;
+
+                if (requiresSelection && !modeloSelecionado) {
+                    // feedback visual e foco
+                    if (appContainer) {
+                        appContainer.classList.add('modelo-error');
+                        setTimeout(() => { try { appContainer.classList.remove('modelo-error'); } catch (e) { } }, 2200);
+                        const toggle = appContainer.querySelector('.vue-dropdown-toggle');
+                        if (toggle && typeof toggle.focus === 'function') toggle.focus();
+                    }
+                    showModeloError('Por favor selecione um modelo antes de adicionar ao carrinho.');
+                    return;
+                }
+
+                return CartSystem.adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, imagemAtual, modeloSelecionado);
             } catch (e) {
                 console.warn('Erro ao adicionar ao carrinho com imagem atual:', e);
-                return CartSystem.adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, null);
+                // fallback: attempt to respect selection requirement
+                try {
+                    const appContainer = document.getElementById('produto-modelo-app');
+                    const hidden = document.getElementById('produto-modelo-select');
+                    const requiresSelection = appContainer && appContainer.dataset && appContainer.dataset.modelosRequired === '1';
+                    const modelo = (hidden && hidden.value) ? hidden.value : null;
+                    if (requiresSelection && !modelo) {
+                        if (appContainer) {
+                            appContainer.classList.add('modelo-error');
+                            setTimeout(() => { try { appContainer.classList.remove('modelo-error'); } catch (e) { } }, 2200);
+                            const toggle = appContainer.querySelector('.vue-dropdown-toggle');
+                            if (toggle && typeof toggle.focus === 'function') toggle.focus();
+                        }
+                        showModeloError('Por favor selecione um modelo antes de adicionar ao carrinho.');
+                        return;
+                    }
+                    return CartSystem.adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, null, modelo);
+                } catch (ee) {
+                    return CartSystem.adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, null, null);
+                }
+            }
+        }
+
+        // Comprar agora respeitando o modelo selecionado (exige seleção se houver múltiplos modelos)
+        function comprarAgoraComModelo(produtoId, nomeProduto, preco) {
+            try {
+                const appContainer = document.getElementById('produto-modelo-app');
+                const hidden = document.getElementById('produto-modelo-select');
+                const requiresSelection = appContainer && appContainer.dataset && appContainer.dataset.modelosRequired === '1';
+                const modelo = (hidden && hidden.value) ? hidden.value : null;
+
+                if (requiresSelection && !modelo) {
+                    if (appContainer) {
+                        appContainer.classList.add('modelo-error');
+                        setTimeout(() => { try { appContainer.classList.remove('modelo-error'); } catch (e) { } }, 2200);
+                        const toggle = appContainer.querySelector('.vue-dropdown-toggle');
+                        if (toggle && typeof toggle.focus === 'function') toggle.focus();
+                    }
+                    showModeloError('Por favor selecione um modelo antes de finalizar a compra.');
+                    return;
+                }
+
+                const produtoParaCheckout = [{
+                    id: produtoId,
+                    nome: nomeProduto,
+                    preco: preco,
+                    quantidade: 1,
+                    modelo: modelo
+                }];
+                abrirCheckout(produtoParaCheckout, preco, produtoId);
+            } catch (e) {
+                console.warn('Erro ao processar compra com modelo:', e);
+                abrirCheckout([{ id: produtoId, nome: nomeProduto, preco: preco, quantidade: 1 }], preco, produtoId);
             }
         }
 
@@ -2041,6 +2146,10 @@
 
             let descricaoHtml = gerarDescricaoHtml(descricao);
 
+            // Preparar versões escapadas do nome do produto para uso seguro em attributes/onClick
+            const nomeEscapedSingle = String(nomeProduto).replace(/'/g, "\\'").replace(/\n/g, ' ');
+            const nomeEscapedDouble = String(nomeProduto).replace(/"/g, '&quot;').replace(/\n/g, ' ');
+
             mainContent.innerHTML = `
                 <div class="breadcrumb" id="breadcrumb-container">
                     <a href="../index.html">Início</a>
@@ -2052,7 +2161,7 @@
                 <div class="produto-container">
                     <div class="produto-imagem carregando">
                         <button class="img-nav img-prev" aria-label="Imagem anterior"><i class="ri-arrow-left-s-line"></i></button>
-                        <img src="" alt="${nomeProduto}" />
+                        <img src="" alt="${nomeEscapedDouble}" />
                         <button class="img-nav img-next" aria-label="Próxima imagem"><i class="ri-arrow-right-s-line"></i></button>
                         <div class="img-counter" id="image-counter" aria-hidden="true">1 / 1</div>
                     </div>
@@ -2063,6 +2172,13 @@
                             ${descontoHtml}
                             ${desconto > 0 ? `<div class="produto-preco-original"> ${precoOriginalFormatado}</div>` : ''}
                             <div class="produto-preco">${preco}</div>
+                                        <div class="produto-modelo" style="margin-top:8px;">
+                                            <label for="produto-modelo-select" style="font-family:'DM Sans',sans-serif;font-size:14px;color:#555;display:block;margin-bottom:6px;">Modelo</label>
+                                            <!-- Hidden input used for compatibility with existing JS (CartSystem reads by id) -->
+                                            <input type="hidden" id="produto-modelo-select" value="">
+                                            <!-- Vue mount point for custom dropdown UI -->
+                                            <div id="produto-modelo-app"></div>
+                                        </div>
                             <div class="meios-pagamento">
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                                     <div class="meio-pagamento-icon" title="PIX">
@@ -2086,11 +2202,11 @@
                                 <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:#555;">Compra 100% segura &bull; Mercado Pago API</span>
                             </div>
                             <div style="display: flex; gap: 10px; flex-direction: column;">
-                            <button class="btn-pedido" onclick="abrirCheckout('${nomeProduto}', ${precoComDesconto}, ${produto.ID})">
+                            <button class="btn-pedido" onclick="comprarAgoraComModelo(${produto.ID}, '${nomeEscapedSingle}', ${precoComDesconto})">
                                 <i class="ri-shopping-bag-4-fill"></i>
                                 Comprar agora
                             </button>
-                            <button class="btn-adicionar-carrinho" onclick="adicionarAoCarrinhoComImagemAtual(this, ${produto.ID}, '${nomeProduto}', ${precoComDesconto})">
+                            <button class="btn-adicionar-carrinho" onclick="adicionarAoCarrinhoComImagemAtual(this, ${produto.ID}, '${nomeEscapedSingle}', ${precoComDesconto})">
                                 <i class="ri-add-line"></i>
                                 Adicionar ao carrinho
                             </button>
@@ -2098,6 +2214,143 @@
                     </div>
                 </div>
             `;
+
+            // Inicializar dropdown de modelos do produto (lê do objeto produto ou consulta Supabase se necessário)
+            (function initProductModels() {
+                const appContainer = document.getElementById('produto-modelo-app');
+                const hiddenInput = document.getElementById('produto-modelo-select'); // hidden compat input
+                if (!appContainer) return;
+
+                // Tentar diversas chaves comuns para o campo de modelos
+                let raw = produto.product_model || produto['product_model'] || produto.PRODUCT_MODEL || produto['product-model'] || produto.MODELO || produto.MODELOS || produto.productModel || produto['product model'] || null;
+
+                function mountVueWithModelos(modelos) {
+                    if (!Array.isArray(modelos) || modelos.length === 0) {
+                        appContainer.style.display = 'none';
+                        if (hiddenInput) hiddenInput.value = '';
+                        return;
+                    }
+
+                    // Unmount previous app if present
+                    if (appContainer.__vue_app) {
+                        try { appContainer.__vue_app.unmount(); } catch (e) { }
+                    }
+
+                    // Inject minimal styles for the custom dropdown (only once)
+                    if (!document.getElementById('produto-modelo-vue-styles')) {
+                        const styleEl = document.createElement('style');
+                        styleEl.id = 'produto-modelo-vue-styles';
+                        styleEl.textContent = `
+                            .vue-dropdown { margin-bottom: 12px; transition: filter .15s ease, opacity .15s ease; }
+                            .vue-dropdown-list li:hover { background: #f5f5f5; }
+                            .vue-dropdown-list li.vue-option-selected { background: #e9f2ff; color: #0b5ed7; font-weight: 600; }
+                            /* Estado desativado: escurecer visualmente */
+                            .vue-dropdown-disabled { opacity: 0.95; filter: brightness(0.70) saturate(0.95); pointer-events: none; }
+                            .vue-dropdown-disabled .vue-dropdown-toggle { background: linear-gradient(180deg,#c6cbd1,#b8bcc3); color: #0b3b5b; cursor: default; border-color: #9ca3af; box-shadow: inset 0 2px 8px rgba(0,0,0,0.10); }
+                            .vue-dropdown-disabled .vue-dropdown-toggle i { color: #374151; opacity: 0.9; }
+                            .vue-dropdown-disabled .vue-dropdown-toggle span { color: #0b3b5b; }
+                            .vue-dropdown-list li.vue-option-disabled { background: #e5e7eb; color: #374151; cursor: default; }
+                            /* Indicação visual de erro quando a seleção é obrigatória e não foi feita */
+                            .modelo-error { border-radius: 10px; box-shadow: 0 8px 30px rgba(224,36,36,0.12); border: 2px solid rgba(224,36,36,0.9); animation: cps-shake .42s cubic-bezier(.36,.07,.19,.97); }
+                            @keyframes cps-shake { 10%, 90% { transform: translateX(-1px); } 20%, 80% { transform: translateX(2px); } 30%, 50%, 70% { transform: translateX(-4px); } 40%, 60% { transform: translateX(4px); } }
+                            /* Mensagem de erro UI para seleção de modelo */
+                            .modelo-error-message { display:none; margin-top:8px; padding:10px 12px; width:100%; box-sizing:border-box; background: linear-gradient(180deg,#ef4444,#dc2626); color:#fff; font-family:'DM Sans',sans-serif; font-size:13px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.12); opacity:0; transform:translateY(-6px); transition: opacity .18s ease, transform .18s ease; }
+                            .modelo-error-message.visible { opacity:1; transform:translateY(0); }
+                        `;
+                        document.head.appendChild(styleEl);
+                    }
+                    // Detectar caso especial: apenas um modelo e seu valor é 'ÚNICO' (variações de acentuação/case)
+                    const stripAccents = (s) => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toUpperCase();
+                    const isSingleUnique = modelos.length === 1 && stripAccents(modelos[0]) === 'UNICO';
+
+                    // Expor metadados simples no container para verificação de seleção em outros handlers
+                    try {
+                        appContainer.dataset.modelosCount = String(modelos.length || 0);
+                        appContainer.dataset.modelosRequired = modelos.length > 1 ? '1' : '0';
+                    } catch (e) { /* ignore if DOM not available */ }
+
+                    const DropdownComponent = {
+                        data() {
+                            return {
+                                open: false,
+                                selected: isSingleUnique ? modelos[0] : '',
+                                options: modelos.slice(),
+                                placeholder: 'Selecione um modelo',
+                                displayText: isSingleUnique ? 'MODELO ÚNICO' : '',
+                                disabled: isSingleUnique
+                            };
+                        },
+                        methods: {
+                            toggle(e) { e.stopPropagation(); if (this.disabled) return; this.open = !this.open; },
+                            selectOption(opt) {
+                                if (this.disabled) return;
+                                // Move selected option to the front
+                                const idx = this.options.indexOf(opt);
+                                if (idx > -1) this.options.splice(idx, 1);
+                                this.options.unshift(opt);
+                                this.selected = opt;
+                                this.displayText = opt;
+                                this.open = false;
+                                if (hiddenInput) hiddenInput.value = opt;
+                            }
+                        },
+                        mounted() {
+                            this._onDocClick = (e) => { if (!this.$el.contains(e.target)) this.open = false; };
+                            document.addEventListener('click', this._onDocClick);
+                            // Se for único modelo, garantir que o hidden input receba o valor real
+                            if (this.disabled && hiddenInput) hiddenInput.value = this.selected || '';
+                            // Se não for único, inicializar displayText com placeholder
+                            if (!this.disabled) this.displayText = '';
+                            // Garantir que para casos com múltiplos modelos o hidden input inicie vazio
+                            if (!this.disabled && hiddenInput) hiddenInput.value = '';
+                        },
+                        beforeUnmount() { document.removeEventListener('click', this._onDocClick); },
+                        template: `
+                            <div :class="['vue-dropdown', disabled ? 'vue-dropdown-disabled' : '']" style="position:relative;max-width:320px;margin-bottom:12px;">
+                                <button type="button" @click="toggle" :disabled="disabled" class="vue-dropdown-toggle" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;border:1px solid #eaeaea;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                                    <span v-text="(displayText || placeholder)" style="color: #333;"></span>
+                                    <i class="ri-arrow-down-s-line" style="font-size:18px;color:#777;"></i>
+                                </button>
+                                <ul v-show="open" class="vue-dropdown-list" style="position:absolute;z-index:30;width:100%;background:#fff;border:1px solid #eaeaea;border-radius:8px;margin-top:6px;max-height:200px;overflow:auto;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,0.08);list-style:none;margin:0;">
+                                    <li v-for="opt in options" :key="opt" @click="disabled ? null : selectOption(opt)" :class="{ 'vue-option-selected': opt === selected, 'vue-option-disabled': disabled }" style="padding:10px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                                        {{ opt }}
+                                    </li>
+                                </ul>
+                            </div>
+                        `
+                    };
+
+                    const app = Vue.createApp(DropdownComponent);
+                    app.mount('#produto-modelo-app');
+                    appContainer.__vue_app = app;
+                }
+
+                if (raw) {
+                    const modelos = String(raw).split(',').map(s => s.trim()).filter(Boolean);
+                    mountVueWithModelos(modelos);
+                    return;
+                }
+
+                // Se não estava presente no objeto, buscar apenas a coluna product_model da tabela (campo 'product_model' na tabela 'j-box')
+                (async () => {
+                    try {
+                        const { data: row, error } = await supabaseClient
+                            .from(SUPABASE_CONFIG.table)
+                            .select('product_model')
+                            .eq('ID', productId)
+                            .single();
+
+                        if (!error && row) {
+                            raw = row.product_model || row.PRODUCT_MODEL || row.MODELOS || row.MODELO || null;
+                        }
+                    } catch (e) {
+                        console.warn('Erro ao buscar modelos do produto:', e);
+                    }
+
+                    const modelos = raw ? String(raw).split(',').map(s => s.trim()).filter(Boolean) : [];
+                    mountVueWithModelos(modelos);
+                })();
+            })();
 
             // Inicializar gallery (sem miniaturas) — controla botões laterais
             (function initImageGallery() {

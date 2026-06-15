@@ -63,7 +63,7 @@ const CartSystem = (() => {
     }
 
     // ===== CRUD DE PRODUTOS =====
-    function adicionarProduto(produtoId, nomeProduto, preco, imagemUrl = null) {
+    function adicionarProduto(produtoId, nomeProduto, preco, imagemUrl = null, modelo = null) {
         if (!produtoId) {
             console.error('❌ ID do produto é obrigatório');
             return false;
@@ -71,7 +71,8 @@ const CartSystem = (() => {
 
         // ===== PROTEÇÃO CONTRA CLIQUES DUPLOS =====
         const agora = Date.now();
-        const ultimoClique = ultimoCliquePorProduto.get(produtoId) || 0;
+        const clickKey = `${produtoId}||${modelo || ''}`;
+        const ultimoClique = ultimoCliquePorProduto.get(clickKey) || 0;
         const intervaloDesdeUltimoClique = agora - ultimoClique;
 
         if (intervaloDesdeUltimoClique < CLICK_THROTTLE_MS) {
@@ -80,11 +81,11 @@ const CartSystem = (() => {
             return false;
         }
 
-        // Registrar este clique
-        ultimoCliquePorProduto.set(produtoId, agora);
+        // Registrar este clique (por id+modelo)
+        ultimoCliquePorProduto.set(clickKey, agora);
 
-        // Verificar se o produto já está no carrinho
-        const indexExistente = carrinhoData.findIndex(item => item.id === produtoId);
+        // Verificar se o produto (mesmo modelo) já está no carrinho
+        const indexExistente = carrinhoData.findIndex(item => String(item.id) === String(produtoId) && ((item.modelo || null) === (modelo || null)));
 
         if (indexExistente >= 0) {
             // Verificar se atingiu o máximo
@@ -95,6 +96,10 @@ const CartSystem = (() => {
             }
             // Aumentar quantidade
             carrinhoData[indexExistente].quantidade += 1;
+            // Atualizar modelo se fornecido
+            try {
+                if (modelo) carrinhoData[indexExistente].modelo = modelo;
+            } catch (e) { }
         } else {
             // Verificar se já atingiu o máximo de produtos diferentes
             if (carrinhoData.length >= MAX_PRODUTOS_DIFERENTES) {
@@ -109,6 +114,7 @@ const CartSystem = (() => {
                 preco: parseFloat(preco),
                 imagem: imagemUrl,
                 quantidade: 1,
+                modelo: modelo || null,
                 adicionadoEm: new Date().toISOString()
             });
         }
@@ -119,20 +125,20 @@ const CartSystem = (() => {
         return true;
     }
 
-    function removerProduto(produtoId) {
+    function removerProduto(produtoId, modelo = null) {
         const indexOriginal = carrinhoData.length;
-        carrinhoData = carrinhoData.filter(item => item.id !== produtoId);
+        carrinhoData = carrinhoData.filter(item => !(String(item.id) === String(produtoId) && ((item.modelo || null) === (modelo || null))));
 
         if (carrinhoData.length < indexOriginal) {
             salvarNoLocalStorage(carrinhoData);
-            console.log(`✓ Produto removido do carrinho: ${produtoId}`);
+            console.log(`✓ Produto removido do carrinho: ${produtoId}${modelo ? ' (' + modelo + ')' : ''}`);
             return true;
         }
         return false;
     }
 
-    function atualizarQuantidade(produtoId, novaQuantidade) {
-        const produto = carrinhoData.find(item => item.id === produtoId);
+    function atualizarQuantidade(produtoId, novaQuantidade, modelo = null) {
+        const produto = carrinhoData.find(item => String(item.id) === String(produtoId) && ((item.modelo || null) === (modelo || null)));
         if (!produto) return false;
 
         const quantidadeInt = parseInt(novaQuantidade);
@@ -147,7 +153,7 @@ const CartSystem = (() => {
         }
 
         if (quantidadeInt <= 0) {
-            return removerProduto(produtoId);
+            return removerProduto(produtoId, modelo);
         }
 
         produto.quantidade = quantidadeInt;
@@ -317,8 +323,10 @@ const CartSystem = (() => {
             const cartItem = e.target.closest('.cart-item');
             if (cartItem) {
                 const produtoId = cartItem.dataset.productId;
+                const produtoModeloEncoded = cartItem.dataset.productModel || '';
+                const produtoModelo = produtoModeloEncoded ? decodeURIComponent(produtoModeloEncoded) : null;
                 if (produtoId) {
-                    window.location.href = `../detalhes/index.html?id=${produtoId}`;
+                    window.location.href = `../detalhes/index.html?id=${produtoId}${produtoModelo ? '&modelo=' + encodeURIComponent(produtoModelo) : ''}`;
                 }
             }
         });
@@ -366,7 +374,7 @@ const CartSystem = (() => {
         cartBody.innerHTML = `
             <div class="cart-items">
                 ${carrinhoData.map(item => `
-                    <div class="cart-item" data-product-id="${item.id}">
+                    <div class="cart-item" data-product-id="${item.id}" data-product-model="${item.modelo ? encodeURIComponent(item.modelo) : ''}">
                         <div class="cart-item-imagem">
                             ${item.imagem ? `
                                 <img src="${item.imagem}" alt="${item.nome}" loading="lazy">
@@ -378,24 +386,29 @@ const CartSystem = (() => {
                         </div>
                         <div class="cart-item-info">
                             <h4 class="cart-item-nome">${item.nome}</h4>
+                            ${item.modelo ? `
+                                <div class="cart-item-model">
+                                    <span class="cart-model-badge">${item.modelo}</span>
+                                </div>
+                            ` : ''}
                             <div class="cart-item-preco">
                                 ${formatarPreco(item.preco)}
                             </div>
                         </div>
                         <div class="cart-item-controles">
-                            <button class="cart-btn-menos" onclick="CartSystem.atualizarQuantidadeUI(${item.id}, ${item.quantidade - 1})">
+                            <button class="cart-btn-menos" onclick='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, ${item.quantidade - 1}, ${JSON.stringify(item.modelo)})'>
                                 <i class="ri-subtract-line"></i>
                             </button>
                             <input type="number" class="cart-quantidade" value="${item.quantidade}" min="1" max="${MAX_QUANTIDADE_POR_PRODUTO}"
-                                   onchange="CartSystem.atualizarQuantidadeUI(${item.id}, this.value)">
-                            <button class="cart-btn-mais" onclick="CartSystem.atualizarQuantidadeUI(${item.id}, ${item.quantidade + 1})" ${item.quantidade >= MAX_QUANTIDADE_POR_PRODUTO ? 'disabled' : ''}>
+                                   onchange='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, this.value, ${JSON.stringify(item.modelo)})'>
+                            <button class="cart-btn-mais" onclick='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, ${item.quantidade + 1}, ${JSON.stringify(item.modelo)})' ${item.quantidade >= MAX_QUANTIDADE_POR_PRODUTO ? 'disabled' : ''}>
                                 <i class="ri-add-line"></i>
                             </button>
                         </div>
                         <div class="cart-item-subtotal">
                             ${formatarPreco(item.preco * item.quantidade)}
                         </div>
-                        <button class="cart-btn-remover" onclick="CartSystem.removerUI(${item.id})" title="Remover produto">
+                        <button class="cart-btn-remover" onclick='CartSystem.removerUI(${JSON.stringify(String(item.id))}, ${JSON.stringify(item.modelo)})' title="Remover produto">
                             <i class="ri-delete-bin-line"></i>
                         </button>
                     </div>
@@ -431,13 +444,13 @@ const CartSystem = (() => {
     }
 
     // ===== UI HELPERS =====
-    function atualizarQuantidadeUI(produtoId, novaQuantidade) {
-        atualizarQuantidade(produtoId, novaQuantidade);
+    function atualizarQuantidadeUI(produtoId, novaQuantidade, modelo = null) {
+        atualizarQuantidade(produtoId, novaQuantidade, modelo);
         renderizarCarrinho();
     }
 
-    function removerUI(produtoId) {
-        removerProduto(produtoId);
+    function removerUI(produtoId, modelo = null) {
+        removerProduto(produtoId, modelo);
         renderizarCarrinho();
     }
 
@@ -603,7 +616,7 @@ const CartSystem = (() => {
     }
 
     // ===== WRAPPER COM PROTEÇÃO DE CLIQUE DUPLO =====
-    function adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, imagemUrl) {
+    function adicionarProdutoComDesabilitar(botao, produtoId, nomeProduto, preco, imagemUrl, modelo) {
         // Desabilitar temporariamente o botão
         botao.disabled = true;
         botao.style.opacity = '0.6';
@@ -612,8 +625,8 @@ const CartSystem = (() => {
         const textoOriginal = botao.innerHTML;
         botao.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Adicionando...';
 
-        // Tentar adicionar produto
-        const sucesso = adicionarProduto(produtoId, nomeProduto, preco, imagemUrl);
+        // Tentar adicionar produto (passando modelo quando disponível)
+        const sucesso = adicionarProduto(produtoId, nomeProduto, preco, imagemUrl, modelo);
 
         // Re-habilitar após 1 segundo
         setTimeout(() => {

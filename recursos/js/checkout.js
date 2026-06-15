@@ -98,7 +98,7 @@ function abrirCheckout(produtosArray, paramPreco, paramId) {
         _co.product_ids = produtosArray.map(p => parseInt(p.id) || 0).filter(id => id > 0);
 
         _co.nomeProduto = quantidadeReal === 1
-            ? produtosArray[0].nome
+            ? (produtosArray[0].modelo ? `${produtosArray[0].nome} - ${produtosArray[0].modelo}` : produtosArray[0].nome)
             : `${quantidadeReal} produtos`;
 
         _co.idProduto = quantidadeReal === 1 ? _co.product_ids[0] : null;
@@ -150,8 +150,8 @@ function renderizarResumoCheckout() {
 
     // CORREÇÃO: Verifica se o TOTAL de itens é 1, e não se o array tem tamanho 1
     if (_co.totalProdutos === 1) {
-        // Um único produto - mostrar nome e preço normalmente
-        containerNome.textContent = _co.produtos[0].nome;
+        // Um único produto - mostrar nome (incluindo modelo quando houver) e preço
+        containerNome.textContent = _co.nomeProduto;
         containerPreco.textContent = 'R$ ' + parsePreco(_co.produtos[0].preco).toFixed(2).replace('.', ',');
     } else {
         // Múltiplos produtos - mostrar "Ver produtos" com link
@@ -238,7 +238,7 @@ function renderizarProdutosCheckout() {
         const subtotal = preco * qtd;
         return `
                         <tr>
-                            <td>${p.nome}</td>
+                            <td>${p.nome}${p.modelo ? ' - ' + p.modelo : ''}</td>
                             <td>${qtd}</td>
                             <td>R$ ${preco.toFixed(2).replace('.', ',')}</td>
                             <td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
@@ -609,7 +609,7 @@ async function verificarStatusPagamento(paymentId) {
             nome_produto: _co.nomeProduto,
             valor_produto: _co.precoProduto,
             product_ids: _co.product_ids,
-            produtos: _co.produtos.map(p => ({ id: p.id, nome: p.nome, preco: p.preco, quantidade: p.quantidade })),
+            produtos: _co.produtos.map(p => ({ id: p.id, nome: p.nome, preco: p.preco, quantidade: p.quantidade, modelo: (p.modelo || null) })),
         });
         const status = data.status;
 
@@ -665,7 +665,7 @@ async function processarPagamentoPIX() {
             nome_produto: _co.nomeProduto,
             product_id: _co.idProduto,
             product_ids: _co.product_ids,
-            produtos: _co.produtos.map(p => ({ id: p.id, nome: p.nome, preco: p.preco, quantidade: p.quantidade })),
+            produtos: _co.produtos.map(p => ({ id: p.id, nome: p.nome, preco: p.preco, quantidade: p.quantidade, modelo: (p.modelo || null) })),
         });
 
         _co.paymentId = data.id;
