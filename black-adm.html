@@ -1295,9 +1295,9 @@
 
         .product-card-price {
             color: rgb(21, 121, 29);
-            font-weight: 4a00;
+            font-weight: 400;
             font-size: 0.82rem;
-            font-family: 'DM Mono', monospace;
+            font-family: 'DM Sans', Arial, sans-serif;
         }
 
         .product-card-badge {
@@ -2191,6 +2191,7 @@
             gap: 12px;
             padding: 14px 24px;
             border-top: 1px solid var(--modal-border);
+            border-bottom: 1px solid var(--modal-border);
             background: var(--modal-surface);
             flex-shrink: 0;
         }
@@ -2541,6 +2542,165 @@
                     <button type="button" class="btn-submit" id="submitReauthBtn">Confirmar</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Gerenciar Produtos -->
+    <div id="manageProductsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i class="ri-search-line"></i></div>
+                    <div>
+                        <h2>Gerenciar Produtos</h2>
+                        <p class="modal-subtitle">Busque por ID ou nome do produto</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="manageCloseBtn" title="Fechar">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="search-container">
+                    <input type="text" id="productSearchInput" class="search-input"
+                        placeholder="Digite o ID ou nome do produto e pressione Enter">
+                    <button type="button" id="productSearchBtn" class="search-button">Pesquisar</button>
+                </div>
+
+                <div id="productsGrid" class="products-grid"></div>
+
+                <div id="noProducts" class="no-results" style="display:none;">
+                    <div class="no-results-icon"><i class="ri-inbox-unarchive-line"></i></div>
+                    Nenhum produto encontrado.
+                </div>
+            </div>
+
+            <div class="pagination-bar" id="productsPaginationBar" style="display:none;">
+                <button type="button" class="pagination-btn" id="productsPrevBtn" title="Página anterior">
+                    <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <div class="pagination-info" id="productsPaginationInfo">1 de 1</div>
+                <button type="button" class="pagination-btn" id="productsNextBtn" title="Próxima página">
+                    <i class="ri-arrow-right-s-line"></i>
+                </button>
+            </div>
+
+            <div class="modal-footer">
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="manageCancelBtn">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Produto -->
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i class="ri-edit-line"></i></div>
+                    <div>
+                        <h2>Editar Produto</h2>
+                        <p class="modal-subtitle">Altere as informações e salve as alterações</p>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeEditModal" title="Fechar">&times;</button>
+            </div>
+
+            <form id="editProductForm">
+                <div class="modal-body">
+                    <p class="form-section-title">Imagens (Máximo 5)</p>
+                    <div class="form-group">
+                        <div class="file-upload-zone" id="editDropZone">
+                            <input type="file" id="editProductImagesInput" accept="image/*" multiple>
+                            <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
+                            <div class="file-upload-text"><strong>Arraste ou clique para adicionar
+                                    imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 5 imagens —
+                                    JPG, PNG, WEBP</span></div>
+                        </div>
+
+                        <div class="images-carousel" id="editImagesCarousel" style="display:none;">
+                            <button type="button" class="carousel-nav left" id="editCarouselPrev"
+                                aria-label="Imagem anterior"><i class="ri-arrow-left-s-line"></i></button>
+                            <div class="images-track" id="editImagesTrack" role="list"></div>
+                            <button type="button" class="carousel-nav right" id="editCarouselNext"
+                                aria-label="Próxima imagem"><i class="ri-arrow-right-s-line"></i></button>
+                        </div>
+                    </div>
+
+                    <p class="form-section-title">Informações</p>
+                    <div class="form-group">
+                        <label for="editProductId">ID</label>
+                        <input type="text" id="editProductId" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editProductTitle">Título <span class="required-star">*</span></label>
+                            <input type="text" id="editProductTitle" placeholder="Nome do produto" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductPrice">Preço (R$) <span class="required-star">*</span></label>
+                            <input type="text" id="editProductPrice" placeholder="0,00" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductDescription">Descrição</label>
+                        <textarea id="editProductDescription" placeholder="Descreva o produto..."></textarea>
+                    </div>
+
+                    <p class="form-section-title">Modelos</p>
+                    <div class="form-group">
+                        <label for="editModelInput">Adicionar modelo</label>
+                        <input type="text" id="editModelInput" placeholder="Ex: Modelo A">
+                        <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                            <button type="button" class="btn-edit" id="addEditModelBtn">Adicionar modelo</button>
+                            <span class="error-message" id="editModelError" style="display:none;">Digite um modelo
+                                válido</span>
+                        </div>
+                        <div id="editModelsContainer" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+                        </div>
+                    </div>
+
+                    <p class="form-section-title">Pagamento</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editProductDiscount">Desconto (%)</label>
+                            <input type="text" id="editProductDiscount" placeholder="0" value="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editInstallments">Total de Parcelas <span class="required-star">*</span></label>
+                            <input type="text" id="editInstallments" placeholder="0" value="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editInterestFreeInstallments">Parcelas Sem Juros <span
+                                class="required-star">*</span></label>
+                        <input type="text" id="editInterestFreeInstallments" placeholder="0" value="0" required>
+                    </div>
+
+                    <p class="form-section-title">Disponibilidade</p>
+                    <div class="form-group">
+                        <label class="toggle-group">
+                            <div class="toggle-label-text">
+                                <span>Disponível para venda</span>
+                                <span>Marque para ativar este produto</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="editProductAvailability">
+                                <span class="toggle-track"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancelEditBtn">Cancelar</button>
+                        <div class="spacer"></div>
+                        <button type="button" class="btn-delete" id="deleteProductBtn">Excluir</button>
+                        <button type="submit" class="btn-submit"><i class="ri-save-line"></i> Salvar Alterações</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -3254,6 +3414,13 @@
                             <div class="action-card-desc">Adicione um novo produto à loja com imagem e preço</div>
                         </div>
                     </button>
+                    <button class="action-card" id="btnManageProducts">
+                        <div class="action-card-icon orange"><i class="ri-store-2-line"></i></div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Gerenciar Produtos</div>
+                            <div class="action-card-desc">Buscar, editar e remover produtos</div>
+                        </div>
+                    </button>
                     <button class="action-card" id="btnViewOrders" style="position: relative;">
                         <div class="orders-notification-badge hidden" id="ordersNotificationBadge">0</div>
                         <div class="action-card-icon blue"><i class="ri-file-list-3-line"></i></div>
@@ -3272,6 +3439,8 @@
 
             document.getElementById('btnPublishProduct').addEventListener('click', openPublishModal);
             document.getElementById('btnViewOrders').addEventListener('click', openOrdersModal);
+            const manageBtn = document.getElementById('btnManageProducts');
+            if (manageBtn) manageBtn.addEventListener('click', openManageProductsModal);
 
             fetchImagekitCredentials();
 
@@ -3284,6 +3453,472 @@
                 ordersFilterEl.addEventListener('change', fetchOrders);
             }
         }
+
+        // Produtos: funções de gerenciamento (busca e edição)
+        const manageProductsModal = document.getElementById('manageProductsModal');
+        const productSearchInput = document.getElementById('productSearchInput');
+        const productSearchBtn = document.getElementById('productSearchBtn');
+        const productsGrid = document.getElementById('productsGrid');
+        const noProductsEl = document.getElementById('noProducts');
+        const manageCloseBtn = document.getElementById('manageCloseBtn');
+        const manageCancelBtn = document.getElementById('manageCancelBtn');
+        const productsPaginationBar = document.getElementById('productsPaginationBar');
+        const productsPrevBtn = document.getElementById('productsPrevBtn');
+        const productsNextBtn = document.getElementById('productsNextBtn');
+        const productsPaginationInfo = document.getElementById('productsPaginationInfo');
+
+        const editProductModal = document.getElementById('editProductModal');
+        const editProductForm = document.getElementById('editProductForm');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const closeEditModalBtn = document.getElementById('closeEditModal');
+        const deleteProductBtn = document.getElementById('deleteProductBtn');
+
+        // Variáveis para edição de produto (imagens e modelos)
+        const editDropZone = document.getElementById('editDropZone');
+        const editProductImagesInput = document.getElementById('editProductImagesInput');
+        const editImagesTrack = document.getElementById('editImagesTrack');
+        const editImagesCarousel = document.getElementById('editImagesCarousel');
+        const editCarouselPrev = document.getElementById('editCarouselPrev');
+        const editCarouselNext = document.getElementById('editCarouselNext');
+        const addEditModelBtn = document.getElementById('addEditModelBtn');
+        const editModelInput = document.getElementById('editModelInput');
+        const editModelsContainer = document.getElementById('editModelsContainer');
+
+        let editSelectedImages = []; // array of { file, dataUrl } para imagens do editor
+        let editSelectedModels = []; // array de strings para modelos do editor
+        let currentEditingProductId = null; // rastrear qual produto está sendo editado
+
+        // Variáveis para paginação de produtos
+        const PRODUCTS_PER_PAGE = 9;
+        let allProductsData = [];
+        let currentProductPage = 1;
+        let totalProductPages = 1;
+
+        function openManageProductsModal() {
+            if (manageProductsModal) manageProductsModal.style.display = 'flex';
+            if (productSearchInput) {
+                productSearchInput.value = '';
+                productSearchInput.focus();
+            }
+            if (productsGrid) productsGrid.innerHTML = '';
+            if (noProductsEl) noProductsEl.style.display = 'none';
+            allProductsData = [];
+            currentProductPage = 1;
+            totalProductPages = 1;
+            if (productsPaginationBar) productsPaginationBar.style.display = 'none';
+        }
+
+        function closeManageProductsModal() {
+            if (manageProductsModal) manageProductsModal.style.display = 'none';
+        }
+
+        async function searchProducts(query) {
+            if (!query || !query.trim()) {
+                if (productsGrid) productsGrid.innerHTML = '';
+                if (noProductsEl) noProductsEl.style.display = 'block';
+                if (productsPaginationBar) productsPaginationBar.style.display = 'none';
+                return;
+            }
+            const q = query.trim();
+            try {
+                let filter = `PRODUTO.ilike.%${q}%`;
+                if (/^\d+$/.test(q)) {
+                    filter = `ID.eq.${q},PRODUTO.ilike.%${q}%`;
+                }
+                const { data, error } = await supabase.from('j-box').select('*').or(filter).limit(1000);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    if (productsGrid) productsGrid.innerHTML = '';
+                    if (noProductsEl) noProductsEl.style.display = 'block';
+                    if (productsPaginationBar) productsPaginationBar.style.display = 'none';
+                    return;
+                }
+                if (noProductsEl) noProductsEl.style.display = 'none';
+                allProductsData = data;
+                currentProductPage = 1;
+                totalProductPages = Math.ceil(data.length / PRODUCTS_PER_PAGE);
+                renderProductsPage();
+                updateProductsPaginationInfo();
+            } catch (err) {
+                console.error('Erro ao buscar produtos:', err);
+                alert('Erro ao buscar produtos: ' + (err.message || err));
+            }
+        }
+
+        function getProductName(p) { return p.PRODUTO || p.produto || p.title || ''; }
+        function getProductPrice(p) { return p['PREÇO'] || p.PRECO || p.preco || '0'; }
+        function getProductFirstImage(p) {
+            const urlStr = p['IMAGE-URL'] || p['IMAGE_URL'] || p.imageUrl || '';
+            if (!urlStr) return '';
+            const parts = urlStr.split(/\\:\@\\|:\@:/);
+            return parts[0] || urlStr;
+        }
+
+        function renderProductsPage() {
+            if (!productsGrid) return;
+            productsGrid.innerHTML = '';
+            const start = (currentProductPage - 1) * PRODUCTS_PER_PAGE;
+            const end = start + PRODUCTS_PER_PAGE;
+            const pageItems = allProductsData.slice(start, end);
+
+            pageItems.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                const img = getProductFirstImage(prod) || '';
+                const name = escapeHtml(getProductName(prod));
+                const price = formatCurrency(getProductPrice(prod) || '0');
+                const imgHtml = img ? `<img class="product-card-image" src="${img}" alt="${name}">` : `<div class="product-card-image" style="display:flex;align-items:center;justify-content:center;background:#f0f0f0;color:#999;">Sem imagem</div>`;
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="product-card-info">
+                        <div class="product-card-name">${name}</div>
+                        <div class="product-card-price">${price}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => openEditProductModal(prod));
+                productsGrid.appendChild(card);
+            });
+        }
+
+        function updateProductsPaginationInfo() {
+            if (productsPaginationInfo) {
+                productsPaginationInfo.textContent = `${currentProductPage} de ${totalProductPages}`;
+            }
+            if (productsPrevBtn) productsPrevBtn.disabled = currentProductPage === 1;
+            if (productsNextBtn) productsNextBtn.disabled = currentProductPage === totalProductPages;
+            if (productsPaginationBar) {
+                productsPaginationBar.style.display = totalProductPages > 1 ? 'flex' : 'none';
+            }
+        }
+
+        function goToProductPage(pageNumber) {
+            if (pageNumber < 1 || pageNumber > totalProductPages) return;
+            currentProductPage = pageNumber;
+            renderProductsPage();
+            updateProductsPaginationInfo();
+        }
+
+        function openEditProductModal(prod) {
+            if (!editProductModal) return;
+            currentEditingProductId = prod.ID || prod.id || null;
+            document.getElementById('editProductId').value = (prod.ID !== undefined ? String(prod.ID) : (prod.id !== undefined ? String(prod.id) : ''));
+            document.getElementById('editProductTitle').value = prod.PRODUTO || prod.produto || '';
+            const price = getProductPrice(prod) || '0';
+            document.getElementById('editProductPrice').value = String(price).replace('.', ',');
+            document.getElementById('editProductDescription').value = prod.DESCRIPTION || prod.description || '';
+            document.getElementById('editProductDiscount').value = prod.DESCONTO || prod.desconto || '0';
+            const parcelamento = prod.PARCELAMENTO || prod.parcelamento || '';
+            const [installments, interestFree] = parcelamento ? parcelamento.split(',') : ['0', '0'];
+            document.getElementById('editInstallments').value = installments || '0';
+            document.getElementById('editInterestFreeInstallments').value = interestFree || '0';
+            const avail = !!prod.DISPONIBILIDADE;
+            document.getElementById('editProductAvailability').checked = avail;
+
+            // Carregar imagens existentes
+            const imageUrlStr = prod['IMAGE-URL'] || '';
+            editSelectedImages = [];
+            if (imageUrlStr) {
+                const urls = imageUrlStr.split(/\\:\@\\|:\@:/);
+                urls.forEach(url => {
+                    if (url && url.trim()) {
+                        editSelectedImages.push({ url: url.trim(), isExisting: true });
+                    }
+                });
+            }
+            renderEditImagesCarousel();
+
+            // Carregar modelos existentes
+            const productModel = prod.product_model || '';
+            editSelectedModels = [];
+            if (productModel && productModel !== 'ÚNICO') {
+                const models = productModel.split(',').map(m => m.trim()).filter(Boolean);
+                editSelectedModels = models.map(m => m.charAt(0).toUpperCase() + m.slice(1).toLowerCase());
+            }
+            renderEditModelBadges();
+
+            if (editModelInput) editModelInput.value = '';
+            editProductModal.style.display = 'flex';
+        }
+
+        function renderEditImagesCarousel() {
+            if (!editImagesTrack || !editImagesCarousel) return;
+            editImagesTrack.innerHTML = '';
+            if (!editSelectedImages || editSelectedImages.length === 0) {
+                editImagesCarousel.style.display = 'none';
+                return;
+            }
+            editImagesCarousel.style.display = 'flex';
+            editSelectedImages.forEach((imgObj, idx) => {
+                const item = document.createElement('div');
+                item.className = 'image-item';
+                const img = document.createElement('img');
+                img.src = imgObj.dataUrl || imgObj.url;
+                img.alt = `Prévia ${idx + 1}`;
+                img.loading = 'lazy';
+                item.appendChild(img);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'remove-image-btn';
+                btn.title = 'Remover';
+                btn.innerHTML = '&times;';
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    editSelectedImages.splice(idx, 1);
+                    renderEditImagesCarousel();
+                });
+                item.appendChild(btn);
+                editImagesTrack.appendChild(item);
+            });
+
+            // show/hide nav
+            if (editSelectedImages.length <= 1) {
+                if (editCarouselPrev) editCarouselPrev.style.display = 'none';
+                if (editCarouselNext) editCarouselNext.style.display = 'none';
+            } else {
+                if (editCarouselPrev) editCarouselPrev.style.display = 'flex';
+                if (editCarouselNext) editCarouselNext.style.display = 'flex';
+            }
+        }
+
+        function renderEditModelBadges() {
+            if (!editModelsContainer) return;
+            editModelsContainer.innerHTML = '';
+            editSelectedModels.forEach((m, idx) => {
+                const badge = document.createElement('div');
+                badge.className = 'model-badge';
+                badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:var(--modal-surface);border:1px solid var(--modal-border);font-weight:600;color:var(--modal-text);';
+
+                const text = document.createElement('span');
+                text.textContent = m;
+                text.style.whiteSpace = 'nowrap';
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-model';
+                removeBtn.style.cssText = 'background:transparent;border:none;color:var(--modal-muted);cursor:pointer;font-weight:700;padding:0 6px;margin-left:4px;';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.addEventListener('click', () => {
+                    editSelectedModels.splice(idx, 1);
+                    renderEditModelBadges();
+                });
+
+                badge.appendChild(text);
+                badge.appendChild(removeBtn);
+                editModelsContainer.appendChild(badge);
+            });
+        }
+
+        function addEditModelFromInput() {
+            if (!editModelInput) return;
+            const errEl = document.getElementById('editModelError');
+            if (errEl) errEl.style.display = 'none';
+            const val = editModelInput.value.trim();
+            if (!val) {
+                if (errEl) errEl.style.display = 'block';
+                return;
+            }
+            if (editSelectedModels.some(m => m.toLowerCase() === val.toLowerCase())) {
+                editModelInput.value = '';
+                return;
+            }
+            editSelectedModels.push(val);
+            renderEditModelBadges();
+            editModelInput.value = '';
+            editModelInput.focus();
+        }
+
+        function scrollEditCarousel(direction) {
+            if (!editImagesTrack) return;
+            const item = editImagesTrack.querySelector('.image-item');
+            const gap = 8;
+            const step = (item ? item.offsetWidth : 130) + gap;
+            editImagesTrack.scrollBy({ left: direction * step, behavior: 'smooth' });
+        }
+
+        async function addEditFiles(fileList) {
+            if (!fileList) return;
+            const files = Array.from(fileList);
+            for (const file of files) {
+                if (!file.type || !file.type.startsWith('image/')) continue;
+                if (editSelectedImages.length >= 5) break;
+                const dataUrl = await readFileAsDataURL(file);
+                editSelectedImages.push({ file, dataUrl });
+                renderEditImagesCarousel();
+            }
+        }
+
+        function closeEditProductModal() {
+            if (!editProductModal) return;
+            editProductModal.style.display = 'none';
+            if (editProductForm) editProductForm.reset();
+            editSelectedImages = [];
+            editSelectedModels = [];
+            currentEditingProductId = null;
+        }
+
+        // Event listeners para gerenciar imagens no editor
+        if (editDropZone) {
+            editDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                editDropZone.classList.add('drag-over');
+            });
+            editDropZone.addEventListener('dragleave', () => {
+                editDropZone.classList.remove('drag-over');
+            });
+            editDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                editDropZone.classList.remove('drag-over');
+                if (e.dataTransfer && e.dataTransfer.files) {
+                    addEditFiles(e.dataTransfer.files);
+                }
+            });
+        }
+
+        if (editProductImagesInput) {
+            editProductImagesInput.addEventListener('change', (e) => {
+                addEditFiles(e.target.files);
+                e.target.value = '';
+            });
+        }
+
+        if (editCarouselPrev) editCarouselPrev.addEventListener('click', () => scrollEditCarousel(-1));
+        if (editCarouselNext) editCarouselNext.addEventListener('click', () => scrollEditCarousel(1));
+
+        // Event listeners para modelos no editor
+        if (addEditModelBtn) addEditModelBtn.addEventListener('click', addEditModelFromInput);
+        if (editModelInput) editModelInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addEditModelFromInput();
+            }
+        });
+
+        editProductForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editProductId').value;
+            const title = document.getElementById('editProductTitle').value.trim();
+            const priceStr = document.getElementById('editProductPrice').value.replace(',', '.');
+            const price = parseFloat(priceStr) || 0;
+            const description = document.getElementById('editProductDescription').value;
+            const discount = document.getElementById('editProductDiscount').value || '0';
+            const installments = document.getElementById('editInstallments').value || '0';
+            const interestFreeInstallments = document.getElementById('editInterestFreeInstallments').value || '0';
+            const availability = document.getElementById('editProductAvailability').checked;
+
+            try {
+                const submitBtn = editProductForm.querySelector('.btn-submit');
+                const originalText = submitBtn.textContent;
+                let imageUrls = [];
+                let imageIds = [];
+
+                // Processar imagens novas (que têm arquivo) e manter as existentes
+                const existingImages = editSelectedImages.filter(img => img.isExisting).map(img => img.url);
+                const newImages = editSelectedImages.filter(img => !img.isExisting && img.file);
+
+                if (newImages.length > 0) {
+                    submitBtn.textContent = '⏳ Processando imagens...';
+                    submitBtn.disabled = true;
+
+                    for (let i = 0; i < newImages.length; i++) {
+                        const file = newImages[i].file;
+                        submitBtn.textContent = `⏳ Comprimindo imagem ${i + 1} de ${newImages.length}...`;
+                        const compressed = await compressImageToWebP(file);
+
+                        submitBtn.textContent = `⏳ Enviando imagem ${i + 1} de ${newImages.length}...`;
+                        const uploadResult = await uploadImageToImageKit(compressed);
+
+                        if (uploadResult) {
+                            imageUrls.push(uploadResult.url);
+                            imageIds.push(uploadResult.fileId);
+                        }
+                    }
+                }
+
+                // Combinar imagens existentes com novas
+                const allImageUrls = [...existingImages, ...imageUrls];
+                const allImageIds = editSelectedImages.filter(img => img.isExisting).map(() => '') || [];
+                allImageIds.push(...imageIds);
+
+                submitBtn.textContent = '⏳ Salvando...';
+
+                // Preparar string de modelos
+                let modelsString = 'ÚNICO';
+                if (editSelectedModels && editSelectedModels.length > 0) {
+                    modelsString = editSelectedModels
+                        .slice()
+                        .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
+                        .map(s => s.toUpperCase())
+                        .join(',');
+                }
+
+                const updateObj = {
+                    PRODUTO: title,
+                    PREÇO: price.toString(),
+                    DESCRIPTION: description,
+                    DESCONTO: String(discount),
+                    PARCELAMENTO: `${installments},${interestFreeInstallments}`,
+                    DISPONIBILIDADE: availability,
+                    product_model: modelsString
+                };
+
+                // Atualizar imagens se houver novas
+                if (allImageUrls.length > 0) {
+                    updateObj['IMAGE-URL'] = allImageUrls.join('\\:@\\');
+                    updateObj['IMAGE-ID'] = allImageIds.join('\\:@\\');
+                }
+
+                const { error } = await supabase.from('j-box').update(updateObj).eq('ID', Number(id));
+                if (error) throw error;
+
+                alert('Produto atualizado com sucesso!');
+                closeEditProductModal();
+                const q = productSearchInput?.value || '';
+                if (q) searchProducts(q);
+
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            } catch (err) {
+                console.error('Erro ao atualizar produto:', err);
+                alert('Erro ao atualizar produto: ' + (err.message || err));
+                const submitBtn = editProductForm.querySelector('.btn-submit');
+                submitBtn.disabled = false;
+            }
+        });
+
+        deleteProductBtn?.addEventListener('click', async () => {
+            const id = document.getElementById('editProductId').value;
+            if (!id) return;
+            if (!confirm('Tem certeza que deseja excluir este produto? Esta ação é irreversível.')) return;
+            try {
+                const { error } = await supabase.from('j-box').delete().eq('ID', Number(id));
+                if (error) throw error;
+                alert('Produto excluído com sucesso.');
+                closeEditProductModal();
+                const q = productSearchInput?.value || '';
+                if (q) {
+                    searchProducts(q);
+                } else {
+                    allProductsData = [];
+                    currentProductPage = 1;
+                    totalProductPages = 1;
+                    if (productsGrid) productsGrid.innerHTML = '';
+                    if (productsPaginationBar) productsPaginationBar.style.display = 'none';
+                }
+            } catch (err) {
+                console.error('Erro ao excluir produto:', err);
+                alert('Erro ao excluir produto: ' + (err.message || err));
+            }
+        });
+
+        productSearchBtn?.addEventListener('click', () => searchProducts(productSearchInput.value));
+        productSearchInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') searchProducts(productSearchInput.value); });
+        productsPrevBtn?.addEventListener('click', () => goToProductPage(currentProductPage - 1));
+        productsNextBtn?.addEventListener('click', () => goToProductPage(currentProductPage + 1));
+        manageCloseBtn?.addEventListener('click', closeManageProductsModal);
+        manageCancelBtn?.addEventListener('click', closeManageProductsModal);
+        cancelEditBtn?.addEventListener('click', () => closeEditProductModal());
+        closeEditModalBtn?.addEventListener('click', () => closeEditProductModal());
+        window.addEventListener('click', (e) => { if (e.target === manageProductsModal) closeManageProductsModal(); if (e.target === editProductModal) closeEditProductModal(); });
 
         // Atualizar display do email em diferentes tamanhos de tela
         function updateUserEmailDisplay(email) {
