@@ -1303,8 +1303,24 @@
 
         .product-card-price {
             color: rgb(21, 121, 29);
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: 'DM Sans', Arial, sans-serif;
+        }
+
+        .product-card-original-price {
+            color: var(--muted);
             font-weight: 400;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
+            font-family: 'DM Sans', Arial, sans-serif;
+            text-decoration: line-through;
+            margin-bottom: 4px;
+        }
+
+        .product-card-discount-price {
+            color: rgb(21, 121, 29);
+            font-weight: 600;
+            font-size: 0.85rem;
             font-family: 'DM Sans', Arial, sans-serif;
         }
 
@@ -3597,11 +3613,19 @@
 
         function getProductName(p) { return p.PRODUTO || p.produto || p.title || ''; }
         function getProductPrice(p) { return p['PREÇO'] || p.PRECO || p.preco || '0'; }
+        function getProductDiscount(p) { return parseInt(p.DESCONTO || p.desconto || p.discount || 0) || 0; }
         function getProductFirstImage(p) {
             const urlStr = p['IMAGE-URL'] || p['IMAGE_URL'] || p.imageUrl || '';
             if (!urlStr) return '';
             const parts = urlStr.split(/\\:\@\\|:\@:/);
             return parts[0] || urlStr;
+        }
+
+        function calculateDiscountedPrice(price, discount) {
+            const priceNum = parseFloat(String(price).replace(',', '.')) || 0;
+            const discountNum = Math.max(0, Math.min(100, discount || 0));
+            if (discountNum === 0) return priceNum;
+            return priceNum * (1 - discountNum / 100);
         }
 
         function renderProductsPage() {
@@ -3616,13 +3640,29 @@
                 card.className = 'product-card';
                 const img = getProductFirstImage(prod) || '';
                 const name = escapeHtml(getProductName(prod));
-                const price = formatCurrency(getProductPrice(prod) || '0');
+                const priceRaw = getProductPrice(prod) || '0';
+                const discount = getProductDiscount(prod);
+                const priceNum = parseFloat(String(priceRaw).replace(',', '.')) || 0;
+                const discountedPrice = calculateDiscountedPrice(priceNum, discount);
+                const originalPriceFormatted = formatCurrency(priceNum);
+                const discountedPriceFormatted = formatCurrency(discountedPrice);
                 const imgHtml = img ? `<img class="product-card-image" src="${img}" alt="${name}">` : `<div class="product-card-image" style="display:flex;align-items:center;justify-content:center;background:#f0f0f0;color:#999;">Sem imagem</div>`;
+
+                let priceHtml = '';
+                if (discount > 0) {
+                    priceHtml = `
+                        <div class="product-card-original-price">${originalPriceFormatted}</div>
+                        <div class="product-card-discount-price">${discountedPriceFormatted}</div>
+                    `;
+                } else {
+                    priceHtml = `<div class="product-card-price">${originalPriceFormatted}</div>`;
+                }
+
                 card.innerHTML = `
                     ${imgHtml}
                     <div class="product-card-info">
                         <div class="product-card-name">${name}</div>
-                        <div class="product-card-price">${price}</div>
+                        ${priceHtml}
                     </div>
                 `;
                 card.addEventListener('click', () => openEditProductModal(prod));
@@ -4077,8 +4117,15 @@
 
         function formatCurrency(value) {
             if (value === null || value === undefined) return '';
-            const cleaned = String(value).replace(/\s/g, '').replace(/\./g, '').replace(',', '.').replace(/[^\d\.-]/g, '');
-            const num = parseFloat(cleaned);
+
+            let num;
+            if (typeof value === 'number') {
+                num = value;
+            } else {
+                const cleaned = String(value).replace(/\s/g, '').replace(/\./g, '').replace(',', '.').replace(/[^\d\.-]/g, '');
+                num = parseFloat(cleaned);
+            }
+
             if (isNaN(num)) return value;
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
