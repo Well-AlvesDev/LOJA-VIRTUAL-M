@@ -1252,7 +1252,6 @@
         .product-card:hover {
             border-color: var(--modal-accent);
             box-shadow: 0 4px 16px rgba(29, 99, 211, 0.15);
-            transform: translateY(-2px);
         }
 
         .product-card.selected {
@@ -2689,8 +2688,10 @@
 
                     <p class="form-section-title">Informações</p>
                     <div class="form-group">
-                        <label for="editProductId">ID</label>
-                        <input type="text" id="editProductId" readonly>
+                        <label>ID</label>
+                        <div id="editProductId"
+                            style="padding: 9px 12px; background: var(--modal-input-bg); border: 1.5px solid var(--modal-border); border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--modal-muted); font-family: 'DM Sans', Arial, sans-serif;">
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -3691,16 +3692,35 @@
         function openEditProductModal(prod) {
             if (!editProductModal) return;
             currentEditingProductId = prod.ID || prod.id || null;
-            document.getElementById('editProductId').value = (prod.ID !== undefined ? String(prod.ID) : (prod.id !== undefined ? String(prod.id) : ''));
+            document.getElementById('editProductId').textContent = (prod.ID !== undefined ? String(prod.ID) : (prod.id !== undefined ? String(prod.id) : ''));
             document.getElementById('editProductTitle').value = prod.PRODUTO || prod.produto || '';
+
+            // Formatar preço
             const price = getProductPrice(prod) || '0';
-            document.getElementById('editProductPrice').value = String(price).replace('.', ',');
+            const editPriceInput = document.getElementById('editProductPrice');
+            editPriceInput.value = String(price).replace('.', ',');
+            formatPriceInput(editPriceInput);
+
             document.getElementById('editProductDescription').value = prod.DESCRIPTION || prod.description || '';
-            document.getElementById('editProductDiscount').value = prod.DESCONTO || prod.desconto || '0';
+
+            // Formatar desconto
+            const editDiscountInput = document.getElementById('editProductDiscount');
+            editDiscountInput.value = prod.DESCONTO || prod.desconto || '0';
+            formatDiscountInput(editDiscountInput);
+
             const parcelamento = prod.PARCELAMENTO || prod.parcelamento || '';
             const [installments, interestFree] = parcelamento ? parcelamento.split(',') : ['0', '0'];
-            document.getElementById('editInstallments').value = installments || '0';
-            document.getElementById('editInterestFreeInstallments').value = interestFree || '0';
+
+            // Formatar parcelas
+            const editInstallmentsInputEl = document.getElementById('editInstallments');
+            editInstallmentsInputEl.value = installments || '0';
+            formatInstallmentsInput(editInstallmentsInputEl);
+
+            // Formatar parcelas sem juros
+            const editInterestFreeInstallmentsInputEl = document.getElementById('editInterestFreeInstallments');
+            editInterestFreeInstallmentsInputEl.value = interestFree || '0';
+            formatInstallmentsInput(editInterestFreeInstallmentsInputEl);
+
             const avail = !!prod.DISPONIBILIDADE;
             document.getElementById('editProductAvailability').checked = avail;
 
@@ -3885,7 +3905,7 @@
 
         editProductForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = document.getElementById('editProductId').value;
+            const id = document.getElementById('editProductId').textContent;
             const title = document.getElementById('editProductTitle').value.trim();
             const priceStr = document.getElementById('editProductPrice').value.replace(',', '.');
             const price = parseFloat(priceStr) || 0;
@@ -3976,7 +3996,7 @@
         });
 
         deleteProductBtn?.addEventListener('click', async () => {
-            const id = document.getElementById('editProductId').value;
+            const id = document.getElementById('editProductId').textContent;
             if (!id) return;
             if (!confirm('Tem certeza que deseja excluir este produto? Esta ação é irreversível.')) return;
             try {

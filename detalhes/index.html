@@ -2259,9 +2259,8 @@
                         `;
                         document.head.appendChild(styleEl);
                     }
-                    // Detectar caso especial: apenas um modelo e seu valor é 'ÚNICO' (variações de acentuação/case)
-                    const stripAccents = (s) => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toUpperCase();
-                    const isSingleUnique = modelos.length === 1 && stripAccents(modelos[0]) === 'UNICO';
+                    // Detectar caso especial: apenas um modelo (independentemente do nome)
+                    const isSingleUnique = modelos.length === 1;
 
                     // Expor metadados simples no container para verificação de seleção em outros handlers
                     try {
@@ -2276,7 +2275,7 @@
                                 selected: isSingleUnique ? modelos[0] : '',
                                 options: modelos.slice(),
                                 placeholder: 'Selecione um modelo',
-                                displayText: isSingleUnique ? 'MODELO ÚNICO' : '',
+                                displayText: isSingleUnique ? modelos[0] : '',
                                 disabled: isSingleUnique
                             };
                         },
