@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dona Flor - Moda Feminina</title>
+    <title>JOVIC - Moda Masculina</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <link rel="stylesheet" href="./recursos/css/Barra-de-pesquisa.css">
     <link rel="stylesheet" href="./recursos/css/estilos-para-card-de-produtos.css">
     <link rel="stylesheet" href="./recursos/css/cart.css">
-    <link rel="icon" type="image/png" href="./recursos/identidade/logo.jpg">
+    <link rel="icon" type="image/svg" href="./recursos/identidade/logo.svg">
+    <link rel="shortcut icon" href="./recursos/identidade/logo.svg">
+    <link rel="apple-touch-icon" href="./recursos/identidade/logo.svg">
     <style>
         * {
             margin: 0;
@@ -58,7 +60,7 @@
 
         /* Navbar */
         nav {
-            background-color: #ffd0e9;
+            background-color: #061636;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
@@ -100,7 +102,7 @@
         }
 
         .nav-link {
-            color: #730a52;
+            color: #f3f3f3;
             text-decoration: none;
             font-weight: 500;
             padding: 10px 5px;
@@ -187,7 +189,7 @@
         .hamburger span {
             width: 23px;
             height: 2.3px;
-            background-color: #670e49;
+            background-color: #f1f1f1;
             border-radius: 2px;
             transition: all 0.1s ease;
         }
@@ -981,8 +983,8 @@
             .banner img {
                 width: 105%;
                 margin-top: 0px;
-                
-                
+
+
             }
         }
 
@@ -1095,8 +1097,8 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="./recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
-                        alt="logotipo da empresa/loja" style="width: 190px;">
+                    <img src="./recursos/identidade/Screenshot_20260616_191620_Instagram.jpg"
+                        alt="logotipo da empresa/loja" style="width: 100px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -1266,16 +1268,18 @@
     <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
     <!-- SEÇÃO DE PRODUTOS -->
     <main>
-        <div id="text-animator"
-            style="text-align: center; min-height: 50px; display: flex; align-items: center; justify-content: center; padding: 0 20px;">
-            <h2
-                style="font-size: clamp(13px, 3vw, 22px); font-weight: 400; color: #3f3f3f; margin: 0; letter-spacing: 0.5px; max-width: 100%; word-wrap: break-word;">
-                {{ textoAnimado }}<span v-if="estaDigitando" class="cursor-blink"></span>
-            </h2>
-        </div>
-
+        <p
+            style="text-align: center; font-size: 14px; color: #f1f1f1; margin: -5px 0; background-color: #11447e; padding: 10px; border-radius: 4px;">
+            Compra 100% segura • Enviamos para todo o Brasil
+        </p>
         <section class="produtos-destaque">
             <div id="produtosLoader" class="produtos-skeleton-loader">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
                 <div class="skeleton-card"></div>
                 <div class="skeleton-card"></div>
                 <div class="skeleton-card"></div>
@@ -1624,8 +1628,7 @@
                 async initBanners() {
                     const fromMeta = await this.loadConfigBanners();
                     const urls = (fromMeta && fromMeta.length) ? fromMeta : [
-                        './recursos/identidade/banner.webp',
-                        './recursos/identidade/banner2.webp'
+                        './recursos/identidade/banner3.webp'
                     ];
 
                     this.banners = urls.map(u => ({ src: u, displaySrc: u, alt: '' }));
@@ -1682,79 +1685,6 @@
                 this.stopTimer();
             }
         }).mount('#banner-app');
-
-        // ===== VUE APP PARA ANIMAÇÃO DE TEXTO COM TYPEWRITER =====
-        const textAnimatorApp = Vue.createApp({
-            data() {
-                return {
-                    textoAnimado: '',
-                    frases: ["Ei, vem dar uma olhadinha... 👀",
-                        "🫢 Esses looks estão um ARRASO, vem ver!",
-                        "Temos o look perfeito para você! ✨",
-                        "Floresça com nossos looks incríveis! 🌸"],
-                    indiceAtual: 0,
-                    velocidadeDigitacao: 20,
-                    velocidadeApagamento: 19,
-                    pausaAposFrase: 4500,
-                    pausaAntesDeContinuar: 400,
-                    estaDigitando: true
-                };
-            },
-            methods: {
-                async animar() {
-                    while (true) {
-                        const frase = this.frases[this.indiceAtual];
-                        this.estaDigitando = true;
-
-                        // Digitar com variação natural
-                        for (let i = 0; i <= frase.length; i++) {
-                            this.textoAnimado = frase.substring(0, i);
-                            // Variação aleatória de velocidade (humano)
-                            const variacaao = Math.random() * 40 - 20;
-                            await this.delay(this.velocidadeDigitacao + variacaao);
-                        }
-
-                        // Pausa com cursor piscando
-                        this.estaDigitando = false;
-                        await this.delay(this.pausaAposFrase);
-
-                        // Apagar com velocidade diferente
-                        this.estaDigitando = true;
-                        for (let i = frase.length; i >= 0; i--) {
-                            this.textoAnimado = frase.substring(0, i);
-                            const variacaao = Math.random() * 20 - 10;
-                            await this.delay(this.velocidadeApagamento + variacaao);
-                        }
-
-                        // Próxima frase
-                        this.indiceAtual = (this.indiceAtual + 1) % this.frases.length;
-                        await this.delay(this.pausaAntesDeContinuar);
-                    }
-                },
-
-                delay(ms) {
-                    return new Promise(resolve => setTimeout(resolve, ms));
-                }
-            },
-
-            mounted() {
-                // Carregar frases do metadados.json
-                fetchMetadados()
-                    .then(data => {
-                        const textConfig = data.find(item => item.elemento === 'typewriter-text-home');
-                        if (textConfig && textConfig.frases && Array.isArray(textConfig.frases)) {
-                            this.frases = textConfig.frases;
-                        }
-                        this.animar();
-                    })
-                    .catch(error => {
-                        console.error('Erro ao carregar configuração de texto animado:', error);
-                        this.animar();
-                    });
-            }
-        });
-
-        textAnimatorApp.mount('#text-animator');
 
         // Selecionar elementos da busca
         const buscaInput = document.getElementById('busca-input');
@@ -1871,20 +1801,20 @@
         }
 
         async function carregarSugestoes() {
-            // Usar as palavras-chave carregadas em vez do xrl.json
+            // Sugestões são palavras únicas dos produtos (primeira e segunda palavra)
             if (sugestoesCache) return sugestoesCache;
 
             try {
-                // Carregar ambas as listas de palavras
-                const palavras1 = await carregarPalavrasUnicas();
-                const palavras2 = await carregarDuasPalavrasUnicas();
+                const [palavras, duasPalavras] = await Promise.all([
+                    carregarPalavrasUnicas(),
+                    carregarDuasPalavrasUnicas()
+                ]);
 
-                // Combinar ambas as listas (duas palavras primeiro para melhor UX)
-                const lista = [...new Set([...palavras2, ...palavras1])];
-
-                sugestoesCache = lista;
-                logManager.log(`✓ ${lista.length} sugestões carregadas para barra de pesquisa`);
-                return lista;
+                // Combinar palavras únicas com duas palavras e remover duplicatas
+                const combined = [...new Set([...palavras, ...duasPalavras])];
+                sugestoesCache = combined;
+                logManager.log(`✓ ${combined.length} sugestões (palavras-chave) carregadas para barra de pesquisa`);
+                return combined;
             } catch (err) {
                 logManager.warn('Não foi possível carregar sugestões da barra:', err);
                 sugestoesCache = [];
@@ -1901,6 +1831,38 @@
 
         let palavrasUnicasCache = null;
         let duasPalavrasCache = null;
+
+        /**
+         * Remove emojis de um texto
+         */
+        function limparEmojis(texto) {
+            if (!texto) return texto;
+            try {
+                // Usa Unicode Property Escapes (suportado em navegadores modernos)
+                return String(texto).replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+            } catch (e) {
+                // Fallback para navegadores antigos: remove ranges comuns de emojis
+                return String(texto)
+                    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '') // Surrogate pairs
+                    .replace(/[\u{1F000}-\u{1F9FF}]/gu, '')         // Emojis
+                    .replace(/[\u{2600}-\u{27BF}]/gu, '')           // Símbolos
+                    .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')         // Misc symbols
+                    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')         // Transport
+                    .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')         // Flags
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+        }
+
+        /**
+         * Valida se uma palavra é válida para ser categoria
+         * Rejeita: strings vazias, apenas espaços, ou com menos de 2 caracteres
+         */
+        function ehCategoriaValida(palavra) {
+            if (!palavra) return false;
+            const limpa = String(palavra).trim();
+            return limpa.length >= 2 && !/^\s*$/.test(limpa);
+        }
 
         /**
          * Carrega a primeira palavra única de todos os produtos do Supabase
@@ -1934,19 +1896,26 @@
                     if (err) throw new Error(`Erro ao carregar produtos: ${err.message}`);
                     if (!produtos || produtos.length === 0) throw new Error('Nenhum produto encontrado');
 
-                    // Processar e extrair primeiras palavras únicas
-                    const palavras = new Set();
+                    // Processar e extrair primeiras palavras únicas (desduplicando por termo normalizado)
+                    const palavrasMap = new Map(); // Chave: termo normalizado, Valor: termo original
                     produtos.forEach(item => {
                         if (item.PRODUTO) {
-                            const primeira = item.PRODUTO.trim().split(/\s+/)[0];
-                            if (primeira) palavras.add(primeira);
+                            const primeira = limparEmojis(item.PRODUTO.trim().split(/\s+/)[0]);
+                            // Validar: não adicionar vazio, espaços ou menos de 2 caracteres
+                            if (ehCategoriaValida(primeira)) {
+                                const normalizado = normalizarTermo(primeira);
+                                // Adicionar apenas se a versão normalizada não existe ainda
+                                if (!palavrasMap.has(normalizado)) {
+                                    palavrasMap.set(normalizado, primeira);
+                                }
+                            }
                         }
                     });
 
-                    const resultado = Array.from(palavras).sort();
+                    const resultado = Array.from(palavrasMap.values()).sort((a, b) => a.localeCompare(b, 'pt-BR'));
                     palavrasUnicasCache = resultado;
                     SessionCacheManager.set(CACHE_KEY_PALAVRAS_UNICAS, resultado, CACHE_TTL_5_HORAS_MS);
-                    logManager.log(`✓ ${resultado.length} primeiras palavras carregadas e cacheadas`);
+                    logManager.log(`✓ ${resultado.length} primeiras palavras carregadas e cacheadas (desduplicadas)`);
                     return resultado;
                 }
 
@@ -1964,7 +1933,51 @@
         }
 
         /**
+         * Lista de conjunções e preposições em português que não contam como "palavras significativas"
+         */
+        const CONJUNCOES_PT = new Set([
+            'e', 'ou', 'mas', 'porém', 'contudo', 'todavia', 'entretanto', 'no', 'na',
+            'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
+            'para', 'por', 'com', 'sem', 'sob', 'sobre', 'entre', 'até', 'desde',
+            'a', 'ao', 'aos', 'à', 'às', 'é', 'são', 'está', 'estão'
+        ]);
+
+        /**
+         * Verifica se uma palavra é uma conjunção ou preposição
+         */
+        function ehConjuncao(palavra) {
+            if (!palavra) return false;
+            return CONJUNCOES_PT.has(String(palavra).toLowerCase().trim());
+        }
+
+        /**
+         * Extrai N palavras significativas de um nome de produto, ignorando conjunções na contagem
+         * Inclui todas as palavras (conjunções e significativas) mas conta apenas as significativas
+         */
+        function extrairPalavrasSignificativas(nome, quantidadeSignificativas = 2) {
+            if (!nome) return '';
+            const palavras = String(nome).trim().split(/\s+/);
+            if (palavras.length === 0) return '';
+
+            let significativasEncontradas = 0;
+            let indiceFinal = 0;
+
+            for (let i = 0; i < palavras.length; i++) {
+                if (!ehConjuncao(palavras[i])) {
+                    significativasEncontradas++;
+                }
+                indiceFinal = i;
+                if (significativasEncontradas >= quantidadeSignificativas) {
+                    break;
+                }
+            }
+
+            return palavras.slice(0, indiceFinal + 1).join(' ');
+        }
+
+        /**
          * Carrega primeira + segunda palavra única de todos os produtos do Supabase
+         * Se a segunda palavra for uma conjunção, estende para 3-4 palavras significativas
          * Usa cache localStorage com TTL de 5 horas
          */
         async function carregarDuasPalavrasUnicas() {
@@ -1989,26 +2002,98 @@
                 if (error) throw new Error(`Erro ao carregar produtos: ${error.message}`);
                 if (!produtos || produtos.length === 0) throw new Error('Nenhum produto encontrado');
 
-                // Processar e extrair primeira + segunda palavras únicas
-                const duasPalavras = new Set();
+                // Processar e extrair primeira + segunda palavras únicas (desduplicando por termo normalizado)
+                const duasPalavrasMap = new Map(); // Chave: termo normalizado, Valor: termo original
                 produtos.forEach(item => {
                     if (item.PRODUTO) {
                         const palavras = item.PRODUTO.trim().split(/\s+/);
                         if (palavras.length >= 2) {
-                            const combinacao = `${palavras[0]} ${palavras[1]}`;
-                            duasPalavras.add(combinacao);
+                            let combinacao;
+                            // Verificar se a segunda palavra é uma conjunção
+                            if (ehConjuncao(palavras[1])) {
+                                // Se for conjunção, extrair 3-4 palavras significativas
+                                combinacao = limparEmojis(extrairPalavrasSignificativas(item.PRODUTO, 4));
+                            } else {
+                                // Caso contrário, manter apenas 2 palavras
+                                combinacao = limparEmojis(`${palavras[0]} ${palavras[1]}`);
+                            }
+
+                            if (ehCategoriaValida(combinacao)) {
+                                const normalizado = normalizarTermo(combinacao);
+                                // Adicionar apenas se a versão normalizada não existe ainda
+                                if (!duasPalavrasMap.has(normalizado)) {
+                                    duasPalavrasMap.set(normalizado, combinacao);
+                                }
+                            }
                         }
                     }
                 });
 
-                const resultado = Array.from(duasPalavras).sort();
+                const resultado = Array.from(duasPalavrasMap.values()).sort((a, b) => a.localeCompare(b, 'pt-BR'));
                 duasPalavrasCache = resultado;
                 SessionCacheManager.set(CACHE_KEY_DUAS_PALAVRAS, resultado, CACHE_TTL_5_HORAS_MS);
-                logManager.log(`✓ ${resultado.length} combinações de duas palavras carregadas e cacheadas`);
+                logManager.log(`✓ ${resultado.length} combinações de duas/múltiplas palavras carregadas e cacheadas (desduplicadas)`);
                 return resultado;
 
             } catch (err) {
                 logManager.error('❌ Erro ao carregar duas palavras:', err);
+                return [];
+            }
+        }
+
+        const CACHE_KEY_NOMES_PRODUTOS = 'nomes_produtos_busca';
+        let nomesProdutosCache = null;
+
+        /**
+         * Carrega os nomes COMPLETOS de todos os produtos disponíveis do Supabase.
+         * Esta é a fonte usada pelo mecanismo de sugestões da barra de pesquisa:
+         * em vez de sugerir apenas a 1ª/2ª palavra do produto, sugerimos o nome
+         * completo, permitindo que o usuário veja exatamente o que vai encontrar.
+         * Usa cache em memória + sessionStorage com TTL de 5 horas.
+         */
+        async function carregarNomesProdutos() {
+            if (nomesProdutosCache) return nomesProdutosCache;
+
+            const cached = SessionCacheManager.get(CACHE_KEY_NOMES_PRODUTOS);
+            if (cached) {
+                nomesProdutosCache = cached;
+                logManager.log('📝 Nomes de produtos carregados do cache sessionStorage');
+                return cached;
+            }
+
+            try {
+                logManager.log('🔄 Carregando nomes de produtos do Supabase para sugestões...');
+
+                const { data: produtos, error } = await window.supabaseClient
+                    .from('j-box')
+                    .select('"PRODUTO"')
+                    .eq('"DISPONIBILIDADE"', true);
+
+                if (error) throw new Error(`Erro ao carregar produtos: ${error.message}`);
+                if (!produtos || produtos.length === 0) throw new Error('Nenhum produto encontrado');
+
+                // Carregar nomes desduplicando por termo normalizado
+                const nomesMap = new Map(); // Chave: termo normalizado, Valor: termo original
+                produtos.forEach(item => {
+                    if (!item.PRODUTO) return;
+                    const nome = limparEmojis(String(item.PRODUTO).trim().replace(/\s+/g, ' '));
+                    if (ehCategoriaValida(nome)) {
+                        const normalizado = normalizarTermo(nome);
+                        // Adicionar apenas se a versão normalizada não existe ainda
+                        if (!nomesMap.has(normalizado)) {
+                            nomesMap.set(normalizado, nome);
+                        }
+                    }
+                });
+
+                const resultado = Array.from(nomesMap.values()).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+                nomesProdutosCache = resultado;
+                SessionCacheManager.set(CACHE_KEY_NOMES_PRODUTOS, resultado, CACHE_TTL_5_HORAS_MS);
+                logManager.log(`✓ ${resultado.length} nomes de produtos carregados e cacheados (desduplicados)`);
+                return resultado;
+
+            } catch (err) {
+                logManager.error('❌ Erro ao carregar nomes de produtos:', err);
                 return [];
             }
         }
@@ -2021,7 +2106,8 @@
                 logManager.log('🔄 Pré-carregando todas as palavras-chave...');
                 await Promise.all([
                     carregarPalavrasUnicas(),
-                    carregarDuasPalavrasUnicas()
+                    carregarDuasPalavrasUnicas(),
+                    carregarNomesProdutos()
                 ]);
                 logManager.log('✓ Palavras-chave pré-carregadas com sucesso');
             } catch (err) {
@@ -2063,14 +2149,26 @@
             }).join(' ');
         }
 
+        // Escapa caracteres especiais de HTML antes de inserir via innerHTML
+        // (os nomes de produto vêm do banco de dados, então tratamos como texto não confiável)
+        function escaparHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function gerarVariantesSimples(token) {
             const norm = normalizarTermo(token);
             const variants = new Set([norm]);
 
-            // heurísticas comuns para PT-BR
+            // heurísticas comuns para PT-BR (singular/plural)
             if (/ões$|ães$|ãos$/.test(norm)) variants.add(norm.replace(/(ões|ães|ãos)$/, 'ao')); // ão <-> ões/ães/ãos
             if (/ns$/.test(norm)) variants.add(norm.replace(/ns$/, 'm'));                         // homem <- homens
             if (/zes$/.test(norm)) variants.add(norm.replace(/zes$/, 'z'));                       // luz <- luzes
+            if (/is$/.test(norm) && norm.length > 3) variants.add(norm.replace(/is$/, 'l'));      // anel <- aneis
 
             // remoção/adição simples de 's' (casas <-> casa)
             if (norm.endsWith('s') && norm.length > 3) variants.add(norm.slice(0, -1));
@@ -2079,9 +2177,79 @@
             return Array.from(variants);
         }
 
-        // cache leve para as variantes normalizadas das sugestões (evita recomputar em cada tecla)
+        /**
+         * Distância de Levenshtein (número mínimo de inserções/remoções/substituições
+         * para transformar 'a' em 'b'). Usada para tolerar erros de digitação nas
+         * sugestões (ex: "vstido" ainda encontra "vestido").
+         * Implementação iterativa com duas linhas — O(n*m), rápida para strings curtas.
+         */
+        function levenshtein(a, b) {
+            if (a === b) return 0;
+            const la = a.length, lb = b.length;
+            if (la === 0) return lb;
+            if (lb === 0) return la;
+            // limite de segurança: nomes de produto não costumam passar de ~80 chars
+            let prevRow = new Array(lb + 1);
+            let currRow = new Array(lb + 1);
+            for (let j = 0; j <= lb; j++) prevRow[j] = j;
+
+            for (let i = 1; i <= la; i++) {
+                currRow[0] = i;
+                const ca = a.charCodeAt(i - 1);
+                for (let j = 1; j <= lb; j++) {
+                    const cb = b.charCodeAt(j - 1);
+                    const cost = ca === cb ? 0 : 1;
+                    currRow[j] = Math.min(
+                        prevRow[j] + 1,      // remoção
+                        currRow[j - 1] + 1,  // inserção
+                        prevRow[j - 1] + cost // substituição
+                    );
+                }
+                [prevRow, currRow] = [currRow, prevRow];
+            }
+            return prevRow[lb];
+        }
+
+        // Limite de distância tolerada conforme o tamanho da query: queries curtas
+        // toleram menos erro (evita "sp" virar match de tudo), queries longas toleram mais.
+        function limiteFuzzy(len) {
+            if (len <= 3) return 0;
+            if (len <= 5) return 1;
+            if (len <= 9) return 2;
+            return 3;
+        }
+
+        // cache leve para as variantes normalizadas e tokens das sugestões
+        // (evita recomputar a cada tecla digitada — a lista de produtos não muda durante a sessão)
         const _sugestoesNormCache = new Map();
 
+        function obterDadosSugestao(s) {
+            let dados = _sugestoesNormCache.get(s);
+            if (!dados) {
+                const norm = normalizarTermo(s);
+                dados = {
+                    norm,
+                    variantes: gerarVariantesSimples(s),
+                    palavras: norm.split(/\s+/).filter(Boolean)
+                };
+                _sugestoesNormCache.set(s, dados);
+            }
+            return dados;
+        }
+
+        /**
+         * Motor de sugestões de pesquisa.
+         * `lista` contém os nomes COMPLETOS dos produtos (coluna PRODUTO).
+         * Estratégia de pontuação, da mais forte para a mais fraca:
+         *   1) Igualdade exata com o nome do produto
+         *   2) Nome do produto começa com a query
+         *   3) Alguma palavra do nome começa com a query (ex: "bolsa" em "Mini Bolsa")
+         *   4) Query aparece como substring em qualquer lugar do nome
+         *   5) Correspondência aproximada (tolera erros de digitação) via Levenshtein,
+         *      comparando a query com cada palavra do nome do produto
+         * Em todos os casos, matches mais próximos do início do texto e nomes mais
+         * curtos (mais específicos) ganham prioridade no empate.
+         */
         function filtrar(q, lista) {
             if (!q) return [];
             const raw = String(q).trim();
@@ -2090,79 +2258,83 @@
 
             const qNorm = normalizarTermo(raw);
             const queryVariants = gerarVariantesSimples(raw);
+            const fuzzyMax = limiteFuzzy(qNorm.length);
 
             const scored = [];
 
             for (const s of lista) {
-                const sugVars = _sugestoesNormCache.get(s) || (function () {
-                    const v = gerarVariantesSimples(s);
-                    _sugestoesNormCache.set(s, v);
-                    return v;
-                })();
+                const { norm: sNorm, variantes: sugVars, palavras } = obterDadosSugestao(s);
 
                 let score = 0;
                 let bestPos = Infinity;
 
-                // Exact match (highest priority)
-                for (const sv of sugVars) {
-                    if (sv === qNorm) {
-                        score += 200;
-                        bestPos = 0;
-                        break;
-                    }
-                }
-
-                // Prefix matches (start of suggestion)
-                if (score === 0) {
-                    for (const sv of sugVars) {
-                        if (sv.startsWith(qNorm)) {
-                            score += 120;
+                // 1) Igualdade exata (considerando variantes de singular/plural)
+                if (queryVariants.includes(sNorm) || sugVars.includes(qNorm)) {
+                    score = 300;
+                    bestPos = 0;
+                } else {
+                    // 2) Nome do produto começa com a query
+                    for (const qv of queryVariants) {
+                        if (sNorm.startsWith(qv)) {
+                            score = Math.max(score, 220);
                             bestPos = 0;
                             break;
                         }
                     }
-                }
 
-                // Match at start of any word inside the suggestion (e.g. query='bolsa' matches 'Bolsa Baguete' and 'Mini Bolsa')
-                if (score === 0) {
-                    for (const sv of sugVars) {
-                        const parts = sv.split(/\s+/);
-                        for (const p of parts) {
-                            if (p.startsWith(qNorm)) {
-                                score += 100;
-                                bestPos = Math.min(bestPos, sv.indexOf(p));
-                                break;
+                    // 3) Alguma palavra do nome começa com a query
+                    if (score === 0) {
+                        for (let i = 0; i < palavras.length; i++) {
+                            const p = palavras[i];
+                            for (const qv of queryVariants) {
+                                if (p.startsWith(qv)) {
+                                    // palavras mais próximas do início do nome pontuam mais
+                                    score = Math.max(score, 160 - Math.min(i, 5) * 8);
+                                    bestPos = Math.min(bestPos, sNorm.indexOf(p));
+                                    break;
+                                }
                             }
                         }
-                        if (score >= 100) break;
                     }
-                }
 
-                // Substring matches
-                if (score === 0) {
-                    for (const sv of sugVars) {
-                        const idx = sv.indexOf(qNorm);
+                    // 4) Substring em qualquer posição do nome
+                    if (score === 0) {
+                        const idx = sNorm.indexOf(qNorm);
                         if (idx !== -1) {
-                            // earlier occurrences are better
-                            score += Math.max(40, 60 - Math.min(40, idx));
-                            bestPos = Math.min(bestPos, idx);
-                            break;
+                            score = Math.max(40, 100 - idx);
+                            bestPos = idx;
+                        }
+                    }
+
+                    // 5) Correspondência aproximada (erro de digitação) — só roda se nada
+                    // mais forte deu match, e só compara contra palavras de tamanho parecido
+                    // (evita custo desnecessário e falsos positivos)
+                    if (score === 0 && fuzzyMax > 0) {
+                        let melhorDist = Infinity;
+                        for (let i = 0; i < palavras.length; i++) {
+                            const p = palavras[i];
+                            if (Math.abs(p.length - qNorm.length) > fuzzyMax) continue;
+                            const dist = levenshtein(qNorm, p);
+                            if (dist < melhorDist) melhorDist = dist;
+                        }
+                        if (melhorDist <= fuzzyMax) {
+                            score = Math.max(20, 70 - melhorDist * 15);
+                            bestPos = sNorm.indexOf(palavras[0]) === -1 ? 0 : 0;
                         }
                     }
                 }
 
-
                 if (score > 0) {
-                    // small preference for shorter labels and for suggestions where the first word equals the query
-                    const firstWord = normalizarTermo(String(s).split(/\s+/)[0] || '');
-                    if (firstWord === qNorm) score += 8;
-                    score += Math.max(0, 6 - String(s).length / 8);
+                    // pequena preferência por nomes mais curtos (mais específicos/diretos)
+                    // e por nomes cuja primeira palavra é exatamente a query
+                    if (palavras[0] === qNorm) score += 10;
+                    score += Math.max(0, 6 - s.length / 12);
 
-                    scored.push({ s, score, pos: bestPos, len: String(s).length });
+                    scored.push({ s, score, pos: bestPos, len: s.length });
                 }
             }
 
-            // ordenar por score desc, posição asc (earlier match), comprimento asc, texto
+            // ordenar por score desc, posição asc (match mais cedo no texto), comprimento asc, texto
             scored.sort((a, b) => {
                 if (b.score !== a.score) return b.score - a.score;
                 if (a.pos !== b.pos) return a.pos - b.pos;
@@ -2170,7 +2342,7 @@
                 return a.s.localeCompare(b.s, 'pt-BR');
             });
 
-            // retornar strings únicas, permitir um pool maior (rolável) mas visualmente mostramos 4 — limitar pool a 12
+            // retornar strings únicas; pool maior que o visível (rolável), limitado a 12
             const out = [];
             for (const item of scored) {
                 if (out.indexOf(item.s) === -1) out.push(item.s);
@@ -2208,7 +2380,7 @@
 
             sugestoesList.innerHTML = items.map((s, idx) => `
                 <li id="sug-${idx}" role="option" data-index="${idx}" class="sugestao-item" tabindex="-1" aria-selected="false">
-                    <span class="sug-text">${toTitleCase(s)}</span>
+                    <span class="sug-text">${escaparHtml(s)}</span>
                     <i class="ri-arrow-right-line sugestao-icon" aria-hidden="true"></i>
                 </li>
             `).join('');
@@ -2906,7 +3078,10 @@
             }
 
             // Carregar categorias (otimizado com cache)
-            const categorias = await carregarCategorias();
+            let categorias = await carregarCategorias();
+
+            // Filtro adicional de segurança: remover categorias inválidas
+            categorias = categorias.filter(cat => ehCategoriaValida(cat));
 
             // Criar contêiner do dropdown
             const container = document.createElement('div');
@@ -3083,11 +3258,14 @@
         // Carregar Submenu de Produtos da Nav
         async function carregarSubmenuProdutos() {
             try {
-                const categorias = await carregarCategorias();
+                let categorias = await carregarCategorias();
 
                 if (!categorias || categorias.length === 0) {
                     return;
                 }
+
+                // Filtro adicional de segurança: remover categorias inválidas
+                categorias = categorias.filter(cat => ehCategoriaValida(cat));
 
                 const submenu = document.querySelector('.submenu');
 
@@ -3134,7 +3312,7 @@
             
                 <div class="footer-container">
                     <div class="footer-section">
-                        <h3> Dona Flor - moda feminina</h3>
+                        <h3>JOVIC - Moda masculina</h3>
                         <p>Qualidade, estilo e preço justo para você.</p>
                         <div class="footer-social">
                             <a href="https://instagram.com" target="_blank" title="Instagram"><i class="ri-instagram-line"></i></a>
@@ -3148,7 +3326,7 @@
                 <div class="footer-bottom">
                       <div class="footer-adm-btn" style="margin-top: -20px; text-decoration: underline; font-size: 11px; margin-bottom: 10px;">
                             <a style="color: blue;" href="./login.html" class="btn btn-primary">Área Administrativa</a> </div>
-                    <p>&copy; 2026 Dona Flor - Moda Feminina <br> Todos os direitos reservados. | Desenvolvido com <i class="ri-heart-fill" style="color: #e22a8c;"></i> para você.</p>
+                    <p>&copy; 2026 Use JOVIC - Moda Masculina <br> Todos os direitos reservados. | Desenvolvido com <i class="ri-heart-fill" style="color: blue;"></i> para você.</p>
                 </div>
             `;
 
@@ -3159,8 +3337,8 @@
 
         // ===== INICIALIZAÇÃO DO SUPABASE =====
         if (!window.supabaseClient) {
-            const SUPABASE_URL = 'https://hovfcntzthahwszjaxsw.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvdmZjbnR6dGhhaHdzempheHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDgxNDUsImV4cCI6MjA5Mzc4NDE0NX0.Pss5O_ykTybPUsuZCCln72Pq5dkTGMQ1G1kXR4HOVyw';
+            const SUPABASE_URL = 'https://jjogtnqqjkwsyzegotyb.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impqb2d0bnFxamt3c3l6ZWdvdHliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MDI0MjYsImV4cCI6MjA5NzI3ODQyNn0.OAu9OrVN04l7N-OM4NQ8n3O2Mgw9Bq4_5ulb7mQKwh8';
             window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 

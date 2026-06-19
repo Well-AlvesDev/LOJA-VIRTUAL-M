@@ -17,7 +17,7 @@ const MP_CONFIG = {
     // ✅ Access Token REMOVIDO do frontend — agora fica seguro na Edge Function do Supabase.
     //    Substitua a URL abaixo pela URL da sua Edge Function após o deploy.
     //    Formato: https://<SEU_PROJECT_REF>.supabase.co/functions/v1/mp-checkout
-    edgeFunctionUrl: 'https://hovfcntzthahwszjaxsw.supabase.co/functions/v1/mp-checkout',
+    edgeFunctionUrl: 'https://jjogtnqqjkwsyzegotyb.supabase.co/functions/v1/mp-checkout',
 
     // Intervalo de polling em ms (verifica status do pagamento a cada X ms)
     // Aumentado para 5 segundos para reduzir requisições desnecessárias
@@ -46,6 +46,17 @@ function parsePreco(valor) {
     // Só ponto → decimal padrão: "91.08"
     return parseFloat(str) || 0;
 }
+
+// ================================================================
+//  HELPER: Exibir modelo sem a quantidade após o asterisco
+// ================================================================
+function exibirModelo(modelo) {
+    if (!modelo) return null;
+    const partes = String(modelo).split('*');
+    return partes[0].trim() || null;
+}
+
+
 
 
 // Helper: chama a Edge Function com uma action específica
@@ -98,7 +109,7 @@ function abrirCheckout(produtosArray, paramPreco, paramId) {
         _co.product_ids = produtosArray.map(p => parseInt(p.id) || 0).filter(id => id > 0);
 
         _co.nomeProduto = quantidadeReal === 1
-            ? (produtosArray[0].modelo ? `${produtosArray[0].nome} - ${produtosArray[0].modelo}` : produtosArray[0].nome)
+            ? (produtosArray[0].modelo ? `${produtosArray[0].nome} - ${exibirModelo(produtosArray[0].modelo)}` : produtosArray[0].nome)
             : `${quantidadeReal} produtos`;
 
         _co.idProduto = quantidadeReal === 1 ? _co.product_ids[0] : null;
@@ -236,9 +247,10 @@ function renderizarProdutosCheckout() {
         const preco = parsePreco(p.preco);
         const qtd = p.quantidade || 1;
         const subtotal = preco * qtd;
+        const modeloExibicao = p.modelo ? p.modelo.split('*')[0].trim() : null;
         return `
                         <tr>
-                            <td>${p.nome}${p.modelo ? ' - ' + p.modelo : ''}</td>
+                            <td>${p.nome}${modeloExibicao ? ' - ' + modeloExibicao : ''}</td>
                             <td>${qtd}</td>
                             <td>R$ ${preco.toFixed(2).replace('.', ',')}</td>
                             <td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
@@ -609,7 +621,13 @@ async function verificarStatusPagamento(paymentId) {
             nome_produto: _co.nomeProduto,
             valor_produto: _co.precoProduto,
             product_ids: _co.product_ids,
-            produtos: _co.produtos.map(p => ({ id: p.id, nome: p.nome, preco: p.preco, quantidade: p.quantidade, modelo: (p.modelo || null) })),
+            produtos: _co.produtos.map(p => ({
+                id: p.id,
+                nome: p.nome,
+                preco: p.preco,
+                quantidade: p.quantidade,
+                modelo: p.modelo ? p.modelo.split('*')[0].trim() : null
+            })),
         });
         const status = data.status;
 
@@ -665,7 +683,13 @@ async function processarPagamentoPIX() {
             nome_produto: _co.nomeProduto,
             product_id: _co.idProduto,
             product_ids: _co.product_ids,
-            produtos: _co.produtos.map(p => ({ id: p.id, nome: p.nome, preco: p.preco, quantidade: p.quantidade, modelo: (p.modelo || null) })),
+            produtos: _co.produtos.map(p => ({
+                id: p.id,
+                nome: p.nome,
+                preco: p.preco,
+                quantidade: p.quantidade,
+                modelo: p.modelo ? p.modelo.split('*')[0].trim() : null
+            })),
         });
 
         _co.paymentId = data.id;

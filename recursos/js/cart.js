@@ -14,6 +14,27 @@ const CartSystem = (() => {
     let carrinhoData = null;
     const ultimoCliquePorProduto = new Map(); // Rastrear últimos cliques
 
+    // ===== EXTRAÇÃO DE QUANTIDADE MÁXIMA DO MODELO =====
+    // Extrai a quantidade máxima após o asterisco (*)
+    // Ex: "Tamanho P * 5 un" -> 5
+    function extrairQtdMaximaDoModelo(modelo) {
+        if (!modelo) return MAX_QUANTIDADE_POR_PRODUTO;
+        const partes = String(modelo).split('*');
+        if (partes.length > 1) {
+            const numStr = partes[1].trim().split(/\s+/)[0]; // Pega primeiro número
+            const num = parseInt(numStr);
+            return !isNaN(num) && num > 0 ? num : MAX_QUANTIDADE_POR_PRODUTO;
+        }
+        return MAX_QUANTIDADE_POR_PRODUTO;
+    }
+
+    // Remove tudo após o asterisco (*) do modelo - apenas para exibição
+    function exibirModelo(modelo) {
+        if (!modelo) return null;
+        const partes = String(modelo).split('*');
+        return partes[0].trim() || null;
+    }
+
     // ===== INICIALIZAR =====
     function init() {
         // Criar cliente Supabase se disponível
@@ -69,6 +90,9 @@ const CartSystem = (() => {
             return false;
         }
 
+        // Extrair a quantidade máxima permitida deste modelo
+        const qtdMaximaModelo = extrairQtdMaximaDoModelo(modelo);
+
         // ===== PROTEÇÃO CONTRA CLIQUES DUPLOS =====
         const agora = Date.now();
         const clickKey = `${produtoId}||${modelo || ''}`;
@@ -88,10 +112,10 @@ const CartSystem = (() => {
         const indexExistente = carrinhoData.findIndex(item => String(item.id) === String(produtoId) && ((item.modelo || null) === (modelo || null)));
 
         if (indexExistente >= 0) {
-            // Verificar se atingiu o máximo
-            if (carrinhoData[indexExistente].quantidade >= MAX_QUANTIDADE_POR_PRODUTO) {
-                console.warn(`⚠️ Quantidade máxima (${MAX_QUANTIDADE_POR_PRODUTO}) atingida para "${nomeProduto}"`);
-                mostrarNotificacaoErro(`Máximo de ${MAX_QUANTIDADE_POR_PRODUTO} unidades por produto`);
+            // Verificar se atingiu o máximo (baseado no estoque do modelo)
+            if (carrinhoData[indexExistente].quantidade >= qtdMaximaModelo) {
+                console.warn(`⚠️ Quantidade máxima (${qtdMaximaModelo}) atingida para "${nomeProduto}"`);
+                mostrarNotificacaoErro(`Máximo de ${qtdMaximaModelo} unidades disponíveis para este modelo`);
                 return false;
             }
             // Aumentar quantidade
@@ -142,12 +166,13 @@ const CartSystem = (() => {
         if (!produto) return false;
 
         const quantidadeInt = parseInt(novaQuantidade);
+        const qtdMaximaModelo = extrairQtdMaximaDoModelo(produto.modelo);
 
         // Validar quantidade
-        if (quantidadeInt > MAX_QUANTIDADE_POR_PRODUTO) {
-            console.warn(`⚠️ Quantidade excede o máximo de ${MAX_QUANTIDADE_POR_PRODUTO}`);
-            mostrarNotificacaoErro(`Máximo de ${MAX_QUANTIDADE_POR_PRODUTO} unidades por produto`);
-            produto.quantidade = MAX_QUANTIDADE_POR_PRODUTO;
+        if (quantidadeInt > qtdMaximaModelo) {
+            console.warn(`⚠️ Quantidade excede o máximo de ${qtdMaximaModelo}`);
+            mostrarNotificacaoErro(`Máximo de ${qtdMaximaModelo} unidades disponíveis para este modelo`);
+            produto.quantidade = qtdMaximaModelo;
             salvarNoLocalStorage(carrinhoData);
             return false;
         }
@@ -388,7 +413,7 @@ const CartSystem = (() => {
                             <h4 class="cart-item-nome">${item.nome}</h4>
                             ${item.modelo ? `
                                 <div class="cart-item-model">
-                                    <span class="cart-model-badge">${item.modelo}</span>
+                                    <span class="cart-model-badge">${exibirModelo(item.modelo)}</span>
                                 </div>
                             ` : ''}
                             <div class="cart-item-preco">
@@ -399,9 +424,9 @@ const CartSystem = (() => {
                             <button class="cart-btn-menos" onclick='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, ${item.quantidade - 1}, ${JSON.stringify(item.modelo)})'>
                                 <i class="ri-subtract-line"></i>
                             </button>
-                            <input type="number" class="cart-quantidade" value="${item.quantidade}" min="1" max="${MAX_QUANTIDADE_POR_PRODUTO}"
-                                   onchange='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, this.value, ${JSON.stringify(item.modelo)})'>
-                            <button class="cart-btn-mais" onclick='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, ${item.quantidade + 1}, ${JSON.stringify(item.modelo)})' ${item.quantidade >= MAX_QUANTIDADE_POR_PRODUTO ? 'disabled' : ''}>
+                            <input type="number" class="cart-quantidade" value="${item.quantidade}" min="1" max="${extrairQtdMaximaDoModelo(item.modelo)}"
+                                   onchange='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, Math.min(this.value, ${extrairQtdMaximaDoModelo(item.modelo)}), ${JSON.stringify(item.modelo)})'>
+                            <button class="cart-btn-mais" onclick='CartSystem.atualizarQuantidadeUI(${JSON.stringify(String(item.id))}, ${item.quantidade + 1}, ${JSON.stringify(item.modelo)})' ${item.quantidade >= extrairQtdMaximaDoModelo(item.modelo) ? 'disabled' : ''}>
                                 <i class="ri-add-line"></i>
                             </button>
                         </div>

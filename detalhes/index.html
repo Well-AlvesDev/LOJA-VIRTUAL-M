@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dona Flor - Moda Feminina</title>
+    <title>JOVIC - Moda Masculina</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
     <link rel="stylesheet" href="../recursos/css/cart.css">
-    <link rel="icon" type="image/png" href="../recursos/identidade/logo.jpg">
+    <link rel="icon" type="image/svg" href="../recursos/identidade/logo.svg">
+    <link rel="shortcut icon" href="../recursos/identidade/logo.svg">
+    <link rel="apple-touch-icon" href="../recursos/identidade/logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -71,7 +73,7 @@
 
     /* Navbar */
     nav {
-        background-color: #ffd0e9;
+        background-color: #061636;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         position: fixed;
         top: 0;
@@ -113,7 +115,7 @@
     }
 
     .nav-link {
-        color: #730a52;
+        color: #f3f3f3;
         text-decoration: none;
         font-weight: 500;
         padding: 10px 5px;
@@ -201,7 +203,7 @@
     .hamburger span {
         width: 23px;
         height: 2.3px;
-        background-color: #670e49;
+        background-color: #f1f1f1;
         border-radius: 2px;
         transition: all 0.1s ease;
     }
@@ -340,13 +342,6 @@
     }
 
     /* Botão Carrinho */
-    .cart-button {
-        background-color: #eb3a75;
-    }
-
-    .cart-button:hover {
-        background-color: #d42d63;
-    }
 
     /* Botão WhatsApp */
     .whatsapp-button {
@@ -418,7 +413,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, #f8f8f8, #fff1f8);
+        background: linear-gradient(180deg, #f8f8f8, #f1f5ff);
         pointer-events: none;
     }
 
@@ -460,7 +455,7 @@
 
     .produto-imagem .img-nav i {
         font-size: 20px;
-        color: #670e49;
+        color: #0e1867;
     }
 
     .produto-imagem .img-nav[disabled] {
@@ -506,7 +501,7 @@
     }
 
     .produto-imagem.carregando {
-        background: linear-gradient(90deg, #fde8f2 25%, #fff4f8 50%, #fde8f2 75%);
+        background: linear-gradient(90deg, #e8edfd 25%, #f4f6ff 50%, #e8edfd 75%);
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite;
     }
@@ -591,7 +586,7 @@
     }
 
     .produto-parcelamento {
-        background: #fafcff;
+        background: #051e43;
         padding: 12px 16px;
         border-radius: 10px;
         margin-bottom: 14px;
@@ -602,7 +597,7 @@
     .parcelamento-item {
         font-family: 'DM Sans', sans-serif;
         font-size: 13px;
-        color: #555;
+        color: #f5f5f5;
         margin-bottom: 6px;
         display: flex;
         align-items: center;
@@ -614,7 +609,7 @@
     }
 
     .parcelamento-item i {
-        color: #5b9bd5;
+        color: #e7e7e7;
         font-size: 15px;
     }
 
@@ -654,7 +649,7 @@
     }
 
     .ver-mais-link {
-        color: #eb3a75;
+        color: #0b3383;
         cursor: pointer;
         font-weight: 500;
         font-family: 'DM Sans', sans-serif;
@@ -666,17 +661,16 @@
     }
 
     .ver-mais-link:hover {
-        color: #c91e5a;
         text-decoration: underline;
     }
 
     /* Meios de Pagamento */
     .meios-pagamento {
-        background: linear-gradient(135deg, #fffcfe, #fff6fa);
+        background: linear-gradient(135deg, #fcfdff, #f6f9ff);
         padding: 14px 16px;
         border-radius: 10px;
         margin-bottom: 16px;
-        border: 1px solid rgba(235, 58, 117, 0.12);
+        border: 1px solid rgba(58, 111, 235, 0.12);
     }
 
     .meios-pagamento-icons {
@@ -733,8 +727,8 @@
 
     .btn-adicionar-carrinho {
         background: transparent;
-        color: #eb3a75;
-        border: 1.5px solid #eb3a75;
+        color: #103f84;
+        border: 1.5px solid #3a87eb;
         padding: 15px 30px;
         font-family: 'DM Sans', sans-serif;
         font-size: 14px;
@@ -767,8 +761,8 @@
     .loading-spinner {
         width: 44px;
         height: 44px;
-        border: 3px solid #fde0ec;
-        border-top: 3px solid #eb3a75;
+        border: 3px solid #c7d8fe;
+        border-top: 3px solid #0f449a;
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
@@ -809,13 +803,13 @@
     }
 
     .breadcrumb a {
-        color: #eb3a75;
+        color: #103b93;
         text-decoration: none;
         transition: color 0.2s ease;
     }
 
     .breadcrumb a:hover {
-        color: #c91e5a;
+        text-decoration: underline;
     }
 
     .breadcrumb span {
@@ -1028,8 +1022,8 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
-                        alt="logotipo da empresa/loja" style="width: 190px;">
+                    <img src="../recursos/identidade/Screenshot_20260616_191620_Instagram.jpg"
+                        alt="logotipo da empresa/loja" style="width: 100px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -1218,6 +1212,28 @@
         };
 
         /**
+         * Remove emojis de um texto
+         */
+        function limparEmojis(texto) {
+            if (!texto) return texto;
+            try {
+                // Usa Unicode Property Escapes (suportado em navegadores modernos)
+                return String(texto).replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+            } catch (e) {
+                // Fallback para navegadores antigos: remove ranges comuns de emojis
+                return String(texto)
+                    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '') // Surrogate pairs
+                    .replace(/[\u{1F000}-\u{1F9FF}]/gu, '')         // Emojis
+                    .replace(/[\u{2600}-\u{27BF}]/gu, '')           // Símbolos
+                    .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')         // Misc symbols
+                    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')         // Transport
+                    .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')         // Flags
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+        }
+
+        /**
          * Carrega apenas a primeira palavra de cada produto
          * (Ex: "Vestido Floral Rosa" -> "Vestido")
          */
@@ -1244,7 +1260,7 @@
                 const palavrasSet = new Set();
                 data.forEach(item => {
                     if (item.nome) {
-                        const primeiraPalavra = item.nome.split(/\s+/)[0].toLowerCase();
+                        const primeiraPalavra = limparEmojis(item.nome.split(/\s+/)[0]).toLowerCase();
                         if (primeiraPalavra.length > 0) {
                             palavrasSet.add(primeiraPalavra);
                         }
@@ -1291,7 +1307,7 @@
                     if (item.nome) {
                         const palavras = item.nome.split(/\s+/);
                         if (palavras.length >= 2) {
-                            const duasPalavras = `${palavras[0]} ${palavras[1]}`.toLowerCase();
+                            const duasPalavras = limparEmojis(`${palavras[0]} ${palavras[1]}`).toLowerCase();
                             if (duasPalavras.length > 0) {
                                 duasSet.add(duasPalavras);
                             }
@@ -1437,107 +1453,382 @@
             // Barra de pesquisa com sugestões
             if (buscaInput && buscaClear && sugestoesList) {
                 let sugestoes = [];
+                let sugestoesPromise = null;
+                let debounceTimer = null;
+                let activeSuggestionIndex = -1;
 
-                // Carregar sugestões do Supabase (palavras-chave)
-                async function carregarSugestoesDoSupabase() {
-                    try {
-                        // Carregar ambas as listas de palavras
-                        const [palavras1, palavras2] = await Promise.all([
-                            carregarPalavrasUnicas(),
-                            carregarDuasPalavrasUnicas()
-                        ]);
+                function escaparHtml(str) {
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                }
 
-                        // Combinar ambas as listas (duas palavras primeiro para melhor UX)
-                        sugestoes = [...new Set([...palavras2, ...palavras1])];
-                        console.log(`✅ ${sugestoes.length} sugestões carregadas do Supabase`);
-                    } catch (err) {
-                        console.warn('⚠️ Erro ao carregar sugestões:', err);
-                        sugestoes = [];
+                function normalizarTexto(texto) {
+                    return String(texto || '')
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .toLowerCase()
+                        .trim();
+                }
+
+                function gerarVariantesCompletas(palavra) {
+                    const norm = normalizarTexto(palavra);
+                    const variantes = new Set([norm]);
+
+                    const regras = [
+                        { pattern: /ão$/, replacements: ['ões', 'ães', 'ãos', 'ao'] },
+                        { pattern: /ões$/, replacements: ['ão', 'ãe'] },
+                        { pattern: /ães$/, replacements: ['ão'] },
+                        { pattern: /ãos$/, replacements: ['ão'] },
+                        { pattern: /m$/, replacements: ['ns'] },
+                        { pattern: /ns$/, replacements: ['m'] },
+                        { pattern: /z$/, replacements: ['zes'] },
+                        { pattern: /zes$/, replacements: ['z'] },
+                        { pattern: /al$/, replacements: ['ais'] },
+                        { pattern: /ais$/, replacements: ['al'] },
+                        { pattern: /s$/, replacements: [norm.slice(0, -1)] },
+                        { pattern: /[^s]$/, replacements: [norm + 's'] }
+                    ];
+
+                    for (const regra of regras) {
+                        if (regra.pattern.test(norm)) {
+                            for (const replacement of regra.replacements) {
+                                const variante = norm.replace(regra.pattern, replacement);
+                                if (variante !== norm && variante.length > 2) variantes.add(variante);
+                            }
+                        }
                     }
+
+                    if (norm.length > 4) {
+                        variantes.add(norm.slice(0, -1));
+                        variantes.add(norm.slice(0, -2));
+                    }
+
+                    return Array.from(variantes);
+                }
+
+                function levenshtein(a, b) {
+                    if (a === b) return 0;
+                    const la = a.length, lb = b.length;
+                    if (la === 0) return lb;
+                    if (lb === 0) return la;
+                    let prevRow = new Array(lb + 1);
+                    let currRow = new Array(lb + 1);
+                    for (let j = 0; j <= lb; j++) prevRow[j] = j;
+
+                    for (let i = 1; i <= la; i++) {
+                        currRow[0] = i;
+                        const ca = a.charCodeAt(i - 1);
+                        for (let j = 1; j <= lb; j++) {
+                            const cb = b.charCodeAt(j - 1);
+                            const cost = ca === cb ? 0 : 1;
+                            currRow[j] = Math.min(prevRow[j] + 1, currRow[j - 1] + 1, prevRow[j - 1] + cost);
+                        }
+                        [prevRow, currRow] = [currRow, prevRow];
+                    }
+                    return prevRow[lb];
+                }
+
+                function limiteFuzzy(len) {
+                    if (len <= 3) return 0;
+                    if (len <= 5) return 1;
+                    if (len <= 9) return 2;
+                    return 3;
+                }
+
+                function buscarComTolerancia(palavra, candidato, maxErros = 1) {
+                    const palavraNorm = normalizarTexto(palavra);
+                    const candidatoNorm = normalizarTexto(candidato);
+
+                    if (palavraNorm === candidatoNorm) return { match: true, score: 100, tipo: 'exato' };
+                    if (candidatoNorm.startsWith(palavraNorm)) return { match: true, score: 90, tipo: 'prefixo' };
+                    const palavras = candidatoNorm.split(/\s+/);
+                    if (palavras.some(p => p === palavraNorm)) return { match: true, score: 85, tipo: 'palavra-completa' };
+                    if (palavras.some(p => p.startsWith(palavraNorm))) return { match: true, score: 80, tipo: 'prefixo-palavra' };
+                    if (candidatoNorm.includes(palavraNorm)) return { match: true, score: 70, tipo: 'substring' };
+
+                    const variantesRef = gerarVariantesCompletas(palavra);
+                    for (const variante of variantesRef) {
+                        if (candidatoNorm === variante) return { match: true, score: 88, tipo: 'variante-exata' };
+                        if (candidatoNorm.startsWith(variante)) return { match: true, score: 82, tipo: 'variante-prefixo' };
+                        if (candidatoNorm.includes(variante)) return { match: true, score: 75, tipo: 'variante-substring' };
+                    }
+
+                    if (maxErros > 0) {
+                        const maxPermitido = palavraNorm.length <= 3 ? 0 : (palavraNorm.length <= 6 ? 1 : 2);
+                        const dist = levenshtein(palavraNorm, candidatoNorm);
+                        if (dist <= Math.min(maxPermitido, maxErros)) {
+                            return { match: true, score: 65, tipo: 'tolerancia-erro' };
+                        }
+                    }
+
+                    return { match: false, score: 0, tipo: 'nenhum' };
+                }
+
+                const _sugestoesNormCache = new Map();
+
+                function filtrar(q, lista) {
+                    if (!q) return [];
+                    const raw = String(q).trim();
+                    if (raw.length < 2) return [];
+
+                    const qNorm = normalizarTexto(raw);
+                    const queryVariants = gerarVariantesCompletas(raw);
+                    const fuzzyMax = limiteFuzzy(qNorm.length);
+                    const scored = [];
+
+                    for (const s of lista) {
+                        const norm = normalizarTexto(s);
+                        const variantes = _sugestoesNormCache.get(s) || (function () {
+                            const v = gerarVariantesCompletas(s);
+                            _sugestoesNormCache.set(s, v);
+                            return v;
+                        })();
+
+                        let score = 0;
+                        let bestPos = Infinity;
+
+                        if (queryVariants.includes(norm) || variantes.includes(qNorm)) {
+                            score = 300;
+                            bestPos = 0;
+                        } else {
+                            for (const qv of queryVariants) {
+                                if (norm.startsWith(qv)) {
+                                    score = Math.max(score, 220);
+                                    bestPos = 0;
+                                    break;
+                                }
+                            }
+
+                            if (score === 0) {
+                                const palavras = norm.split(/\s+/);
+                                for (let i = 0; i < palavras.length; i++) {
+                                    const p = palavras[i];
+                                    for (const qv of queryVariants) {
+                                        if (p.startsWith(qv)) {
+                                            score = Math.max(score, 160 - Math.min(i, 5) * 8);
+                                            bestPos = Math.min(bestPos, norm.indexOf(p));
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (score === 0) {
+                                const idx = norm.indexOf(qNorm);
+                                if (idx !== -1) {
+                                    score = Math.max(40, 100 - idx);
+                                    bestPos = idx;
+                                }
+                            }
+
+                            if (score === 0 && fuzzyMax > 0) {
+                                let melhorDist = Infinity;
+                                const palavras = norm.split(/\s+/);
+                                for (const p of palavras) {
+                                    if (Math.abs(p.length - qNorm.length) > fuzzyMax) continue;
+                                    const dist = levenshtein(qNorm, p);
+                                    if (dist < melhorDist) melhorDist = dist;
+                                }
+                                if (melhorDist <= fuzzyMax) {
+                                    score = Math.max(20, 70 - melhorDist * 15);
+                                    bestPos = norm.indexOf(palavras[0]) === -1 ? 0 : 0;
+                                }
+                            }
+                        }
+
+                        if (score > 0) {
+                            const primeiraPalavra = norm.split(/\s+/)[0] || '';
+                            if (primeiraPalavra === qNorm) score += 10;
+                            score += Math.max(0, 6 - s.length / 12);
+                            scored.push({ s, score, pos: bestPos, len: s.length });
+                        }
+                    }
+
+                    scored.sort((a, b) => {
+                        if (b.score !== a.score) return b.score - a.score;
+                        if (a.pos !== b.pos) return a.pos - b.pos;
+                        if (a.len !== b.len) return a.len - b.len;
+                        return a.s.localeCompare(b.s, 'pt-BR');
+                    });
+
+                    const out = [];
+                    for (const item of scored) {
+                        if (out.indexOf(item.s) === -1) out.push(item.s);
+                        if (out.length >= 12) break;
+                    }
+                    return out;
+                }
+
+                function renderSugestoes(items, query) {
+                    activeSuggestionIndex = -1;
+                    if (!sugestoesList) return;
+
+                    if (!items || items.length === 0) {
+                        fecharSugestoes();
+                        return;
+                    }
+
+                    sugestoesList.innerHTML = items.map((s, idx) => `
+                        <li id="sug-${idx}" role="option" data-index="${idx}" class="sugestao-item" tabindex="-1" aria-selected="false">
+                            <span class="sug-text">${escaparHtml(toTitleCase(s))}</span>
+                            <i class="ri-arrow-right-line sugestao-icon" aria-hidden="true"></i>
+                        </li>
+                    `).join('');
+                    sugestoesList.hidden = false;
+                    buscaInput.setAttribute('aria-expanded', 'true');
+                }
+
+                function fecharSugestoes() {
+                    if (!sugestoesList) return;
+                    sugestoesList.hidden = true;
+                    buscaInput.setAttribute('aria-expanded', 'false');
+                    activeSuggestionIndex = -1;
+                    buscaInput.removeAttribute('aria-activedescendant');
+                }
+
+                function navegarParaPesquisa(termo) {
+                    const valor = String(termo || '').trim();
+                    if (!valor) return;
+                    const encoded = encodeURIComponent(valor);
+                    window.location.href = `../produtos/?q=${encoded}`;
+                }
+
+                function selecionarSugestao(idx) {
+                    const item = sugestoesList && sugestoesList.querySelector(`[data-index="${idx}"]`);
+                    if (!item) return;
+                    const valor = item.textContent.trim();
+                    buscaInput.value = valor;
+                    fecharSugestoes();
+                    buscaInput.focus();
+                    navegarParaPesquisa(valor);
+                }
+
+                function atualizarAtivo(novoIndex) {
+                    const items = Array.from(sugestoesList.querySelectorAll('.sugestao-item'));
+                    if (!items.length) return;
+                    items.forEach((it, i) => {
+                        const sel = i === novoIndex;
+                        it.setAttribute('aria-selected', sel ? 'true' : 'false');
+                    });
+                    const ativo = items[novoIndex];
+                    if (ativo) {
+                        buscaInput.setAttribute('aria-activedescendant', ativo.id);
+                        ativo.scrollIntoView({ block: 'nearest' });
+                    } else {
+                        buscaInput.removeAttribute('aria-activedescendant');
+                    }
+                    activeSuggestionIndex = novoIndex;
+                }
+
+                async function carregarSugestoesDoSupabase() {
+                    if (sugestoesPromise) return sugestoesPromise;
+                    if (sugestoes.length) return sugestoes;
+
+                    sugestoesPromise = (async () => {
+                        try {
+                            const [palavras1, palavras2] = await Promise.all([
+                                carregarPalavrasUnicas(),
+                                carregarDuasPalavrasUnicas()
+                            ]);
+                            sugestoes = [...new Set([...palavras2, ...palavras1])];
+                            console.log(`✅ ${sugestoes.length} sugestões carregadas do Supabase`);
+                            return sugestoes;
+                        } catch (err) {
+                            console.warn('⚠️ Erro ao carregar sugestões:', err);
+                            sugestoes = [];
+                            return sugestoes;
+                        }
+                    })();
+
+                    return sugestoesPromise;
+                }
+
+                function debounce(fn, wait = 120) {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(fn, wait);
                 }
 
                 // Carregar sugestões ao iniciar
-                carregarSugestoesDoSupabase();
-
-                // Filtrar e exibir sugestões
-                function mostrarSugestoes(termo) {
-                    sugestoesList.innerHTML = '';
-
-                    if (!termo || sugestoes.length === 0) {
-                        sugestoesList.hidden = true;
-                        return;
-                    }
-
-                    const termoLower = termo.toLowerCase();
-                    const filtradas = sugestoes.filter(sug =>
-                        sug.toLowerCase().includes(termoLower)
-                    );
-
-                    if (filtradas.length === 0) {
-                        sugestoesList.hidden = true;
-                        return;
-                    }
-
-                    filtradas.forEach(sugestao => {
-                        const li = document.createElement('li');
-                        li.className = 'sugestao-item';
-                        li.role = 'option';
-                        const sugestaoFormatada = toTitleCase(sugestao);
-                        li.innerHTML = `
-                            <span class="sug-text">${sugestaoFormatada}</span>
-                            <i class="ri-arrow-right-line sugestao-icon"></i>
-                        `;
-
-                        li.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            sugestoesList.hidden = true;
-                            // Formatar o termo com hífens e redirecionar para página de produtos
-                            const termoFormatado = sugestao.replace(/\s+/g, '-');
-                            window.location.href = `../produtos/?q=${termoFormatado}`;
-                        });
-
-                        sugestoesList.appendChild(li);
-                    });
-
-                    sugestoesList.hidden = false;
-                }
+                carregarSugestoesDoSupabase().catch(() => { });
 
                 buscaInput.addEventListener('input', (e) => {
                     const valor = e.target.value.trim();
                     buscaClear.hidden = !valor;
-                    mostrarSugestoes(valor);
+
+                    if (valor.length < 2) {
+                        clearTimeout(debounceTimer);
+                        fecharSugestoes();
+                        return;
+                    }
+
+                    debounce(async () => {
+                        const lista = await carregarSugestoesDoSupabase();
+                        const filtradas = filtrar(valor, lista);
+                        renderSugestoes(filtradas, valor);
+                    });
                 });
 
                 buscaClear.addEventListener('click', () => {
                     buscaInput.value = '';
                     buscaClear.hidden = true;
-                    sugestoesList.hidden = true;
+                    fecharSugestoes();
                     buscaInput.focus();
                 });
 
-                buscaInput.addEventListener('keypress', (e) => {
+                buscaInput.addEventListener('keydown', (e) => {
+                    const items = sugestoesList && Array.from(sugestoesList.querySelectorAll('.sugestao-item')) || [];
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = (activeSuggestionIndex + 1) >= items.length ? 0 : activeSuggestionIndex + 1;
+                        atualizarAtivo(next);
+                        return;
+                    }
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = (activeSuggestionIndex - 1) < 0 ? (items.length - 1) : (activeSuggestionIndex - 1);
+                        atualizarAtivo(prev);
+                        return;
+                    }
                     if (e.key === 'Enter') {
-                        const termo = buscaInput.value.trim();
-                        if (termo) {
-                            sugestoesList.hidden = true;
-                            const encoded = termo.replace(/\s+/g, '-');
-                            window.location.href = `../produtos/?q=${encoded}`;
+                        if (activeSuggestionIndex >= 0) {
+                            e.preventDefault();
+                            selecionarSugestao(activeSuggestionIndex);
+                        } else {
+                            e.preventDefault();
+                            navegarParaPesquisa(buscaInput.value);
                         }
+                        return;
+                    }
+                    if (e.key === 'Escape') {
+                        fecharSugestoes();
+                        return;
                     }
                 });
 
-                // Fechar sugestões ao clicar fora
+                sugestoesList.addEventListener('click', (e) => {
+                    const item = e.target.closest('.sugestao-item');
+                    if (!item) return;
+                    const idx = Number(item.getAttribute('data-index'));
+                    selecionarSugestao(idx);
+                });
+
                 document.addEventListener('click', (e) => {
                     if (!e.target.closest('.caixa-de-pesquisa')) {
-                        sugestoesList.hidden = true;
+                        fecharSugestoes();
                     }
                 });
 
-                // Fechar sugestões ao focar em outro elemento
+                buscaInput.addEventListener('focus', () => {
+                    carregarSugestoesDoSupabase().catch(() => { });
+                });
+
                 buscaInput.addEventListener('blur', () => {
                     setTimeout(() => {
-                        sugestoesList.hidden = true;
+                        fecharSugestoes();
                     }, 200);
                 });
             }
@@ -2184,9 +2475,9 @@
                                     <div class="meio-pagamento-icon" title="PIX">
                                         <img src="../recursos/icones/pix@2x.png" alt="Pix">
                                     </div>
-                                    <span style="font-family:'DM Sans',sans-serif;font-size:13px;color:#eb3a75;font-weight:600;">PIX disponível</span>
+                                    <span style="font-family:'DM Sans',sans-serif;font-size:13px;color:black;font-weight:600;">PIX disponível</span>
                                 </div>
-                                <p style="font-family:'DM Sans',sans-serif;font-size:11px;color:#aaa;line-height:1.4;margin:0;">Escaneie o código QR para pagar com PIX de forma rápida e segura</p>
+                                <p style="font-family:'DM Sans',sans-serif;font-size:11px;color:black;line-height:1.4;margin:0;">Escaneie o código QR para pagar com PIX de forma rápida e segura</p>
                             </div>
                             ${parcelamentoHtml ? `
                                 <div class="produto-parcelamento">
@@ -2245,7 +2536,7 @@
                             .vue-dropdown-list li:hover { background: #f5f5f5; }
                             .vue-dropdown-list li.vue-option-selected { background: #e9f2ff; color: #0b5ed7; font-weight: 600; }
                             /* Estado desativado: escurecer visualmente */
-                            .vue-dropdown-disabled { opacity: 0.95; filter: brightness(0.70) saturate(0.95); pointer-events: none; }
+                            .vue-dropdown-disabled { opacity: 0.5; filter: brightness(0.70) saturate(0.95); pointer-events: none; }
                             .vue-dropdown-disabled .vue-dropdown-toggle { background: linear-gradient(180deg,#c6cbd1,#b8bcc3); color: #0b3b5b; cursor: default; border-color: #9ca3af; box-shadow: inset 0 2px 8px rgba(0,0,0,0.10); }
                             .vue-dropdown-disabled .vue-dropdown-toggle i { color: #374151; opacity: 0.9; }
                             .vue-dropdown-disabled .vue-dropdown-toggle span { color: #0b3b5b; }
@@ -2275,7 +2566,7 @@
                                 selected: isSingleUnique ? modelos[0] : '',
                                 options: modelos.slice(),
                                 placeholder: 'Selecione um modelo',
-                                displayText: isSingleUnique ? modelos[0] : '',
+                                displayText: isSingleUnique ? modelos[0].split('*')[0].trim() : '',
                                 disabled: isSingleUnique
                             };
                         },
@@ -2288,15 +2579,16 @@
                                 if (idx > -1) this.options.splice(idx, 1);
                                 this.options.unshift(opt);
                                 this.selected = opt;
-                                this.displayText = opt;
+                                // Exibir sem o *número, mas guardar completo
+                                this.displayText = opt.split('*')[0].trim();
                                 this.open = false;
-                                if (hiddenInput) hiddenInput.value = opt;
+                                if (hiddenInput) hiddenInput.value = opt;  // Guardar modelo completo (ex: MODELO1*2)
                             }
                         },
                         mounted() {
                             this._onDocClick = (e) => { if (!this.$el.contains(e.target)) this.open = false; };
                             document.addEventListener('click', this._onDocClick);
-                            // Se for único modelo, garantir que o hidden input receba o valor real
+                            // Se for único modelo, guardar modelo completo (com estoque) no hidden input
                             if (this.disabled && hiddenInput) hiddenInput.value = this.selected || '';
                             // Se não for único, inicializar displayText com placeholder
                             if (!this.disabled) this.displayText = '';
@@ -2312,7 +2604,7 @@
                                 </button>
                                 <ul v-show="open" class="vue-dropdown-list" style="position:absolute;z-index:30;width:100%;background:#fff;border:1px solid #eaeaea;border-radius:8px;margin-top:6px;max-height:200px;overflow:auto;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,0.08);list-style:none;margin:0;">
                                     <li v-for="opt in options" :key="opt" @click="disabled ? null : selectOption(opt)" :class="{ 'vue-option-selected': opt === selected, 'vue-option-disabled': disabled }" style="padding:10px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;">
-                                        {{ opt }}
+                                        {{ opt.split('*')[0].trim() }}
                                     </li>
                                 </ul>
                             </div>
@@ -2442,7 +2734,7 @@
             
                 <div class="footer-container">
                     <div class="footer-section">
-                        <h3> Dona Flor - moda feminina</h3>
+                        <h3> JOVIC - MODA MASCULINA</h3>
                         <p>Qualidade, estilo e preço justo para você.</p>
                         <div class="footer-social">
                             <a href="https://instagram.com" target="_blank" title="Instagram"><i class="ri-instagram-line"></i></a>
@@ -2452,7 +2744,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2026 Dona Flor - Moda Feminina <br> Todos os direitos reservados. | Desenvolvido com <i class="ri-heart-fill" style="color: #e22a8c;"></i> para você.</p>
+                    <p>&copy; 2026 JOVIC - Moda Masculina <br> Todos os direitos reservados. | Desenvolvido com <i class="ri-heart-fill" style="color: blue;"></i> para você.</p>
                 </div>
             `;
 
@@ -2568,9 +2860,9 @@
             <!-- Cabeçalho -->
             <div class="checkout-header">
                 <div class="checkout-brand">
-                    <img src="../recursos/icones/Mercado_Pago.svg" alt="Mercado Pago" class="mp-logo">
-                    <img src="../recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" alt="Loja"
-                        class="store-logo">
+
+                    <img src="../recursos/identidade/Screenshot_20260616_191620_Instagram.jpg" alt="Loja"
+                        class="store-logo" style=" border-radius: 4px;">
                 </div>
 
                 <button class="checkout-fechar" onclick="fecharCheckout()" title="Fechar" aria-label="Fechar checkout">
@@ -2578,7 +2870,7 @@
                 </button>
             </div>
             <p style="margin-left: 25px; font-size: 12px; margin-bottom: 10px;">Finalize sua compra com segurança e
-                rapidez <br> atráves do Mercado Pago.</p>
+                rapidez <br> atráves do app do seu banco.</p>
             <!-- Resumo do produto -->
             <div class="checkout-resumo">
                 <span class="checkout-resumo-nome" id="co-nome-produto">—</span>

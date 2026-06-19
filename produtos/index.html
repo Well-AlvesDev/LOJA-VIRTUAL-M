@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dona Flor - Moda Feminina</title>
+    <title>JOVIC - Moda Masculina</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <link rel="stylesheet" href="../recursos/css/Barra-de-pesquisa.css">
     <link rel="stylesheet" href="../recursos/css/estilos-para-card-de-produtos.css">
     <link rel="stylesheet" href="../recursos/css/cart.css">
-    <link rel="icon" type="image/png" href="../recursos/identidade/logo.jpg">
+    <link rel="icon" type="image/svg" href="../recursos/identidade/logo.svg">
+    <link rel="shortcut icon" href="../recursos/identidade/logo.svg">
+    <link rel="apple-touch-icon" href="../recursos/identidade/logo.svg">
     <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -78,8 +80,8 @@
         .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid #f0f0f0;
-            border-top: 4px solid #eb3a75;
+            border: 4px solid #c7d8fe;
+            border-top: 4px solid #164dad;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -105,8 +107,8 @@
             .spinner {
                 width: 40px;
                 height: 40px;
-                border: 3px solid #f0f0f0;
-                border-top: 3px solid #eb3a75;
+                border: 3px solid #c7d8fe;
+                border-top: 3px solid #164dad;
             }
 
             .loader-text {
@@ -126,7 +128,7 @@
 
         /* Navbar */
         nav {
-            background-color: #ffd0e9;
+            background-color: #061636;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
@@ -147,7 +149,7 @@
 
         .logo {
             font-size: 16px;
-            color: #eb3a75;
+            color: #164dad;
             margin-left: 10px;
             text-decoration: none;
             display: flex;
@@ -168,7 +170,7 @@
         }
 
         .nav-link {
-            color: #730a52;
+            color: #f1f1f1;
             text-decoration: none;
             font-weight: 500;
             padding: 10px 5px;
@@ -255,7 +257,7 @@
         .hamburger span {
             width: 23px;
             height: 2.3px;
-            background-color: #670e49;
+            background-color: white;
             border-radius: 2px;
             transition: all 0.1s ease;
         }
@@ -446,9 +448,9 @@
 
         .exibindo-resultados-para.promo .exibindo-text {
             background: #f4f4f4;
-            border-color: rgba(235, 58, 117, 0.15);
-            color: #689eea;
-            box-shadow: 0 8px 24px rgba(220, 196, 35, 0.06);
+            border-color: rgba(58, 88, 235, 0.15);
+            color: #1e5db6;
+            box-shadow: 0 8px 24px rgba(35, 106, 220, 0.06);
         }
 
         @media (max-width: 520px) {
@@ -730,7 +732,7 @@
 
             /* Liquid Glass Effect */
             background: whitesmoke;
-            border: 1.5px solid rgba(255, 143, 233, 0.31);
+            border: 1.5px solid rgba(13, 24, 150, 0.31);
             box-shadow:
                 0 8px 32px rgba(42, 113, 226, 0.073),
                 inset 0 1px 2px rgba(255, 255, 255, 0.5);
@@ -1048,8 +1050,8 @@
             <div class="nav-container">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <img src="../recursos/identidade/file_00000000b6b0720ea0c3e2232a775598.png"
-                        alt="logotipo da empresa/loja" style="width: 190px;">
+                    <img src="../recursos/identidade/Screenshot_20260616_191620_Instagram.jpg"
+                        alt="logotipo da empresa/loja" style="width: 100px;">
                 </a>
 
                 <!-- Menu Principal -->
@@ -1122,7 +1124,7 @@
             </div>
         </div>
         <div class="title">
-            <h1 id="stop-point" style="font-weight: 400; color: #447bda; text-align: center;">Página de pesquisa</h1>
+            <h1 id="stop-point" style="font-weight: 400; color: #0a3e96; text-align: center;">Página de pesquisa</h1>
         </div>
         <div class="voltar-home">
             <a href="../index.html"><i class="ri-arrow-left-long-fill"></i> Voltar para tela inicial</a>
@@ -1304,8 +1306,8 @@
 
         // ===== CONFIGURAÇÃO DO SUPABASE =====
         const SUPABASE_CONFIG = {
-            url: 'https://hovfcntzthahwszjaxsw.supabase.co',
-            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvdmZjbnR6dGhhaHdzempheHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDgxNDUsImV4cCI6MjA5Mzc4NDE0NX0.Pss5O_ykTybPUsuZCCln72Pq5dkTGMQ1G1kXR4HOVyw',
+            url: 'https://jjogtnqqjkwsyzegotyb.supabase.co',
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impqb2d0bnFxamt3c3l6ZWdvdHliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MDI0MjYsImV4cCI6MjA5NzI3ODQyNn0.OAu9OrVN04l7N-OM4NQ8n3O2Mgw9Bq4_5ulb7mQKwh8',
             table: 'j-box'
         };
 
@@ -1992,6 +1994,28 @@
         let duasPalavrasCache = null;
 
         /**
+         * Remove emojis de um texto
+         */
+        function limparEmojis(texto) {
+            if (!texto) return texto;
+            try {
+                // Usa Unicode Property Escapes (suportado em navegadores modernos)
+                return String(texto).replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+            } catch (e) {
+                // Fallback para navegadores antigos: remove ranges comuns de emojis
+                return String(texto)
+                    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '') // Surrogate pairs
+                    .replace(/[\u{1F000}-\u{1F9FF}]/gu, '')         // Emojis
+                    .replace(/[\u{2600}-\u{27BF}]/gu, '')           // Símbolos
+                    .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')         // Misc symbols
+                    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')         // Transport
+                    .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')         // Flags
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+        }
+
+        /**
          * Carrega apenas a primeira palavra de cada produto
          * (Ex: "Vestido Floral Rosa" -> "Vestido")
          */
@@ -2017,7 +2041,7 @@
                 const palavrasSet = new Set();
                 data.forEach(item => {
                     if (item.nome) {
-                        const primeiraPalavra = item.nome.split(/\s+/)[0].toLowerCase();
+                        const primeiraPalavra = limparEmojis(item.nome.split(/\s+/)[0]).toLowerCase();
                         if (primeiraPalavra.length > 0) {
                             palavrasSet.add(primeiraPalavra);
                         }
@@ -2063,7 +2087,7 @@
                     if (item.nome) {
                         const palavras = item.nome.split(/\s+/);
                         if (palavras.length >= 2) {
-                            const duasPalavras = `${palavras[0]} ${palavras[1]}`.toLowerCase();
+                            const duasPalavras = limparEmojis(`${palavras[0]} ${palavras[1]}`).toLowerCase();
                             if (duasPalavras.length > 0) {
                                 duasSet.add(duasPalavras);
                             }
@@ -2457,6 +2481,16 @@
             debounceTimer = setTimeout(fn, wait);
         }
 
+        // Normalização e suporte heurístico a singular/plural (PT-BR) + tolerância pequena (Levenshtein)
+        // Objetivo: quando usuário digitar "vestido" ou "vestidos" (ou formas parciais), sugerir ambos.
+        function normalizarTermo(t) {
+            return String(t || '')
+                .normalize('NFD')
+                .replace(/\p{M}/gu, '')
+                .toLowerCase()
+                .trim();
+        }
+
         // Normaliza texto para Title Case (primeira letra de cada palavra maiúscula)
         function toTitleCase(str) {
             if (!str) return str;
@@ -2466,96 +2500,165 @@
             }).join(' ');
         }
 
-        // Função antiga mantida para compatibilidade (usa gerarVariantesCompletas)
-        function gerarVariantesSimples(token) {
-            return gerarVariantesCompletas(token);
+        // Escapa caracteres especiais de HTML antes de inserir via innerHTML
+        // (os nomes de produto vêm do banco de dados, então tratamos como texto não confiável)
+        function escaparHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
-        // cache leve para as variantes normalizadas das sugestões (evita recomputar em cada tecla)
+        function gerarVariantesSimples(token) {
+            const norm = normalizarTermo(token);
+            const variants = new Set([norm]);
+
+            // heurísticas comuns para PT-BR (singular/plural)
+            if (/ões$|ães$|ãos$/.test(norm)) variants.add(norm.replace(/(ões|ães|ãos)$/, 'ao'));
+            if (/ns$/.test(norm)) variants.add(norm.replace(/ns$/, 'm'));
+            if (/zes$/.test(norm)) variants.add(norm.replace(/zes$/, 'z'));
+            if (/is$/.test(norm) && norm.length > 3) variants.add(norm.replace(/is$/, 'l'));
+
+            // remoção/adição simples de 's' (casas <-> casa)
+            if (norm.endsWith('s') && norm.length > 3) variants.add(norm.slice(0, -1));
+            if (!norm.endsWith('s')) variants.add(norm + 's');
+
+            return Array.from(variants);
+        }
+
+        /**
+         * Distância de Levenshtein (número mínimo de inserções/remoções/substituições
+         * para transformar 'a' em 'b'). Usada para tolerar erros de digitação nas
+         * sugestões (ex: "vstido" ainda encontra "vestido").
+         */
+        function levenshtein(a, b) {
+            if (a === b) return 0;
+            const la = a.length, lb = b.length;
+            if (la === 0) return lb;
+            if (lb === 0) return la;
+            let prevRow = new Array(lb + 1);
+            let currRow = new Array(lb + 1);
+            for (let j = 0; j <= lb; j++) prevRow[j] = j;
+
+            for (let i = 1; i <= la; i++) {
+                currRow[0] = i;
+                const ca = a.charCodeAt(i - 1);
+                for (let j = 1; j <= lb; j++) {
+                    const cb = b.charCodeAt(j - 1);
+                    const cost = ca === cb ? 0 : 1;
+                    currRow[j] = Math.min(
+                        prevRow[j] + 1,
+                        currRow[j - 1] + 1,
+                        prevRow[j - 1] + cost
+                    );
+                }
+                [prevRow, currRow] = [currRow, prevRow];
+            }
+            return prevRow[lb];
+        }
+
+        function limiteFuzzy(len) {
+            if (len <= 3) return 0;
+            if (len <= 5) return 1;
+            if (len <= 9) return 2;
+            return 3;
+        }
+
         const _sugestoesNormCache = new Map();
 
+        function obterDadosSugestao(s) {
+            let dados = _sugestoesNormCache.get(s);
+            if (!dados) {
+                const norm = normalizarTermo(s);
+                dados = {
+                    norm,
+                    variantes: gerarVariantesSimples(s),
+                    palavras: norm.split(/\s+/).filter(Boolean)
+                };
+                _sugestoesNormCache.set(s, dados);
+            }
+            return dados;
+        }
+
+        /**
+         * Motor de sugestões de pesquisa.
+         * `lista` contém os nomes COMPLETOS dos produtos (coluna PRODUTO).
+         */
         function filtrar(q, lista) {
             if (!q) return [];
             const raw = String(q).trim();
-            // exigir pelo menos 2 caracteres para começar a sugerir
             if (raw.length < 2) return [];
 
-            const qNorm = normalizarTexto(raw);
-            const queryVariants = gerarVariantesCompletas(raw);
+            const qNorm = normalizarTermo(raw);
+            const queryVariants = gerarVariantesSimples(raw);
+            const fuzzyMax = limiteFuzzy(qNorm.length);
 
             const scored = [];
 
             for (const s of lista) {
-                const sugVars = _sugestoesNormCache.get(s) || (function () {
-                    const v = gerarVariantesCompletas(s);
-                    _sugestoesNormCache.set(s, v);
-                    return v;
-                })();
+                const { norm: sNorm, variantes: sugVars, palavras } = obterDadosSugestao(s);
 
-                let bestScore = 0;
+                let score = 0;
                 let bestPos = Infinity;
-                let bestTipo = '';
 
-                // Testar com busca inteligente contra cada variante
-                for (const sv of sugVars) {
-                    const resultado = buscarComTolerancia(raw, sv, 1);
-                    if (resultado.match && resultado.score > bestScore) {
-                        bestScore = resultado.score;
-                        bestTipo = resultado.tipo;
-                        const idx = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().indexOf(qNorm);
-                        bestPos = Math.min(bestPos, idx === -1 ? Infinity : idx);
+                if (queryVariants.includes(sNorm) || sugVars.includes(qNorm)) {
+                    score = 300;
+                    bestPos = 0;
+                } else {
+                    for (const qv of queryVariants) {
+                        if (sNorm.startsWith(qv)) {
+                            score = Math.max(score, 220);
+                            bestPos = 0;
+                            break;
+                        }
                     }
-                }
 
-                // Também testar match exato de sugestão contra query (backward compatibility)
-                const sNorm = normalizarTexto(s);
-                if (bestScore === 0) {
-                    // Exact match
-                    if (sNorm === qNorm) {
-                        bestScore = 200;
-                        bestPos = 0;
-                        bestTipo = 'exato';
-                    }
-                    // Prefix match
-                    else if (sNorm.startsWith(qNorm)) {
-                        bestScore = 120;
-                        bestPos = 0;
-                        bestTipo = 'prefixo';
-                    }
-                    // Start of word
-                    else {
-                        const parts = sNorm.split(/\s+/);
-                        for (let i = 0; i < parts.length; i++) {
-                            if (parts[i].startsWith(qNorm)) {
-                                bestScore = 100;
-                                bestPos = sNorm.indexOf(parts[i]);
-                                bestTipo = 'inicio-palavra';
-                                break;
+                    if (score === 0) {
+                        for (let i = 0; i < palavras.length; i++) {
+                            const p = palavras[i];
+                            for (const qv of queryVariants) {
+                                if (p.startsWith(qv)) {
+                                    score = Math.max(score, 160 - Math.min(i, 5) * 8);
+                                    bestPos = Math.min(bestPos, sNorm.indexOf(p));
+                                    break;
+                                }
                             }
                         }
                     }
-                    // Substring
-                    if (bestScore === 0) {
+
+                    if (score === 0) {
                         const idx = sNorm.indexOf(qNorm);
                         if (idx !== -1) {
-                            bestScore = Math.max(40, 60 - Math.min(40, idx));
+                            score = Math.max(40, 100 - idx);
                             bestPos = idx;
-                            bestTipo = 'substring';
+                        }
+                    }
+
+                    if (score === 0 && fuzzyMax > 0) {
+                        let melhorDist = Infinity;
+                        for (let i = 0; i < palavras.length; i++) {
+                            const p = palavras[i];
+                            if (Math.abs(p.length - qNorm.length) > fuzzyMax) continue;
+                            const dist = levenshtein(qNorm, p);
+                            if (dist < melhorDist) melhorDist = dist;
+                        }
+                        if (melhorDist <= fuzzyMax) {
+                            score = Math.max(20, 70 - melhorDist * 15);
+                            bestPos = sNorm.indexOf(palavras[0]) === -1 ? 0 : 0;
                         }
                     }
                 }
 
-                if (bestScore > 0) {
-                    // small preference for shorter labels and for suggestions where the first word equals the query
-                    const firstWord = normalizarTexto(String(s).split(/\s+/)[0] || '');
-                    if (firstWord === qNorm) bestScore += 8;
-                    bestScore += Math.max(0, 6 - String(s).length / 8);
+                if (score > 0) {
+                    if (palavras[0] === qNorm) score += 10;
+                    score += Math.max(0, 6 - s.length / 12);
 
-                    scored.push({ s, score: bestScore, pos: bestPos, len: String(s).length, tipo: bestTipo });
+                    scored.push({ s, score, pos: bestPos, len: s.length });
                 }
             }
 
-            // ordenar por score desc, posição asc (earlier match), comprimento asc, texto
             scored.sort((a, b) => {
                 if (b.score !== a.score) return b.score - a.score;
                 if (a.pos !== b.pos) return a.pos - b.pos;
@@ -2563,7 +2666,6 @@
                 return a.s.localeCompare(b.s, 'pt-BR');
             });
 
-            // retornar strings únicas, permitir um pool maior (rolável) mas visualmente mostramos 4 — limitar pool a 12
             const out = [];
             for (const item of scored) {
                 if (out.indexOf(item.s) === -1) out.push(item.s);
@@ -2576,11 +2678,9 @@
             activeSuggestionIndex = -1;
             if (!sugestoesList) return;
 
-            // Se não houver itens, fechar o dropdown (requisição do usuário)
             if (!items || items.length === 0) {
                 fecharSugestoes();
 
-                // Atualização acessível: anunciar brevemente que não houve resultados
                 (function () {
                     let live = document.getElementById('sugestoes-live');
                     if (!live) {
@@ -2592,7 +2692,6 @@
                         document.body.appendChild(live);
                     }
                     live.textContent = query ? `Nenhuma sugestão encontrada para ${query}` : '';
-                    // limpar a mensagem após 2s para não poluir o DOM do leitor de tela
                     setTimeout(() => { live.textContent = ''; }, 2000);
                 })();
 
@@ -2601,14 +2700,13 @@
 
             sugestoesList.innerHTML = items.map((s, idx) => `
                 <li id="sug-${idx}" role="option" data-index="${idx}" class="sugestao-item" tabindex="-1" aria-selected="false">
-                    <span class="sug-text">${toTitleCase(s)}</span>
+                    <span class="sug-text">${escaparHtml(s)}</span>
                     <i class="ri-arrow-right-line sugestao-icon" aria-hidden="true"></i>
                 </li>
             `).join('');
             sugestoesList.hidden = false;
             buscaInput.setAttribute('aria-expanded', 'true');
 
-            // quando há mais resultados que a janela visível, avisar leitores de tela e expor dica de scroll
             const visibleCount = (window.matchMedia && window.matchMedia('(max-width:520px)').matches) ? 4 : 6;
             if (items.length > visibleCount) {
                 let hint = document.getElementById('sugestoes-scroll-hint');
@@ -2619,7 +2717,6 @@
                     hint.setAttribute('aria-hidden', 'false');
                     Object.assign(hint.style, { position: 'absolute', width: '1px', height: '1px', margin: '-1px', border: '0', padding: '0', overflow: 'hidden', clip: 'rect(0 0 0 0)' });
                     hint.textContent = text;
-                    // inserir como irmão do dropdown para manter o escopo visual separado
                     sugestoesList.parentElement && sugestoesList.parentElement.appendChild(hint);
                 } else {
                     hint.textContent = text;
@@ -2629,7 +2726,6 @@
                 sugestoesList.removeAttribute('aria-describedby');
             }
 
-            // correção para Chrome (mobile): reposicionar o dropdown como `fixed` quando necessário
             try { ajustarPosicaoSugestoes(); } catch (err) { /* silencioso */ }
         }
 
@@ -2648,9 +2744,7 @@
             buscaInput.value = valor;
             fecharSugestoes();
             buscaInput.focus();
-            // Realizar busca automaticamente ao selecionar sugestão
             realizarBusca(valor);
-            // disparar evento customizado (hook para lógica de busca existente)
             try { window.dispatchEvent(new CustomEvent('sugestao:selecionada', { detail: { query: valor } })); } catch (e) { console.log('sugestao selecionada', valor); }
         }
 
@@ -2675,12 +2769,10 @@
             buscaInput.addEventListener('input', (e) => {
                 const q = e.target.value;
 
-                // Se o usuário digitou menos de 2 caracteres, garantir que as sugestões desapareçam
                 if (q.trim().length < 2) {
                     clearTimeout(debounceTimer);
                     fecharSugestoes();
 
-                    // acessibilidade: informar que são necessários pelo menos 2 caracteres
                     (function () {
                         let live = document.getElementById('sugestoes-live');
                         if (!live) {
@@ -2724,7 +2816,6 @@
                         e.preventDefault();
                         selecionarSugestao(activeSuggestionIndex);
                     } else {
-                        // Se não houver sugestão selecionada, realizar busca com o texto atual
                         e.preventDefault();
                         realizarBusca();
                     }
@@ -2736,7 +2827,6 @@
                 }
             });
 
-            // Clique em sugestão
             sugestoesList && sugestoesList.addEventListener('click', (e) => {
                 const item = e.target.closest('.sugestao-item');
                 if (!item) return;
@@ -2744,36 +2834,25 @@
                 selecionarSugestao(idx);
             });
 
-            // Fechar quando clicar fora
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.caixa-de-pesquisa')) {
                     fecharSugestoes();
                 }
             });
 
-            // prefetch leve ao focar (UX rápido)
             buscaInput.addEventListener('focus', () => { carregarSugestoes().catch(() => { }); try { ajustarPosicaoSugestoes(); } catch (e) { } });
 
-            /*
-             * Ajusta posicionamento do dropdown de sugestões — workaround para glitches do Chrome
-             * - Em navegadores problemáticos (Chrome mobile) posiciona como fixed e recalcula
-             * - Em outros navegadores mantém comportamento CSS (absolute dentro do input)
-             */
             function ajustarPosicaoSugestoes() {
                 if (!sugestoesList) return;
-                // só agir quando o dropdown estiver visível
                 if (sugestoesList.hidden) return;
 
                 const isMobile = window.matchMedia && window.matchMedia('(max-width:520px)').matches;
                 const isChromeMobile = /Chrome\//.test(navigator.userAgent) && /Android|Mobile/.test(navigator.userAgent);
 
-                // Se estivermos em Chrome no mobile, usar fixed para escapar de clipping por ancestrais com transform/overflow
                 if (isMobile && isChromeMobile) {
                     const container = buscaInput.closest('.caixa-de-pesquisa') || buscaInput.parentElement;
                     const crect = container.getBoundingClientRect();
-
-                    /* horizontal offset usado pelo CSS quando o dropdown é absolute dentro do container */
-                    const horizOffset = 12; // deve coincidir com .sugestoes-list { left: 12px } in CSS
+                    const horizOffset = 12;
 
                     const left = Math.round(crect.left + horizOffset);
                     const width = Math.round(Math.max(120, crect.width - horizOffset * 2));
@@ -2790,7 +2869,6 @@
                     sugestoesList.style.WebkitOverflowScrolling = 'touch';
                     sugestoesList.setAttribute('data-fixed', 'true');
 
-                    // Vincular reposicionamento enquanto estiver aberto
                     if (!window._sug_pos_bound) {
                         window.addEventListener('resize', ajustarPosicaoSugestoes);
                         window.addEventListener('orientationchange', ajustarPosicaoSugestoes);
@@ -2800,7 +2878,6 @@
                     return;
                 }
 
-                // Reset para comportamento padrão (desktop / outros navegadores)
                 sugestoesList.style.position = '';
                 sugestoesList.style.left = '';
                 sugestoesList.style.top = '';
@@ -3662,7 +3739,7 @@
             
                 <div class="footer-container">
                     <div class="footer-section">
-                        <h3> Dona Flor - moda feminina</h3>
+                        <h3> jovic - moda masculina</h3>
                         <p>Qualidade, estilo e preço justo para você.</p>
                         <div class="footer-social">
                             <a href="https://instagram.com" target="_blank" title="Instagram"><i class="ri-instagram-line"></i></a>
@@ -3672,7 +3749,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2026 Dona Flor - Moda Feminina <br> Todos os direitos reservados. | Desenvolvido com <i class="ri-heart-fill" style="color: #e22a8c;"></i> para você.</p>
+                    <p>&copy; 2026 JOVIC - Moda Masculina <br> Todos os direitos reservados. | Desenvolvido com <i class="ri-heart-fill" style="color: blue;"></i> para você.</p>
                 </div>
             `;
 

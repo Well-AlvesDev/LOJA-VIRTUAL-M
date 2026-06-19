@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo</title>
+    <link rel="icon" type="image/svg" href="./recursos/identidade/logo.svg">
+    <link rel="shortcut icon" href="./recursos/identidade/logo.svg">
+    <link rel="apple-touch-icon" href="./recursos/identidade/logo.svg">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
@@ -256,7 +259,7 @@
 
         /* ── WELCOME CARD ── */
         .welcome-card {
-            background: linear-gradient(135deg, rgb(184, 106, 119) 0%, #b33e7f90 60%, #ffa2ce8e 100%);
+            background: linear-gradient(135deg, rgb(106, 131, 184) 0%, #3e63b390 60%, #4a5ce08e 100%);
             border-radius: var(--radius);
             padding: 28px 28px 24px;
             color: white;
@@ -979,6 +982,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+            user-select: none;
+        }
+
+        .image-item:active {
+            cursor: grabbing;
+        }
+
+        .image-item.dragging {
+            opacity: 0.7;
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(29, 99, 211, 0.3);
+            z-index: 100;
+        }
+
+        .image-item.drag-over {
+            border-color: var(--modal-accent);
+            background: var(--modal-accent-light);
         }
 
         .image-item img {
@@ -986,6 +1008,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            pointer-events: none;
         }
 
         .carousel-nav {
@@ -1420,6 +1443,39 @@
             margin: 18px 0 10px;
             padding-bottom: 6px;
             border-bottom: 1px solid var(--modal-border);
+        }
+
+        /* ===== Model Badge Quantity Input ===== */
+        .model-badge input[type="number"] {
+            background: white;
+            color: var(--modal-text);
+            font-weight: 600;
+            border: 1px solid var(--modal-border) !important;
+            border-radius: 4px;
+            padding: 2px 4px !important;
+            height: 24px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .model-badge input[type="number"]:focus {
+            border-color: var(--modal-accent) !important;
+            box-shadow: 0 0 0 2px rgba(29, 99, 211, 0.15) !important;
+            outline: none;
+        }
+
+        /* Remove spinner do número em navegadores Chrome/Safari */
+        .model-badge input[type="number"]::-webkit-outer-spin-button,
+        .model-badge input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Remove spinner do número em Firefox */
+        .model-badge input[type="number"] {
+            -moz-appearance: textfield;
         }
 
         /* ===== success message ===== */
@@ -2400,14 +2456,14 @@
 
         <!-- SITE HEADER -->
         <div class="site-header">
-            <img src="./recursos/identidade/file_00000000311c71fbb1e601ef4eaa248d (1).webp" class="site-header-logo"
+            <img src="./recursos/identidade/Screenshot_20260616_191620_Instagram.jpg" class="site-header-logo"
                 alt="Dona Flor" onerror="this.style.display='none'">
             <div class="site-header-info">
                 <div class="site-header-label">Gerenciando loja</div>
-                <div class="site-header-name">Dona Flor</div>
+                <div class="site-header-name">JOVIC</div>
                 <div class="site-header-url">
                     <a href="index.html" target="_blank">
-                        <i class="ri-external-link-line"></i>dona-flor.com.br
+                        <i class="ri-external-link-line"></i>usejovic.com.br
                     </a>
                 </div>
             </div>
@@ -2436,13 +2492,13 @@
 
             <form id="publishForm">
                 <div class="modal-body">
-                    <p class="form-section-title">Imagens (Máximo 5)</p>
+                    <p class="form-section-title">Imagens (Máximo 9)</p>
                     <div class="form-group">
                         <div class="file-upload-zone" id="publishDropZone">
                             <input type="file" id="productImagesInput" accept="image/*" multiple>
                             <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
                             <div class="file-upload-text"><strong>Arraste ou clique para adicionar
-                                    imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 5 imagens —
+                                    imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 9 imagens —
                                     JPG, PNG, WEBP</span></div>
                         </div>
 
@@ -2667,13 +2723,13 @@
 
             <form id="editProductForm">
                 <div class="modal-body">
-                    <p class="form-section-title">Imagens (Máximo 5)</p>
+                    <p class="form-section-title">Imagens (Máximo 9)</p>
                     <div class="form-group">
                         <div class="file-upload-zone" id="editDropZone">
                             <input type="file" id="editProductImagesInput" accept="image/*" multiple>
                             <div class="file-upload-icon"><i class="ri-image-add-line"></i></div>
                             <div class="file-upload-text"><strong>Arraste ou clique para adicionar
-                                    imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 5 imagens —
+                                    imagens</strong><br><span style="font-size:0.75rem;opacity:0.7;">Até 9 imagens —
                                     JPG, PNG, WEBP</span></div>
                         </div>
 
@@ -2791,6 +2847,16 @@
         const carouselNext = document.getElementById('carouselNext');
 
         let selectedImages = []; // array of { file, dataUrl }
+
+        // Drag-and-drop state para carousel de publicação
+        let dragStatePublish = {
+            isDragging: false,
+            startX: 0,
+            startIndex: -1,
+            currentOffsetX: 0,
+            dragThreshold: 30
+        };
+
         // Modelos (variáveis do DOM e estado)
         const modelInput = document.getElementById('modelInput');
         const addModelBtn = document.getElementById('addModelBtn');
@@ -3007,7 +3073,7 @@
             const files = Array.from(fileList);
             for (const file of files) {
                 if (!file.type || !file.type.startsWith('image/')) continue;
-                if (selectedImages.length >= 5) break;
+                if (selectedImages.length >= 9) break;
                 const dataUrl = await readFileAsDataURL(file);
                 selectedImages.push({ file, dataUrl });
                 renderImagesCarousel();
@@ -3052,6 +3118,9 @@
                 if (carouselPrev) carouselPrev.style.display = 'flex';
                 if (carouselNext) carouselNext.style.display = 'flex';
             }
+
+            // Inicializar drag-and-drop
+            initializeDragAndDropPublish();
         }
 
         function scrollCarousel(direction) {
@@ -3060,6 +3129,128 @@
             const gap = 8;
             const step = (item ? item.offsetWidth : 130) + gap;
             imagesTrack.scrollBy({ left: direction * step, behavior: 'smooth' });
+        }
+
+        // ===== Drag-and-drop para carousel de publicação =====
+        function initializeDragAndDropPublish() {
+            if (!imagesTrack) return;
+            const items = imagesTrack.querySelectorAll('.image-item');
+
+            items.forEach((item, index) => {
+                item.addEventListener('mousedown', (e) => {
+                    dragStatePublish.isDragging = true;
+                    dragStatePublish.startX = e.clientX;
+                    dragStatePublish.startIndex = index;
+                    dragStatePublish.currentOffsetX = 0;
+                    item.classList.add('dragging');
+                });
+            });
+        }
+
+        function handleDragMovePublish(e) {
+            if (!dragStatePublish.isDragging) return;
+            const moveX = e.clientX - dragStatePublish.startX;
+            dragStatePublish.currentOffsetX = moveX;
+
+            const draggedItem = imagesTrack?.children[dragStatePublish.startIndex];
+            if (draggedItem) {
+                draggedItem.style.transform = `translateX(${moveX}px) scale(1.05)`;
+            }
+        }
+
+        function handleDragEndPublish(e) {
+            if (!dragStatePublish.isDragging) return;
+            dragStatePublish.isDragging = false;
+
+            const draggedItem = imagesTrack?.children[dragStatePublish.startIndex];
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+                draggedItem.style.transform = '';
+            }
+
+            // Reordenar para posição mais próxima baseado no movimento
+            if (selectedImages.length > 1) {
+                const startIndex = dragStatePublish.startIndex;
+                const moveX = dragStatePublish.currentOffsetX;
+                const itemSize = 120 + 8; // width + gap
+
+                // Calcular quantas posições foram movidas
+                let newIndex = startIndex + Math.round(moveX / itemSize);
+
+                if (newIndex !== startIndex) {
+                    // Remover do índice original
+                    const [removed] = selectedImages.splice(startIndex, 1);
+                    // Clampar ao novo tamanho do array (após remoção)
+                    newIndex = Math.max(0, Math.min(selectedImages.length, newIndex));
+                    // Inserir na nova posição
+                    selectedImages.splice(newIndex, 0, removed);
+                    renderImagesCarousel();
+                }
+            }
+
+            dragStatePublish.startIndex = -1;
+            dragStatePublish.currentOffsetX = 0;
+        }
+
+        // ===== Drag-and-drop para carousel de edição =====
+        function initializeDragAndDropEdit() {
+            if (!editImagesTrack) return;
+            const items = editImagesTrack.querySelectorAll('.image-item');
+
+            items.forEach((item, index) => {
+                item.addEventListener('mousedown', (e) => {
+                    dragStateEdit.isDragging = true;
+                    dragStateEdit.startX = e.clientX;
+                    dragStateEdit.startIndex = index;
+                    dragStateEdit.currentOffsetX = 0;
+                    item.classList.add('dragging');
+                });
+            });
+        }
+
+        function handleDragMoveEdit(e) {
+            if (!dragStateEdit.isDragging) return;
+            const moveX = e.clientX - dragStateEdit.startX;
+            dragStateEdit.currentOffsetX = moveX;
+
+            const draggedItem = editImagesTrack?.children[dragStateEdit.startIndex];
+            if (draggedItem) {
+                draggedItem.style.transform = `translateX(${moveX}px) scale(1.05)`;
+            }
+        }
+
+        function handleDragEndEdit(e) {
+            if (!dragStateEdit.isDragging) return;
+            dragStateEdit.isDragging = false;
+
+            const draggedItem = editImagesTrack?.children[dragStateEdit.startIndex];
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+                draggedItem.style.transform = '';
+            }
+
+            // Reordenar para posição mais próxima baseado no movimento
+            if (editSelectedImages.length > 1) {
+                const startIndex = dragStateEdit.startIndex;
+                const moveX = dragStateEdit.currentOffsetX;
+                const itemSize = 120 + 8; // width + gap
+
+                // Calcular quantas posições foram movidas
+                let newIndex = startIndex + Math.round(moveX / itemSize);
+
+                if (newIndex !== startIndex) {
+                    // Remover do índice original
+                    const [removed] = editSelectedImages.splice(startIndex, 1);
+                    // Clampar ao novo tamanho do array (após remoção)
+                    newIndex = Math.max(0, Math.min(editSelectedImages.length, newIndex));
+                    // Inserir na nova posição
+                    editSelectedImages.splice(newIndex, 0, removed);
+                    renderEditImagesCarousel();
+                }
+            }
+
+            dragStateEdit.startIndex = -1;
+            dragStateEdit.currentOffsetX = 0;
         }
 
         // ===== Modelos helpers =====
@@ -3073,11 +3264,11 @@
                 return;
             }
             // evitar duplicatas (case-insensitive)
-            if (selectedModels.some(m => m.toLowerCase() === val.toLowerCase())) {
+            if (selectedModels.some(m => m.name.toLowerCase() === val.toLowerCase())) {
                 modelInput.value = '';
                 return;
             }
-            selectedModels.push(val);
+            selectedModels.push({ name: val, qty: 1 });
             renderModelBadges();
             modelInput.value = '';
             modelInput.focus();
@@ -3086,25 +3277,39 @@
         function renderModelBadges() {
             if (!modelsContainer) return;
             modelsContainer.innerHTML = '';
-            selectedModels.forEach((m, idx) => {
+            selectedModels.forEach((modelObj, idx) => {
                 const badge = document.createElement('div');
                 badge.className = 'model-badge';
-                badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:var(--modal-surface);border:1px solid var(--modal-border);font-weight:600;color:var(--modal-text);';
+                badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--modal-surface);border:1px solid var(--modal-border);font-weight:600;color:var(--modal-text);';
+
+                // Input de quantidade
+                const qtyInput = document.createElement('input');
+                qtyInput.type = 'number';
+                qtyInput.min = '1';
+                qtyInput.max = '999';
+                qtyInput.value = modelObj.qty;
+                qtyInput.style.cssText = 'width:40px;height:24px;padding:2px 4px;border:1px solid var(--modal-border);border-radius:4px;text-align:center;font-size:0.8rem;font-family:inherit;';
+                qtyInput.addEventListener('change', (e) => {
+                    const newQty = parseInt(e.target.value) || 1;
+                    modelObj.qty = Math.max(1, Math.min(999, newQty));
+                    e.target.value = modelObj.qty;
+                });
 
                 const text = document.createElement('span');
-                text.textContent = m;
+                text.textContent = modelObj.name;
                 text.style.whiteSpace = 'nowrap';
 
                 const removeBtn = document.createElement('button');
                 removeBtn.type = 'button';
                 removeBtn.className = 'remove-model';
-                removeBtn.style.cssText = 'background:transparent;border:none;color:var(--modal-muted);cursor:pointer;font-weight:700;padding:0 6px;margin-left:4px;';
+                removeBtn.style.cssText = 'background:transparent;border:none;color:var(--modal-muted);cursor:pointer;font-weight:700;padding:0 4px;margin-left:2px;';
                 removeBtn.innerHTML = '&times;';
                 removeBtn.addEventListener('click', () => {
                     selectedModels.splice(idx, 1);
                     renderModelBadges();
                 });
 
+                badge.appendChild(qtyInput);
                 badge.appendChild(text);
                 badge.appendChild(removeBtn);
                 modelsContainer.appendChild(badge);
@@ -3146,7 +3351,7 @@
         if (carouselPrev) carouselPrev.addEventListener('click', () => scrollCarousel(-1));
         if (carouselNext) carouselNext.addEventListener('click', () => scrollCarousel(1));
 
-        // Função para formatar preço com centavos
+        // Função para formatar preço com centavos (BRL)
         function formatPriceInput(inputElement) {
             let value = inputElement.value.replace(/\D/g, ''); // Remove tudo que não é dígito
 
@@ -3155,17 +3360,22 @@
                 return;
             }
 
-            // Adiciona zeros à esquerda se necessário
-            value = value.padStart(3, '0');
+            // Estratégia inteligente: interpretar baseado no comprimento
+            // 1-2 dígitos: considerar como reais inteiros (ex: "50" → "50,00")
+            // 3+ dígitos: últimos 2 como centavos (ex: "5050" → "50,50")
+            let formattedValue;
 
-            // Formata como X,YZ (últimos 2 dígitos são centavos)
-            let integerPart = value.slice(0, -2);
-            const decimalPart = value.slice(-2);
+            if (value.length <= 2) {
+                // Pouco dígitos: tratar como reais inteiros
+                formattedValue = value + ',00';
+            } else {
+                // Muitos dígitos: últimos 2 são centavos
+                const integerPart = value.slice(0, -2).replace(/^0+/, '') || '0';
+                const decimalPart = value.slice(-2);
+                formattedValue = integerPart + ',' + decimalPart;
+            }
 
-            // Remove zeros à esquerda do integerPart
-            integerPart = integerPart.replace(/^0+/, '') || '0';
-
-            inputElement.value = integerPart + ',' + decimalPart;
+            inputElement.value = formattedValue;
         }
 
         // Evento de formatação para campo de preço na publicação
@@ -3315,6 +3525,42 @@
                 }
             });
         }
+
+        // Função para validar título - não permite espaços no início nem emojis
+        function validateTitleInput(inputElement) {
+            let value = inputElement.value;
+
+            // Se vazio, deixa como está
+            if (value === '') return;
+
+            // Remove espaços no início
+            let cleaned = value.replace(/^\s+/, '');
+
+            // Remove emojis de qualquer posição
+            cleaned = cleaned.replace(/[\p{Emoji}\p{Emoji_Presentation}]/gu, '');
+
+            // Se houve alteração, atualiza o valor
+            if (value !== cleaned) {
+                inputElement.value = cleaned;
+            }
+        }
+
+        // Event listeners para validar título na publicação
+        const productTitleInput = document.getElementById('productTitle');
+        if (productTitleInput) {
+            productTitleInput.addEventListener('input', function () {
+                validateTitleInput(this);
+            });
+        }
+
+        // Event listeners para validar título na edição
+        const editProductTitleInput = document.getElementById('editProductTitle');
+        if (editProductTitleInput) {
+            editProductTitleInput.addEventListener('input', function () {
+                validateTitleInput(this);
+            });
+        }
+
         closeModalBtn.addEventListener('click', closePublishModal);
         cancelBtn.addEventListener('click', closePublishModal);
 
@@ -3364,6 +3610,11 @@
                 isValid = false;
             }
 
+            if (selectedModels.length === 0) {
+                document.getElementById('modelError').style.display = 'block';
+                isValid = false;
+            }
+
             if (isNaN(installments) || installments < 0 || installments > 24) {
                 document.getElementById('installmentsError').style.display = 'block';
                 isValid = false;
@@ -3406,13 +3657,13 @@
                     const imageUrlsString = imageUrls.join('\\:@\\');
                     const imageIdsString = imageIds.join('\\:@\\');
 
-                    // Preparar string de modelos: ordenar, maiúsculas e separar por vírgula
+                    // Preparar string de modelos com quantidades: ordenar, maiúsculas e separar por vírgula
                     let modelsString = 'ÚNICO';
                     if (selectedModels && selectedModels.length > 0) {
                         modelsString = selectedModels
                             .slice()
-                            .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
-                            .map(s => s.toUpperCase())
+                            .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }))
+                            .map(m => m.name.toUpperCase() + '*' + m.qty)
                             .join(',');
                     }
 
@@ -3464,7 +3715,7 @@
                     <div class="welcome-greeting">Bem-vindo de volta</div>
                     <h2>${firstName} </h2>
                     <p>${currentUser.email}</p>
-                    <div class="welcome-card-icon"><img src="./recursos/identidade/1778169368015.png" alt="Icon" style="width: 150px"></div>
+                    <div class="welcome-card-icon"><img src="./recursos/identidade/Screenshot_20260616_191620_Instagram.jpg" alt="Icon" style="width: 150px; border-radius: 20%;"></div>
                 </div>
 
                 <div class="action-grid">
@@ -3548,6 +3799,15 @@
         let editSelectedImages = []; // array of { file, dataUrl } para imagens do editor
         let editSelectedModels = []; // array de strings para modelos do editor
         let currentEditingProductId = null; // rastrear qual produto está sendo editado
+
+        // Drag-and-drop state para carousel de edição
+        let dragStateEdit = {
+            isDragging: false,
+            startX: 0,
+            startIndex: -1,
+            currentOffsetX: 0,
+            dragThreshold: 30
+        };
 
         // Variáveis para paginação de produtos
         const PRODUCTS_PER_PAGE = 9;
@@ -3698,8 +3958,12 @@
             // Formatar preço
             const price = getProductPrice(prod) || '0';
             const editPriceInput = document.getElementById('editProductPrice');
-            editPriceInput.value = String(price).replace('.', ',');
-            formatPriceInput(editPriceInput);
+            // Formatar corretamente para BRL: se vier "110", exibir "110,00"
+            let priceStr = String(price).replace('.', ',');
+            if (!priceStr.includes(',')) {
+                priceStr = priceStr + ',00';
+            }
+            editPriceInput.value = priceStr;
 
             document.getElementById('editProductDescription').value = prod.DESCRIPTION || prod.description || '';
 
@@ -3737,12 +4001,17 @@
             }
             renderEditImagesCarousel();
 
-            // Carregar modelos existentes
+            // Carregar modelos existentes com quantidades
             const productModel = prod.product_model || '';
             editSelectedModels = [];
             if (productModel && productModel !== 'ÚNICO') {
                 const models = productModel.split(',').map(m => m.trim()).filter(Boolean);
-                editSelectedModels = models.map(m => m.charAt(0).toUpperCase() + m.slice(1).toLowerCase());
+                editSelectedModels = models.map(m => {
+                    const parts = m.split('*');
+                    const name = parts[0] || m;
+                    const qty = parseInt(parts[1]) || 1;
+                    return { name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(), qty };
+                });
             }
             renderEditModelBadges();
 
@@ -3788,30 +4057,47 @@
                 if (editCarouselPrev) editCarouselPrev.style.display = 'flex';
                 if (editCarouselNext) editCarouselNext.style.display = 'flex';
             }
+
+            // Inicializar drag-and-drop
+            initializeDragAndDropEdit();
         }
 
         function renderEditModelBadges() {
             if (!editModelsContainer) return;
             editModelsContainer.innerHTML = '';
-            editSelectedModels.forEach((m, idx) => {
+            editSelectedModels.forEach((modelObj, idx) => {
                 const badge = document.createElement('div');
                 badge.className = 'model-badge';
-                badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:var(--modal-surface);border:1px solid var(--modal-border);font-weight:600;color:var(--modal-text);';
+                badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--modal-surface);border:1px solid var(--modal-border);font-weight:600;color:var(--modal-text);';
+
+                // Input de quantidade
+                const qtyInput = document.createElement('input');
+                qtyInput.type = 'number';
+                qtyInput.min = '1';
+                qtyInput.max = '999';
+                qtyInput.value = modelObj.qty;
+                qtyInput.style.cssText = 'width:40px;height:24px;padding:2px 4px;border:1px solid var(--modal-border);border-radius:4px;text-align:center;font-size:0.8rem;font-family:inherit;';
+                qtyInput.addEventListener('change', (e) => {
+                    const newQty = parseInt(e.target.value) || 1;
+                    modelObj.qty = Math.max(1, Math.min(999, newQty));
+                    e.target.value = modelObj.qty;
+                });
 
                 const text = document.createElement('span');
-                text.textContent = m;
+                text.textContent = modelObj.name;
                 text.style.whiteSpace = 'nowrap';
 
                 const removeBtn = document.createElement('button');
                 removeBtn.type = 'button';
                 removeBtn.className = 'remove-model';
-                removeBtn.style.cssText = 'background:transparent;border:none;color:var(--modal-muted);cursor:pointer;font-weight:700;padding:0 6px;margin-left:4px;';
+                removeBtn.style.cssText = 'background:transparent;border:none;color:var(--modal-muted);cursor:pointer;font-weight:700;padding:0 4px;margin-left:2px;';
                 removeBtn.innerHTML = '&times;';
                 removeBtn.addEventListener('click', () => {
                     editSelectedModels.splice(idx, 1);
                     renderEditModelBadges();
                 });
 
+                badge.appendChild(qtyInput);
                 badge.appendChild(text);
                 badge.appendChild(removeBtn);
                 editModelsContainer.appendChild(badge);
@@ -3827,11 +4113,11 @@
                 if (errEl) errEl.style.display = 'block';
                 return;
             }
-            if (editSelectedModels.some(m => m.toLowerCase() === val.toLowerCase())) {
+            if (editSelectedModels.some(m => m.name.toLowerCase() === val.toLowerCase())) {
                 editModelInput.value = '';
                 return;
             }
-            editSelectedModels.push(val);
+            editSelectedModels.push({ name: val, qty: 1 });
             renderEditModelBadges();
             editModelInput.value = '';
             editModelInput.focus();
@@ -3850,7 +4136,7 @@
             const files = Array.from(fileList);
             for (const file of files) {
                 if (!file.type || !file.type.startsWith('image/')) continue;
-                if (editSelectedImages.length >= 5) break;
+                if (editSelectedImages.length >= 9) break;
                 const dataUrl = await readFileAsDataURL(file);
                 editSelectedImages.push({ file, dataUrl });
                 renderEditImagesCarousel();
@@ -3915,6 +4201,23 @@
             const interestFreeInstallments = document.getElementById('editInterestFreeInstallments').value || '0';
             const availability = document.getElementById('editProductAvailability').checked;
 
+            // Validar campos obrigatórios
+            if (!title) {
+                alert('Por favor, informe o nome do produto.');
+                return;
+            }
+
+            if (isNaN(price) || price < 1) {
+                alert('Por favor, informe um preço válido.');
+                return;
+            }
+
+            if (editSelectedModels.length === 0) {
+                document.getElementById('editModelError').style.display = 'block';
+                alert('Por favor, adicione pelo menos 1 modelo ao produto.');
+                return;
+            }
+
             try {
                 const submitBtn = editProductForm.querySelector('.btn-submit');
                 const originalText = submitBtn.textContent;
@@ -3951,13 +4254,13 @@
 
                 submitBtn.textContent = '⏳ Salvando...';
 
-                // Preparar string de modelos
+                // Preparar string de modelos com quantidades
                 let modelsString = 'ÚNICO';
                 if (editSelectedModels && editSelectedModels.length > 0) {
                     modelsString = editSelectedModels
                         .slice()
-                        .sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
-                        .map(s => s.toUpperCase())
+                        .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }))
+                        .map(m => m.name.toUpperCase() + '*' + m.qty)
                         .join(',');
                 }
 
@@ -4751,6 +5054,17 @@
             if (event === 'SIGNED_OUT') {
                 redirectToLogin();
             }
+        });
+
+        // ===== Event listeners globais para drag-and-drop =====
+        document.addEventListener('mousemove', (e) => {
+            if (dragStatePublish.isDragging) handleDragMovePublish(e);
+            if (dragStateEdit.isDragging) handleDragMoveEdit(e);
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (dragStatePublish.isDragging) handleDragEndPublish(e);
+            if (dragStateEdit.isDragging) handleDragEndEdit(e);
         });
 
         // Verificar autenticação ao carregar a página
