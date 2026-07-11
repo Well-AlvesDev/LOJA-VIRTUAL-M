@@ -3371,7 +3371,7 @@
                     }
 
                     // Suporte a múltiplas imagens: campo `IMAGE-URL` pode conter várias URLs
-                    // separadas por "\\:@\\" (formato informado). Também suportar alguns delimitadores
+                    // separadas por "/@:/" (formato informado). Também suportar alguns delimitadores
                     // alternativos como '|' e ';' por robustez.
                     const imagemRaw = item['IMAGE-URL'] || '';
                     let imagens = [];
@@ -3379,8 +3379,8 @@
                         const raw = String(imagemRaw).trim();
                         if (!raw) {
                             imagens = [];
-                        } else if (raw.indexOf('\\:@\\') !== -1) {
-                            imagens = raw.split('\\:@\\').map(s => s.trim()).filter(Boolean);
+                        } else if (raw.indexOf('/@:/') !== -1) {
+                            imagens = raw.split('/@:/').map(s => s.trim()).filter(Boolean);
                         } else if (raw.indexOf('|') !== -1) {
                             imagens = raw.split('|').map(s => s.trim()).filter(Boolean);
                         } else if (raw.indexOf(';') !== -1) {

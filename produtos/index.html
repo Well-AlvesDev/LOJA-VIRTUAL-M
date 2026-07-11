@@ -1346,8 +1346,8 @@
                     const raw = String(imagemRaw).trim();
                     if (!raw) {
                         imagens = [];
-                    } else if (raw.indexOf('\\:@\\') !== -1) {
-                        imagens = raw.split('\\:@\\').map(s => s.trim()).filter(Boolean);
+                    } else if (raw.indexOf('/@:/') !== -1) {
+                        imagens = raw.split('/@:/').map(s => s.trim()).filter(Boolean);
                     } else if (raw.indexOf('|') !== -1) {
                         imagens = raw.split('|').map(s => s.trim()).filter(Boolean);
                     } else if (raw.indexOf(';') !== -1) {

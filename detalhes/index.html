@@ -2034,16 +2034,16 @@
                 }
             }
 
-            // Se o campo contiver múltiplas URLs separadas por "\\:@\\", retornar a primeira
-            if (imagemUrl && imagemUrl.includes('\\:@\\')) {
-                const partes = imagemUrl.split('\\:@\\').map(s => s.trim()).filter(Boolean);
+            // Se o campo contiver múltiplas URLs separadas por "/@:/", retornar a primeira
+            if (imagemUrl && imagemUrl.includes('/@:/')) {
+                const partes = imagemUrl.split('/@:/').map(s => s.trim()).filter(Boolean);
                 if (partes.length > 0) return partes[0];
             }
 
             return imagemUrl;
         }
 
-        // Retorna todas as URLs encontradas (separador literal "\\:@\\")
+        // Retorna todas as URLs encontradas (separador literal "/@:/")
         function extrairUrlsImagens(item) {
             let raw = item['IMAGEM-URL'] || item['Imagem-URL'] || item['IMAGEM_URL'] ||
                 item['imagem-url'] || item['imagem'] || item['IMAGEM'] || item['url-imagem'] ||
@@ -2062,7 +2062,7 @@
 
             if (!raw) return [];
 
-            const parts = raw.split('\\:@\\').map(p => p.trim()).filter(Boolean);
+            const parts = raw.split('/@:/').map(p => p.trim()).filter(Boolean);
             // Se não houver separador, retornar a própria string como único item
             return parts.length > 0 ? parts : [raw.trim()].filter(Boolean);
         }

@@ -3654,8 +3654,8 @@
                 }
 
                 if (imageUrls.length > 0) {
-                    const imageUrlsString = imageUrls.join('\\:@\\');
-                    const imageIdsString = imageIds.join('\\:@\\');
+                    const imageUrlsString = imageUrls.join('/@:/');
+                    const imageIdsString = imageIds.join('/@:/');
 
                     // Preparar string de modelos com quantidades: ordenar, maiúsculas e separar por vírgula
                     let modelsString = 'ÚNICO';
@@ -4276,8 +4276,8 @@
 
                 // Atualizar imagens se houver novas
                 if (allImageUrls.length > 0) {
-                    updateObj['IMAGE-URL'] = allImageUrls.join('\\:@\\');
-                    updateObj['IMAGE-ID'] = allImageIds.join('\\:@\\');
+                    updateObj['IMAGE-URL'] = allImageUrls.join('/@:/');
+                    updateObj['IMAGE-ID'] = allImageIds.join('/@:/');
                 }
 
                 const { error } = await supabase.from('j-box').update(updateObj).eq('ID', Number(id));
