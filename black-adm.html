@@ -3878,7 +3878,7 @@
         function getProductFirstImage(p) {
             const urlStr = p['IMAGE-URL'] || p['IMAGE_URL'] || p.imageUrl || '';
             if (!urlStr) return '';
-            const parts = urlStr.split(/\\:\@\\|:\@:/);
+            const parts = urlStr.split('/@:/').map(s => s.trim()).filter(Boolean);
             return parts[0] || urlStr;
         }
 
@@ -3992,7 +3992,7 @@
             const imageUrlStr = prod['IMAGE-URL'] || '';
             editSelectedImages = [];
             if (imageUrlStr) {
-                const urls = imageUrlStr.split(/\\:\@\\|:\@:/);
+                const urls = imageUrlStr.split('/@:/').map(s => s.trim()).filter(Boolean);
                 urls.forEach(url => {
                     if (url && url.trim()) {
                         editSelectedImages.push({ url: url.trim(), isExisting: true });
